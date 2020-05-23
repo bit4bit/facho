@@ -10,26 +10,8 @@ from datetime import datetime
 from .data import dian
 from . import fe
 
-class DataError(Exception):
-
-    def __init__(self, errors):
-        self._errors = errors
-
-        
-class DataValidator:
-
-    # valida y  retorna errores [(key, error)..]
-    def validate(self) -> []:
-        raise NotImplementedError()
-
-    def try_validate(self):
-        errors = self.validate()
-        if errors:
-            raise DataError(errors)
-    
-
 @dataclass
-class Party(DataValidator):
+class Party:
     name: str
     ident: str
     responsability_code: str
@@ -42,20 +24,6 @@ class Party(DataValidator):
     legal_company_ident: str = ''
     legal_address: str = ''
 
-    def validate(self):
-        errors = []
-        try:
-            dian.TipoResponsabilidad[self.responsability_code]
-        except KeyError:
-            errors.append(('responsability_code', 'not found'))
-
-        try:
-            dian.TipoOrganizacion[self.organization_code]
-        except KeyError:
-            errors.append(('organization_code', 'not found'))
-
-        
-        return errors
 
 
 @dataclass
@@ -117,7 +85,7 @@ class LegalMonetaryTotal:
     payable_amount: float = 0.0
 
 
-class Invoice(DataValidator):
+class Invoice:
     def __init__(self):
         self.invoice_period_start = None
         self.invoice_period_end = None
@@ -128,7 +96,6 @@ class Invoice(DataValidator):
         self.invoice_customer = None
         self.invoice_supplier = None
         self.invoice_lines = []
-        self.errors = []
         
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
@@ -149,14 +116,11 @@ class Invoice(DataValidator):
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
 
-    def validate(self):
-        errors_customer = [('customer.%s' % (field), err) for field, err in self.invoice_customer.validate()]
-        errors_supplier = [('supplier.%s' % (field), err) for field, err in self.invoice_customer.validate()]
-        self.errors = errors_customer + errors_supplier
-
-    def valid(self):
-        self.validate()
-        return not self.errors
+    def validate(self, validator):
+        validator.validate_customer(self.invoice_customer)
+        validator.validate_supplier(self.invoice_supplier)
+        for invline in self.invoice_lines:
+            validator.validate_invoice_line(self, invline)
 
     def _calculate_legal_monetary_total(self):
         for invline in self.invoice_lines:
@@ -173,6 +137,36 @@ class Invoice(DataValidator):
         for invline in self.invoice_lines:
             invline.calculate()
 
+
+class DianResolucion0001Validator:
+
+    def __init__(self):
+        self.errors = []
+
+    def _validate_party(self, party):
+        try:
+            dian.TipoResponsabilidad[party.responsability_code]
+        except KeyError:
+            self.errors.append(('responsability_code', 'not found'))
+
+        try:
+            dian.TipoOrganizacion[party.organization_code]
+        except KeyError:
+            self.errors.append(('organization_code', 'not found'))
+
+    def validate_customer(self, customer):
+        self._validate_party(customer)
+
+    def validate_supplier(self, supplier):
+        self._validate_party(supplier)
+
+    def validate_invoice_line(self, invoice, line):
+        pass
+
+    def valid(self):
+        return not self.errors
+
+    
 class DIANInvoiceXML(fe.FeXML):
 
     def __init__(self, invoice, TipoAmbiente = 'Pruebas'):
@@ -184,7 +178,6 @@ class DIANInvoiceXML(fe.FeXML):
         en caso de fallar validacion retorna None"""
         fexml = self
 
-        invoice.try_validate()
         invoice.calculate()
 
         cufe = self._generate_cufe(invoice, TipoAmbiente)

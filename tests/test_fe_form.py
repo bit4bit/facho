@@ -52,7 +52,9 @@ def simple_invoice():
 
 
 def test_invoicesimple_build(simple_invoice):
-    assert simple_invoice.valid() == True
+    invoice_validator = form.DianResolucion0001Validator()
+    simple_invoice.validate(invoice_validator)
+    assert invoice_validator.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
 
     supplier_name = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyName/cbc:Name')
@@ -69,14 +71,18 @@ def test_invoicesimple_build(simple_invoice):
 
 
 def test_invoicesimple_build_with_cufe(simple_invoice):
-    assert simple_invoice.valid() == True
+    invoice_validator = form.DianResolucion0001Validator()
+    simple_invoice.validate(invoice_validator)
+    assert invoice_validator.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
     cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
     assert cufe != ''
 
 
 def test_invoicesimple_xml_signed(simple_invoice):
-    assert simple_invoice.valid() == True
+    invoice_validator = form.DianResolucion0001Validator()
+    simple_invoice.validate(invoice_validator)
+    assert invoice_validator.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
