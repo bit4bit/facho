@@ -128,7 +128,8 @@ class Invoice(DataValidator):
         self.invoice_customer = None
         self.invoice_supplier = None
         self.invoice_lines = []
-
+        self.errors = []
+        
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
         self.invoice_period_end = enddate
@@ -151,7 +152,11 @@ class Invoice(DataValidator):
     def validate(self):
         errors_customer = [('customer.%s' % (field), err) for field, err in self.invoice_customer.validate()]
         errors_supplier = [('supplier.%s' % (field), err) for field, err in self.invoice_customer.validate()]
-        return errors_customer + errors_supplier
+        self.errors = errors_customer + errors_supplier
+
+    def valid(self):
+        self.validate()
+        return not self.errors
 
     def _calculate_legal_monetary_total(self):
         for invline in self.invoice_lines:

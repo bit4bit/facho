@@ -6,8 +6,10 @@ import xmlsig
 import xades
 from datetime import datetime
 import OpenSSL
-
+import zipfile
 import warnings
+import hashlib
+from contextlib import contextmanager
 
 NAMESPACES = {
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
@@ -124,3 +126,29 @@ class DianXMLExtensionSigner:
         return (dian_path, [signature])
         
 
+
+class DianZIP:
+    
+    # RESOLUCION 0001: pagina 540
+    MAX_FILES = 50
+    
+    def __init__(self, file_like):
+        self.zipfile = zipfile.ZipFile(file_like, mode='w')
+        self.num_files = 0
+
+    def add_invoice_xml(self, name, xml_data):
+        self.num_files += 1
+        # TODO cual es la norma para los nombres de archivos?
+        m = hashlib.sha256()
+        m.update(name.encode('utf-8'))
+        filename = m.hexdigest() + '.xml'
+        with self.zipfile.open(filename, 'w') as fp:
+            fp.write(xml_data.encode('utf-8'))
+
+        return filename
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        return self.zipfile.close()

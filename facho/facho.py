@@ -191,3 +191,6 @@ class FachoXML:
 
     def tostring(self):
         return self.builder.tostring(self.root)
+
+    def __str__(self):
+        return self.tostring()

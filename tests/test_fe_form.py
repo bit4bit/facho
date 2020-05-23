@@ -7,6 +7,8 @@
 
 import pytest
 from datetime import datetime
+import io
+import zipfile
 
 import facho.fe.form as form
 from facho import fe
@@ -50,7 +52,7 @@ def simple_invoice():
 
 
 def test_invoicesimple_build(simple_invoice):
-    assert simple_invoice.validate() == []
+    assert simple_invoice.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
 
     supplier_name = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyName/cbc:Name')
@@ -67,14 +69,14 @@ def test_invoicesimple_build(simple_invoice):
 
 
 def test_invoicesimple_build_with_cufe(simple_invoice):
-    assert simple_invoice.validate() == []
+    assert simple_invoice.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
     cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
     assert cufe != ''
 
 
 def test_invoicesimple_xml_signed(simple_invoice):
-    assert simple_invoice.validate() == []
+    assert simple_invoice.valid() == True
     xml = form.DIANInvoiceXML(simple_invoice)
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
@@ -84,3 +86,14 @@ def test_invoicesimple_xml_signed(simple_invoice):
 
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     assert elem.text is not None
+
+def test_invoicesimple_zip(simple_invoice):
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    
+    zipdata = io.BytesIO()
+    with fe.DianZIP(zipdata) as dianzip:
+        name_invoice = dianzip.add_invoice_xml(simple_invoice.invoice_ident, str(xml_invoice))
+
+    with zipfile.ZipFile(zipdata) as dianzip:
+        xml_data = dianzip.open(name_invoice).read().decode('utf-8')
+        assert xml_data == str(xml_invoice)
