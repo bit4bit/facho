@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIAN Genericode listas de valores:: Ultima modificación 18-02-2019 - evb-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+	<Identification>
+		<ShortName>MediosPago</ShortName>
+		<LongName xml:lang="es">Medios de Pago</LongName>
+		<Version>1</Version>
+		<CanonicalUri>urn:dian:names:especificacion:ubl:listacodigos:gc:MediosPago</CanonicalUri>
+		<CanonicalVersionUri>urn:dian:names:especificacion:ubl:listacodigos:gc:MediosPago-2.1</CanonicalVersionUri>
+		<LocationUri>http://dian.gov.co/ubl/os-ubl-2.0/cl/gc/default/MediosPago-2.1.gc</LocationUri>
+		<Agency>
+			<LongName xml:lang="es">DIAN (Dirección de Impuestos y Aduanas Nacionales)</LongName>
+			<Identifier>195</Identifier>
+		</Agency>
+	</Identification>
+	<ColumnSet>
+		<Column Id="code" Use="required">
+			<ShortName>Code</ShortName>
+			<LongName xml:lang="es">Codigo Comun</LongName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Column Id="name" Use="required">
+			<ShortName>Name</ShortName>
+			<LongName xml:lang="es">Nombre</LongName>
+			<Data Type="string"/>
+		</Column>
+		<Key Id="codeKey">
+			<ShortName>CodeKey</ShortName>
+			<ColumnRef Ref="code"/>
+		</Key>
+	</ColumnSet>
+	<SimpleCodeList>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>1</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Instrumento no definido</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>2</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito ACH</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>3</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito ACH</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>4</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Reversión débito de demanda ACH</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>5</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Reversión crédito de demanda ACH </SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>6</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito de demanda ACH</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>7</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito de demanda ACH</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>8</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Mantener</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>9</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Clearing Nacional o Regional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>10</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Efectivo</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>11</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Reversión Crédito Ahorro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>12</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Reversión Débito Ahorro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito Ahorro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>14</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito Ahorro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Bookentry Crédito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>16</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Bookentry Débito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>17</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración de la demanda en efectivo /Desembolso Crédito (CCD)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>18</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración de la demanda en efectivo / Desembolso (CCD) débito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>19</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito Pago negocio corporativo (CTP)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>20</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cheque</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>21</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Poyecto bancario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>22</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Proyecto bancario certificado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cheque bancario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>24</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota cambiaria esperando aceptación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>25</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cheque certificado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>26</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cheque Local</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>27</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito Pago Neogcio Corporativo (CTP)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>28</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito Negocio Intercambio Corporativo (CTX)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>29</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito Negocio Intercambio Corporativo (CTX)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>30</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transferecia Crédito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>31</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transferencia Débito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>32</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración Efectivo / Desembolso Crédito plus (CCD+)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>33</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración Efectivo / Desembolso Débito plus (CCD+)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>34</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pago y depósito pre acordado (PPD)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>35</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración efectivo ahorros / Desembolso Crédito (CCD)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>36</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración efectivo ahorros / Desembolso Drédito (CCD)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>37</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pago Negocio Corporativo Ahorros Crédito (CTP)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>38</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pago Neogcio Corporativo Ahorros Débito (CTP)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>39</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Crédito Negocio Intercambio Corporativo (CTX)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>40</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Débito Negocio Intercambio Corporativo (CTX)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>41</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración efectivo/Desembolso Crédito plus (CCD+) </SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>42</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Consiganción bancaria</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>43</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Concentración efectivo / Desembolso Débito plus (CCD+)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>44</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota cambiaria</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>45</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transferencia Crédito Bancario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>46</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transferencia Débito Interbancario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transferencia Débito Bancaria</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>48</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Tarjeta Crédito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>49</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Tarjeta Débito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>50</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Postgiro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>51</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Telex estándar bancario francés</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>52</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pago comercial urgente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>53</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pago Tesorería Urgente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>60</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>61</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada por el acreedor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>62</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada por el acreedor, avalada por el banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>63</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada por el acreedor, avalada por un tercero</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>64</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada pro el banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>65</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada por un banco avalada por otro banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>66</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada </SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>67</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota promisoria firmada por un tercero avalada por un banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>70</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de nota por el por el acreedor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>74</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de nota por el por el acreedor sobre un banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>75</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de nota por el acreedor, avalada por otro banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>76</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de nota por el acreedor, sobre un banco avalada por un tercero</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>77</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de una nota por el acreedor sobre un tercero</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>78</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retiro de una nota por el acreedor sobre un tercero avalada por un banco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>91</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota bancaria tranferible</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>92</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cheque local traferible</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>93</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Giro referenciado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>94</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Giro urgente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>95</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Giro formato abierto</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>96</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Método de pago solicitado no usuado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>97</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Clearing entre partners</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>ZZZ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Acuerdo mutuo</SimpleValue>
+			</Value>
+		</Row>
+	</SimpleCodeList>
+</gc:CodeList>

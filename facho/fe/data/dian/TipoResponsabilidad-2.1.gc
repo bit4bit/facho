@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIAN Genericode listas de valores:: Ultima modificación 18-02-2019 - evb-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+	<Identification>
+		<ShortName>TipoResponsabilidad</ShortName>
+		<LongName xml:lang="es">Responsabilidades fiscales; Régimen fiscal</LongName>
+		<Version>1</Version>
+		<CanonicalUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TipoResponsabilidad</CanonicalUri>
+		<CanonicalVersionUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TipoResponsabilidad-2.1</CanonicalVersionUri>
+		<LocationUri>http://dian.gov.co/ubl/os-ubl-2.0/cl/gc/default/TipoResponsabilidad-2.1.gc</LocationUri>
+		<Agency>
+			<LongName xml:lang="es">DIAN (Dirección de Impuestos y Aduanas Nacionales)</LongName>
+			<Identifier>195</Identifier>
+		</Agency>
+	</Identification>
+	<ColumnSet>
+		<Column Id="code" Use="required">
+			<ShortName>Code</ShortName>
+			<LongName xml:lang="es">Codigo Comun</LongName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Column Id="name" Use="required">
+			<ShortName>Name</ShortName>
+			<LongName xml:lang="es">Nombre</LongName>
+			<Data Type="string"/>
+		</Column>
+		<Key Id="codeKey">
+			<ShortName>CodeKey</ShortName>
+			<ColumnRef Ref="code"/>
+		</Key>
+	</ColumnSet>
+	<SimpleCodeList>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Gran contribuyente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Autorretenedor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente de retención IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Régimen simple de tributación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>ZZ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No aplica</SimpleValue>
+			</Value>
+		</Row>
+	</SimpleCodeList>
+</gc:CodeList>

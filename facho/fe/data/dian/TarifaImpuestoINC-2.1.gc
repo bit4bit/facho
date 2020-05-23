@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIAN Genericode listas de validacion :: Ultima modificación 18-02-2019 - evb-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+   <Identification>
+      <ShortName>TarifaImpuestoINC</ShortName>
+      <LongName xml:lang="es">Tarifas por Impuesto</LongName>
+      <Version>1</Version>
+      <CanonicalUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TarifaImpuestoINC</CanonicalUri>
+      <CanonicalVersionUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TarifaImpuestoINC-2.1</CanonicalVersionUri>
+      <LocationUri>http://dian.gov.co/ubl/os-ubl-2.0/cl/gc/default/TarifaImpuestoINC-2.1.gc</LocationUri>
+      <Agency>
+         <LongName xml:lang="es">DIAN (Dirección de Impuestos y Aduanas Nacionales)</LongName>
+         <Identifier>195</Identifier>
+      </Agency>
+   </Identification>
+   <ColumnSet>
+      <Column Id="code" Use="required">
+         <ShortName>Code</ShortName>
+         <LongName xml:lang="es">Codigo Comun</LongName>
+         <Data Type="normalizedString"/>
+      </Column>
+      <Column Id="name" Use="required">
+         <ShortName>Name</ShortName>
+         <LongName xml:lang="es">Nombre</LongName>
+         <Data Type="string"/>
+      </Column>
+      <Column Id="description" Use="required">
+         <ShortName>Description</ShortName>
+         <LongName xml:lang="es">Descripcion</LongName>
+         <Data Type="string"/>
+      </Column>
+      <Key Id="codeKey">
+         <ShortName>CodeKey</ShortName>
+         <ColumnRef Ref="code"/>
+      </Key>
+   </ColumnSet>
+   <SimpleCodeList>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>INC</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Tarifa especial</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>4.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>INC</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Tarifa especial</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>8.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>INC</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Tarifa general</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>16.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>INC</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Tarifa especial</SimpleValue>
+         </Value>
+      </Row>
+   </SimpleCodeList>
+</gc:CodeList>

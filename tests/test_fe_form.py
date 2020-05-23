@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of facho.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+
+"""Tests for `facho` package."""
+
+import pytest
+from datetime import datetime
+
+import facho.fe.form as form
+from facho import fe
+
+
+
+@pytest.fixture
+def simple_invoice():
+    inv = form.Invoice()
+    inv.set_period(datetime.now(), datetime.now())
+    inv.set_issue(datetime.now())
+    inv.set_ident('ABC123')
+    inv.set_supplier(form.Party(
+        name = 'facho-supplier',
+        ident = 123,
+        responsability_code = 'No aplica',
+        organization_code = 'Persona Natural'
+    ))
+    inv.set_customer(form.Party(
+        name = 'facho-customer',
+        ident = 321,
+        responsability_code = 'No aplica',
+        organization_code = 'Persona Natural'
+    ))
+    inv.add_invoice_line(form.InvoiceLine(
+        quantity = 1,
+        description = 'producto facho',
+        item_ident = 9999,
+        price_amount = 100.0,
+        tax = form.TaxTotal(
+            tax_amount = 0.0,
+            taxable_amount = 0.0,
+            subtotals = [
+                form.TaxSubTotal(
+                    percent = 19.0,
+                )
+            ]
+        )
+    ))
+    return inv
+
+
+def test_invoicesimple_build(simple_invoice):
+    assert simple_invoice.validate() == []
+    xml = form.DIANInvoiceXML(simple_invoice)
+
+    supplier_name = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyName/cbc:Name')
+    assert supplier_name == simple_invoice.invoice_supplier.name
+
+    supplier_identification_number = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyIdentification/cbc:ID')
+    assert int(supplier_identification_number) == simple_invoice.invoice_supplier.ident
+
+    customer_name = xml.get_element_text('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyName/cbc:Name')
+    assert customer_name == simple_invoice.invoice_customer.name
+
+    customer_identification_number = xml.get_element_text('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyIdentification/cbc:ID')
+    assert int(customer_identification_number) == simple_invoice.invoice_customer.ident
+
+
+def test_invoicesimple_build_with_cufe(simple_invoice):
+    assert simple_invoice.validate() == []
+    xml = form.DIANInvoiceXML(simple_invoice)
+    cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
+    assert cufe != ''
+
+
+def test_invoicesimple_xml_signed(simple_invoice):
+    assert simple_invoice.validate() == []
+    xml = form.DIANInvoiceXML(simple_invoice)
+
+    signer = fe.DianXMLExtensionSigner('./tests/example.p12')
+    xml.add_extension(signer)
+
+    xml.attach_extensions()
+
+    elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
+    assert elem.text is not None

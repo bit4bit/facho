@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIAN Genericode listas de valores:: Ultima modificación 18-02-2019 - evb-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+	<Identification>
+		<ShortName>TipoEntrega</ShortName>
+		<LongName xml:lang="es">Condiciones de Entrega</LongName>
+		<Version>1</Version>
+		<CanonicalUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TipoEntrega</CanonicalUri>
+		<CanonicalVersionUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TipoEntrega-2.1</CanonicalVersionUri>
+		<LocationUri>http://dian.gov.co/ubl/os-ubl-2.0/cl/gc/default/TipoEntrega-2.1.gc</LocationUri>
+		<Agency>
+			<LongName xml:lang="es">DIAN (Dirección de Impuestos y Aduanas Nacionales)</LongName>
+			<Identifier>195</Identifier>
+		</Agency>
+	</Identification>
+	<ColumnSet>
+		<Column Id="code" Use="required">
+			<ShortName>Code</ShortName>
+			<LongName xml:lang="es">Codigo Comun</LongName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Column Id="name" Use="required">
+			<ShortName>Name</ShortName>
+			<LongName xml:lang="es">Nombre</LongName>
+			<Data Type="string"/>
+		</Column>
+		<Key Id="codeKey">
+			<ShortName>CodeKey</ShortName>
+			<ColumnRef Ref="code"/>
+		</Key>
+	</ColumnSet>
+	<SimpleCodeList>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>CFR</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Costo y flete</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>CIF</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Costo, flete y seguro</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>CIP</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transporte y Seguro Pagados hasta</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>CPT</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transporte Pagado Hasta</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>DAP</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Entregado en un Lugar</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>DAT</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Entregado en Terminal</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>DDP</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Entregado con Pago de Derechos</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>EXW</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>En Fábrica</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>FAS</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Franco al costado del buque</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>FCA</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Franco transportista</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>FOB</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Franco a bordo</SimpleValue>
+			</Value>
+		</Row>
+	</SimpleCodeList>
+</gc:CodeList>
