@@ -35,3 +35,13 @@ def test_xmlsigned_with_passphrase_build():
     
     assert elem is not None
     #assert elem.findall('ds:SignedInfo', fe.NAMESPACES) is not None
+
+
+def test_dian_extension_software_security_code():
+    security_code = fe.DianXMLExtensionSoftwareSecurityCode('idsoftware', '1234', '1')
+    xml = fe.FeXML('Invoice',
+                   'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.add_extension(security_code)
+    xml.attach_extensions()
+    content = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode')
+    assert content is not None

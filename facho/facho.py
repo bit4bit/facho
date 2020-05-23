@@ -118,9 +118,12 @@ class FachoXML:
         # construir las extensiones o adicionar en caso de indicar
         for extension in self.extensions:
             xpath, elements = extension.build(self)
-            for new_element in elements:
-                elem = self.find_or_create_element('/'+ root_tag + xpath)
-                self.builder.append(elem, new_element)
+            if isinstance(elements, str):
+                elem = self.set_element('/'+ root_tag + xpath, elements)
+            else:
+                for new_element in elements:
+                    elem = self.find_or_create_element('/'+ root_tag + xpath)
+                    self.builder.append(elem, new_element)
 
     def fragment(self, xpath, append=False):
         parent = self.find_or_create_element(xpath, append=append)

@@ -76,7 +76,21 @@ class ConsultaResolucionesFacturacionPeticion(SOAPService):
     def build_response(self, as_dict):
         return ConsultaResolucionesFacturacionRespuesta.fromdict(as_dict)
 
+@dataclass
+class SendBillAsync:
+    fileName: str
+    contentFile: str
 
+    def get_wsdl(self):
+        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+
+    def get_service(self):
+        return 'SendBillAsync'
+
+    def build_response(self, as_dict):
+        return {}
+
+    
 class DianClient:
 
     def __init__(self, user, password):

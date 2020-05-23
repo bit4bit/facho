@@ -39,7 +39,23 @@ class FeXML(FachoXML):
         #self.find_or_create_element(self._cn)
 
 
-        
+
+class DianXMLExtensionSoftwareSecurityCode:
+    # RESOLUCION 0001: pagina 535
+    
+    def __init__(self, id_software: str, pin: str, invoice_ident: str):
+        self.id_software = id_software
+        self.pin = pin
+        self.invoice_ident = invoice_ident
+
+    def build(self, fachoxml):
+        dian_path = '/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode'
+        code = str(self.id_software) + str(self.pin) + str(self.invoice_ident)
+        m = hashlib.sha384()
+        m.update(code.encode('utf-8'))
+        return dian_path, m.hexdigest()
+
+    
 class DianXMLExtensionSigner:
     POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
     POLICY_NAME = 'Dian'
