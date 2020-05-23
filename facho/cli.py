@@ -41,9 +41,26 @@ def consultaResolucionesFacturacion(nit, nit_proveedor, id_software, username, p
     ))
     print(str(resp))
 
+    
+@click.command()
+@click.option('--private-key', required=True)
+@click.option('--public-key', required=True)
+@click.option('--password')
+@click.argument('filename', required=True)
+@click.argument('zipfile', type=click.Path(exists=True))
+def SendTestSetAsync(private_key, public_key, password, filename, zipfile):
+    from facho.fe.client import dian
+    
+    client = dian.DianSignatureClient(private_key, public_key, password=password)
+    resp = client.request(dian.SendTestSetAsync(
+        filename, zipfile.read().encode('utf-8')
+    ))
+    print(resp)
 
+    
 @click.group()
 def main():
     pass
 
 main.add_command(consultaResolucionesFacturacion)
+main.add_command(SendTestSetAsync)

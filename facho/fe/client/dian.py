@@ -2,7 +2,7 @@ from facho import facho
 
 import zeep
 from zeep.wsse.username import UsernameToken
-
+from zeep.wsse.signature import Signature
 
 import urllib.request
 from datetime import datetime
@@ -90,15 +90,26 @@ class SendBillAsync:
     def build_response(self, as_dict):
         return {}
 
-    
-class DianClient:
 
-    def __init__(self, user, password):
-        self._username = user
-        self._password = password
+@dataclass
+class SendTestSetAsync:
+    fileName: str
+    contentFile: str
+
+    def get_wsdl(self):
+        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+
+    def get_service(self):
+        return 'SendTestSetAsync'
+
+    def build_response(self, as_dict):
+        return {}
+
+
+class DianGateway:
 
     def _open(self, service):
-        return zeep.Client(service.get_wsdl(), wsse=UsernameToken(self._username, self._password))
+        raise NotImplementedError()
 
     def _remote_service(self, conn, service):
         return conn.service[service.get_service()]
@@ -117,5 +128,26 @@ class DianClient:
 
         return service.build_response(resp)
 
+
+class DianClient(DianGateway):
+
+    def __init__(self, user, password):
+        self._username = user
+        self._password = password
+
+    def _open(self, service):
+        return zeep.Client(service.get_wsdl(), wsse=UsernameToken(self._username, self._password))
+
+    
+class DianSignatureClient(DianGateway):
+
+    def __init__(self, private_key_path, public_key_path, password=None):
+        self.private_key_path = private_key_path
+        self.public_key_path = public_key_path
+        self.password = password
+
+    def _open(self, service):
+        return zeep.Client(service.get_wsdl(), wsse=Signature(
+            self.private_key_path, self.public_key_path, self.password))
     
 
