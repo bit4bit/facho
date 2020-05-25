@@ -1,7 +1,7 @@
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
 
-from ..facho import FachoXML
+from ..facho import FachoXML, FachoXMLExtension
 import xmlsig
 import xades
 from datetime import datetime
@@ -40,7 +40,7 @@ class FeXML(FachoXML):
 
 
 
-class DianXMLExtensionSoftwareSecurityCode:
+class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
     # RESOLUCION 0001: pagina 535
     
     def __init__(self, id_software: str, pin: str, invoice_ident: str):
@@ -56,7 +56,8 @@ class DianXMLExtensionSoftwareSecurityCode:
         return dian_path, m.hexdigest()
 
     
-class DianXMLExtensionSigner:
+class DianXMLExtensionSigner(FachoXMLExtension):
+    # RESOLUCION 0001: pagina 516
     POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
     POLICY_NAME = 'Dian'
     

@@ -45,6 +45,10 @@ setup(
     license="GNU General Public License v3",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
+    package_data = {
+        # If any package contains *.txt or *.rst files, include them:
+        '': ['*.gc']
+    },
     keywords='facho',
     name='facho',
     packages=find_packages(exclude=("tests",)),

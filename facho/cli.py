@@ -53,9 +53,43 @@ def SendTestSetAsync(private_key, public_key, password, filename, zipfile):
     
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     resp = client.request(dian.SendTestSetAsync(
-        filename, zipfile.read().encode('utf-8')
+        filename, open(zipfile, 'r').read().encode('utf-8')
     ))
     print(resp)
+
+
+@click.command()
+@click.option('--private-key', type=click.Path(exists=True))
+@click.option('--passphrase')
+@click.argument('scriptname', type=click.Path(exists=True), required=True)
+def generate_invoice(private_key, passphrase, scriptname):
+    """
+    imprime xml en pantalla.
+    SCRIPTNAME espera 
+     def invoice() -> form.Invoice
+     def extensions(form.Invoice): -> List[facho.FachoXMLExtension]
+    """
+    import importlib.util
+    
+    spec = importlib.util.spec_from_file_location('invoice', scriptname)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    import facho.fe.form as form
+    from facho import fe
+
+    invoice = module.invoice()
+    xml = form.DIANInvoiceXML(invoice)
+    
+    extensions = module.extensions(invoice)
+    for extension in extensions:
+        xml.add_extension(extension)
+
+    if private_key:
+        signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+        xml.add_extension(signer)
+        xml.attach_extensions()
+    print(str(xml))
 
     
 @click.group()
@@ -64,3 +98,4 @@ def main():
 
 main.add_command(consultaResolucionesFacturacion)
 main.add_command(SendTestSetAsync)
+main.add_command(generate_invoice)

@@ -6,6 +6,12 @@ from lxml.etree import Element, SubElement, tostring
 import re
 
 
+class FachoXMLExtension:
+
+    def build(self, fachoxml):
+        raise NotImplementedError
+
+    
 class LXMLBuilder:
     """
     extrae la manipulacion de XML
