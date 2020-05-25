@@ -79,6 +79,7 @@ def generate_invoice(private_key, passphrase, scriptname):
     from facho import fe
 
     invoice = module.invoice()
+    invoice.calculate()
     xml = form.DIANInvoiceXML(invoice)
     
     extensions = module.extensions(invoice)
