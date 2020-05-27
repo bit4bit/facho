@@ -14,6 +14,25 @@ import facho.fe.form as form
 from facho import fe
 
 
+@pytest.fixture
+def simple_invoice_without_lines():
+    inv = form.Invoice()
+    inv.set_period(datetime.now(), datetime.now())
+    inv.set_issue(datetime.now())
+    inv.set_ident('ABC123')
+    inv.set_supplier(form.Party(
+        name = 'facho-supplier',
+        ident = 123,
+        responsability_code = 'No aplica',
+        organization_code = 'Persona Natural'
+    ))
+    inv.set_customer(form.Party(
+        name = 'facho-customer',
+        ident = 321,
+        responsability_code = 'No aplica',
+        organization_code = 'Persona Natural'
+    ))
+    return inv
 
 @pytest.fixture
 def simple_invoice():
@@ -110,7 +129,70 @@ def test_invoicesimple_zip(simple_invoice):
 
 def test_bug_cbcid_empty_on_invoice_line(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
-    print(str(xml_invoice))
-
     cbc_id = xml_invoice.get_element_text('/fe:Invoice/fe:InvoiceLine[1]/cbc:ID', format_=int)
     assert cbc_id == 1
+
+def test_invoice_line_count_numeric(simple_invoice):
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    count = xml_invoice.get_element_text('/fe:Invoice/cbc:LineCountNumeric', format_=int)
+    assert count == len(simple_invoice.invoice_lines)
+    
+def test_invoice_profileexecutionid(simple_invoice):
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:ProfileExecutionID', format_=int)
+    assert id_ == 2
+
+def test_invoice_totals(simple_invoice_without_lines):
+    simple_invoice = simple_invoice_without_lines
+    simple_invoice.invoice_ident = '323200000129'
+    simple_invoice.invoice_issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
+    simple_invoice.invoice_supplier.ident = '700085371'
+    simple_invoice.invoice_customer.ident = '800199436'
+    simple_invoice.add_invoice_line(form.InvoiceLine(
+        quantity = 1,
+        description = 'producto',
+        item_ident = 9999,
+        price_amount = 1_500_000,
+        tax = form.TaxTotal(
+            subtotals = [
+                form.TaxSubTotal(
+                    tax_scheme_ident = '01',
+                    percent = 19.0
+                )])
+    ))
+    simple_invoice.calculate()
+    assert 1 == len(simple_invoice.invoice_lines)
+    assert 1_500_000 == simple_invoice.invoice_legal_monetary_total.line_extension_amount
+    assert 1_785_000 == simple_invoice.invoice_legal_monetary_total.payable_amount
+
+def test_invoice_cufe(simple_invoice_without_lines):
+    simple_invoice = simple_invoice_without_lines
+    simple_invoice.invoice_ident = '323200000129'
+    simple_invoice.invoice_issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
+    simple_invoice.invoice_supplier.ident = '700085371'
+    simple_invoice.invoice_customer.ident = '800199436'
+    simple_invoice.add_invoice_line(form.InvoiceLine(
+        quantity = 1,
+        description = 'producto',
+        item_ident = 9999,
+        price_amount = 1_500_000,
+        tax = form.TaxTotal(
+            subtotals = [
+                form.TaxSubTotal(
+                    tax_scheme_ident = '01',
+                    percent = 19.0
+                )])
+    ))
+            
+    class FakeDIANInvoiceXML(form.DIANInvoiceXML):
+        def issue_time(self, datetime_):
+            return '10:53:10-05:00'
+        def issue_date(self, datetime_):
+            return '2019-01-16'
+
+    xml_invoice = FakeDIANInvoiceXML(simple_invoice,
+                                     tipo_ambiente = form.DIANInvoiceXML.AMBIENTE_PRODUCCION,
+                                     clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471')
+    cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
+
+    assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'

@@ -54,6 +54,7 @@ class TaxTotal:
 
 @dataclass
 class InvoiceLine:
+    # RESOLUCION 0004: pagina 155
     quantity: int
     description: str
     item_ident: int
@@ -66,11 +67,11 @@ class InvoiceLine:
 
     @property
     def total_tax_inclusive_amount(self):
-        return self.tax.taxable_amount
+        return self.tax.taxable_amount + self.tax.tax_amount
 
     @property
     def total_tax_exclusive_amount(self):
-        return self.tax.tax_amount
+        return self.tax.taxable_amount
 
     def calculate(self):
         self.tax.calculate(self)
@@ -125,17 +126,18 @@ class Invoice:
     def _calculate_legal_monetary_total(self):
         for invline in self.invoice_lines:
             self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
-            self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_amount
+            self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
+            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
             self.invoice_legal_monetary_total.charge_total_amount += invline.total_amount
-
-        self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_exclusive_amount \
-            + self.invoice_legal_monetary_total.line_extension_amount \
-            + self.invoice_legal_monetary_total.tax_inclusive_amount
-
+        #self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_exclusive_amount \
+        #    + self.invoice_legal_monetary_total.line_extension_amount \
+        #    + self.invoice_legal_monetary_total.tax_inclusive_amount
+        self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount
+        
     def calculate(self):
-        self._calculate_legal_monetary_total()
         for invline in self.invoice_lines:
             invline.calculate()
+        self._calculate_legal_monetary_total()
 
 
 class DianResolucion0001Validator:
@@ -168,30 +170,40 @@ class DianResolucion0001Validator:
 
     
 class DIANInvoiceXML(fe.FeXML):
-
-    def __init__(self, invoice, TipoAmbiente = 'Pruebas'):
+    AMBIENTE_PRUEBAS = 'Pruebas'
+    AMBIENTE_PRODUCCION = 'Producción'
+    
+    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-        self.attach_invoice(invoice, TipoAmbiente)
-        
-    def attach_invoice(self, invoice, TipoAmbiente):
+        self.tipo_ambiente = tipo_ambiente
+        self.clave_tecnica = clave_tecnica
+        self.attach_invoice(invoice)
+
+    def _tipo_ambiente(self):
+        return int(dian.TipoAmbiente[self.tipo_ambiente]['code'])
+
+    def attach_invoice(self, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""
         fexml = self
 
         invoice.calculate()
 
-        cufe = self._generate_cufe(invoice, TipoAmbiente)
+        cufe = self._generate_cufe(invoice)
 
+        fexml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
         fexml.set_element('/fe:Invoice/cbc:UUID[schemaName="CUFE-SHA384"]', cufe)
-        fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
-        fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S'))
+        fexml.set_element('/fe:Invoice/cbc:IssueDate', self.issue_date(invoice.invoice_issue))
+        fexml.set_element('/fe:Invoice/cbc:IssueTime', self.issue_time(invoice.invoice_issue))
         fexml.set_element('/fe:Invoice/cac:InvoicePeriod/cbc:StartDate', invoice.invoice_period_start.strftime('%Y-%m-%d'))
         fexml.set_element('/fe:Invoice/cac:InvoicePeriod/cbc:EndDate', invoice.invoice_period_end.strftime('%Y-%m-%d'))
 
         fexml.set_element('/fe:Invoice/cbc:LineCountNumeric', len(invoice.invoice_lines))
 
         fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyIdentification/cbc:ID',
+                          invoice.invoice_supplier.ident)
+        fexml.set_element('/Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident)
         fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_supplier.responsability_code)
@@ -211,6 +223,8 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.organization_code)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyName/cbc:Name',
                           invoice.invoice_customer.name)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
+                          invoice.invoice_customer.ident)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PhysicalLocation/fe:Address/cac:AddressLine/cbc:Line',
@@ -232,6 +246,7 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_legal_monetary_total.payable_amount,
                           currencyID='COP')
 
+        fexml.set_element('/fe:Invoice/cbc:LineCountNumeric', len(invoice.invoice_lines))
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
             line = fexml.fragment('/fe:Invoice/fe:InvoiceLine', append=next_append)
@@ -243,13 +258,18 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/fe:InvoiceLine/fe:Price/cbc:PriceAmount', invoice_line.price_amount, currencyID="COP") 
             line.set_element('/fe:InvoiceLine/fe:Item/cbc:Description', invoice_line.description)
 
+
         return fexml
 
-
-    def _generate_cufe(self, invoice, TipoAmbiente = 'Pruebas'):
+    def issue_time(self, datetime_):
+        return datetime_.strftime('%H:%M:%S%z')
+    def issue_date(self, datetime_):
+        return datetime_.strftime('%Y-%m-%d')
+    
+    def _generate_cufe(self, invoice):
         NumFac = invoice.invoice_ident
-        FecFac = invoice.invoice_issue.strftime('%Y-%m-%d')
-        HoraFac = invoice.invoice_issue.strftime('%H:%H:%S')
+        FecFac = self.issue_date(invoice.invoice_issue)
+        HoraFac = self.issue_time(invoice.invoice_issue)
         ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
         ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}
@@ -268,25 +288,27 @@ class DIANInvoiceXML(fe.FeXML):
 
         NitOFE = invoice.invoice_supplier.ident
         NumAdq = invoice.invoice_customer.ident
-        TipoAmb = int(dian.TipoAmbiente[TipoAmbiente]['code'])
-
-        formatVars = {
-            '%s': NumFac,
-            '%s': FecFac,
-            '%.02f': HoraFac,
-            '%.02f': ValorBruto,
-            '%.02f': ValorTotalPagar,
-            '%.02f': ValorImpuestoPara.get(CodImpuesto1, 0.0),
-            '%02d': CodImpuesto1,
-            '%.02f': ValorImpuestoPara.get(CodImpuesto2, 0.0),
-            '%02d': CodImpuesto2,
-            '%.02f': ValorImpuestoPara.get(CodImpuesto3, 0.0),
-            '%02d': CodImpuesto3,
-            '%s': NitOFE,
-            '%s': NumAdq,
-            '%d': TipoAmb,
-        }
-        cufe = "".join(formatVars.keys()) % tuple(formatVars.values())
+        TipoAmb = self._tipo_ambiente()
+        ClTec = str(self.clave_tecnica)
+        
+        formatVars = [
+            '%s' % NumFac,
+            '%s' % FecFac,
+            '%s' % HoraFac,
+            '%.02f' % ValorBruto,
+            '%02d' % CodImpuesto1,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto1, 0.0),
+            '%02d' % CodImpuesto2,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto2, 0.0),
+            '%02d' % CodImpuesto3,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto3, 0.0),
+            '%.02f' % ValorTotalPagar,
+            '%s' % NitOFE,
+            '%s' % NumAdq,
+            '%s' % ClTec,
+            '%d' % TipoAmb,
+        ]
+        cufe = "".join(formatVars)
 
         # crear hash...
         h = hashlib.sha384()
