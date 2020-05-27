@@ -85,6 +85,16 @@ class LXMLBuilder:
     def set_text(self, elem, text):
         elem.text = text
 
+    def xpath(self, elem, xpath):
+        print('xpath:' + xpath)
+        print('elem:'+ self.tostring(elem))
+        elems = elem.xpath(xpath, namespaces=self.nsmap)
+        print('xpath elemnts:' + str(elems))
+        if elems:
+            return elems[0]
+
+        return None
+    
     def get_text(self, elem):
         return elem.text
 
@@ -99,7 +109,7 @@ class FachoXML:
     """
     Decora XML con funciones de consulta XPATH de un solo elemento
     """
-    def __init__(self, root, builder=None, nsmap=None):
+    def __init__(self, root, builder=None, nsmap=None, fragment_prefix=''):
         if builder is None:
             self.builder = LXMLBuilder(nsmap)
         else:
@@ -112,6 +122,7 @@ class FachoXML:
         else:
             self.root = root
 
+        self.fragment_prefix = fragment_prefix
         self.xpath_for = {}
         self.extensions = []
 
@@ -132,8 +143,11 @@ class FachoXML:
                     self.builder.append(elem, new_element)
 
     def fragment(self, xpath, append=False):
+        nodes = xpath.split('/')
+        nodes.pop()
+        root_prefix = '/'.join(nodes)
         parent = self.find_or_create_element(xpath, append=append)
-        return FachoXML(parent, nsmap=self.nsmap)
+        return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix)
 
     def register_alias_xpath(self, alias, xpath):
         self.xpath_for[alias] = xpath
@@ -186,7 +200,8 @@ class FachoXML:
     def set_element(self, xpath, content, **attrs):
         xpath = self._normalize_xpath(xpath)
         format_ = attrs.pop('format_', '%s')
-        elem = self.find_or_create_element(xpath)
+        append_ = attrs.pop('append_', False)
+        elem = self.find_or_create_element(xpath, append=append_)
         if content:
             self.builder.set_text(elem, format_ % content)
         for k, v in attrs.items():
@@ -194,8 +209,9 @@ class FachoXML:
         return elem
 
     def get_element_text(self, xpath, format_=str):
-        xpath = self._normalize_xpath(xpath)
-        text = self.builder.get_text(self.find_or_create_element(xpath))
+        xpath = self.fragment_prefix + self._normalize_xpath(xpath)
+        elem = self.builder.xpath(self.root, xpath)
+        text = self.builder.get_text(elem)
         return format_(text)
 
     def tostring(self):

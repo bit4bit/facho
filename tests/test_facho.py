@@ -139,4 +139,16 @@ def test_facho_xml_get_element_text():
     line.set_element('/Line/Quantity', 5)
     assert line.get_element_text('/Line/Quantity', format_=int) == 5
 
+def test_facho_xml_get_element_text_next_child():
+    xml = facho.FachoXML('Invoice')
+    xml.set_element('/Invoice/ID', 'ABC123')
+
+    assert xml.get_element_text('/Invoice/ID') == 'ABC123'
+
+    line = xml.fragment('/Invoice/Line')
+    line.set_element('/Line/Quantity', 5)
+    line = xml.fragment('/Invoice/Line', append=True)
+    line.set_element('/Line/Quantity', 6)
+    assert line.get_element_text('/Line[2]/Quantity', format_=int) == 6
+    
 

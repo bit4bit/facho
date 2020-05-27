@@ -106,3 +106,4 @@ def test_invoicesimple_zip(simple_invoice):
     with zipfile.ZipFile(zipdata) as dianzip:
         xml_data = dianzip.open(name_invoice).read().decode('utf-8')
         assert xml_data == str(xml_invoice)
+
