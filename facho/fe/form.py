@@ -231,11 +231,13 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/fe:LegalMonetaryTotal/cbc:PayableAmount',
                           invoice.invoice_legal_monetary_total.payable_amount,
                           currencyID='COP')
-                          
-        for index, invoice_line in enumerate(invoice.invoice_lines):
-            line = fexml.fragment('/fe:Invoice/fe:InvoiceLine', append=True)
 
-            line.set_element('/fe:InvoiceLine/cbc:ID', index)
+        next_append = False
+        for index, invoice_line in enumerate(invoice.invoice_lines):
+            line = fexml.fragment('/fe:Invoice/fe:InvoiceLine', append=next_append)
+            next_append = True
+
+            line.set_element('/fe:InvoiceLine/cbc:ID', index + 1)
             line.set_element('/fe:InvoiceLine/cbc:InvoicedQuantity', invoice_line.quantity, unitCode = 'NAR')
             line.set_element('/fe:InvoiceLine/cbc:LineExtensionAmount', invoice_line.total_amount, currencyID="COP")
             line.set_element('/fe:InvoiceLine/fe:Price/cbc:PriceAmount', invoice_line.price_amount, currencyID="COP") 

@@ -86,10 +86,7 @@ class LXMLBuilder:
         elem.text = text
 
     def xpath(self, elem, xpath):
-        print('xpath:' + xpath)
-        print('elem:'+ self.tostring(elem))
         elems = elem.xpath(xpath, namespaces=self.nsmap)
-        print('xpath elemnts:' + str(elems))
         if elems:
             return elems[0]
 

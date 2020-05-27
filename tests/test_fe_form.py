@@ -107,3 +107,10 @@ def test_invoicesimple_zip(simple_invoice):
         xml_data = dianzip.open(name_invoice).read().decode('utf-8')
         assert xml_data == str(xml_invoice)
 
+
+def test_bug_cbcid_empty_on_invoice_line(simple_invoice):
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    print(str(xml_invoice))
+
+    cbc_id = xml_invoice.get_element_text('/fe:Invoice/fe:InvoiceLine[1]/cbc:ID', format_=int)
+    assert cbc_id == 1
