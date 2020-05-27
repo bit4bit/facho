@@ -79,7 +79,7 @@ def test_invoicesimple_build_with_cufe(simple_invoice):
     assert cufe != ''
 
 
-def test_invoicesimple_xml_signed(simple_invoice):
+def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     invoice_validator = form.DianResolucion0001Validator()
     simple_invoice.validate(invoice_validator)
     assert invoice_validator.valid() == True
@@ -88,7 +88,10 @@ def test_invoicesimple_xml_signed(simple_invoice):
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
     xml.add_extension(signer)
 
-    xml.attach_extensions()
+    with monkeypatch.context() as m:
+        import helpers
+        helpers.mock_urlopen(m)
+        xml.attach_extensions()
 
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     assert elem.text is not None

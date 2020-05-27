@@ -7,7 +7,10 @@ import pytest
 from facho import fe
 
 
-def test_xmlsigned_build():
+import helpers
+
+
+def test_xmlsigned_build(monkeypatch):
     #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem 
     #openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
@@ -15,14 +18,17 @@ def test_xmlsigned_build():
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
     xml.add_extension(signer)
-    xml.attach_extensions()
+
+    with monkeypatch.context() as m:
+        helpers.mock_urlopen(m)
+        xml.attach_extensions()
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     
     assert elem is not None
     #assert elem.findall('ds:SignedInfo', fe.NAMESPACES) is not None
 
 
-def test_xmlsigned_with_passphrase_build():
+def test_xmlsigned_with_passphrase_build(monkeypatch):
     #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem 
     #openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
     signer = fe.DianXMLExtensionSigner('./tests/example-with-passphrase.p12', 'test')
@@ -30,7 +36,10 @@ def test_xmlsigned_with_passphrase_build():
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
     xml.add_extension(signer)
-    xml.attach_extensions()
+    
+    with monkeypatch.context() as m:
+        helpers.mock_urlopen(m)
+        xml.attach_extensions()
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     
     assert elem is not None
