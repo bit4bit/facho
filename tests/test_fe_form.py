@@ -194,5 +194,5 @@ def test_invoice_cufe(simple_invoice_without_lines):
                                      tipo_ambiente = form.DIANInvoiceXML.AMBIENTE_PRODUCCION,
                                      clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471')
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
-
+    # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
