@@ -92,7 +92,6 @@ class Invoice:
         self.invoice_period_end = None
         self.invoice_issue = None
         self.invoice_ident = None
-        self.invoice_cufe = None
         self.invoice_legal_monetary_total = LegalMonetaryTotal(0, 0, 0, 0, 0)
         self.invoice_customer = None
         self.invoice_supplier = None
@@ -168,19 +167,12 @@ class DianResolucion0001Validator:
     def valid(self):
         return not self.errors
 
-    
-class DIANInvoiceXML(fe.FeXML):
-    AMBIENTE_PRUEBAS = 'Pruebas'
-    AMBIENTE_PRODUCCION = 'Producción'
-    
-    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
-        super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-        self.tipo_ambiente = tipo_ambiente
-        self.clave_tecnica = clave_tecnica
-        self.attach_invoice(invoice)
 
-    def _tipo_ambiente(self):
-        return int(dian.TipoAmbiente[self.tipo_ambiente]['code'])
+class DIANInvoiceXML(fe.FeXML):
+
+    def __init__(self, invoice):
+        super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+        self.attach_invoice(invoice)
 
     def attach_invoice(self, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
@@ -189,11 +181,7 @@ class DIANInvoiceXML(fe.FeXML):
 
         invoice.calculate()
 
-        cufe = self._generate_cufe(invoice)
-
-        fexml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
-        fexml.set_element('/fe:Invoice/cbc:UUID[schemaName="CUFE-SHA384"]', cufe)
         fexml.set_element('/fe:Invoice/cbc:IssueDate', self.issue_date(invoice.invoice_issue))
         fexml.set_element('/fe:Invoice/cbc:IssueTime', self.issue_time(invoice.invoice_issue))
         fexml.set_element('/fe:Invoice/cac:InvoicePeriod/cbc:StartDate', invoice.invoice_period_start.strftime('%Y-%m-%d'))
@@ -265,53 +253,4 @@ class DIANInvoiceXML(fe.FeXML):
         return datetime_.strftime('%H:%M:%S%z')
     def issue_date(self, datetime_):
         return datetime_.strftime('%Y-%m-%d')
-    
-    def _generate_cufe(self, invoice):
-        NumFac = invoice.invoice_ident
-        FecFac = self.issue_date(invoice.invoice_issue)
-        HoraFac = self.issue_time(invoice.invoice_issue)
-        ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
-        ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
-        ValorImpuestoPara = {}
-        ValorImpuesto1 = 0.0
-        CodImpuesto1 = 1
-        ValorImpuesto2 = 0.0
-        CodImpuesto2 = 4
-        ValorImpuesto3 = 0.0
-        CodImpuesto3 = 3
-        for invoice_line in invoice.invoice_lines:
-            for subtotal in invoice_line.tax.subtotals:
-                # TODO cual es la naturaleza de tax_scheme_ident?
-                codigo_impuesto = int(subtotal.tax_scheme_ident)
-                ValorImpuestoPara.setdefault(codigo_impuesto, 0.0)
-                ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
-
-        NitOFE = invoice.invoice_supplier.ident
-        NumAdq = invoice.invoice_customer.ident
-        TipoAmb = self._tipo_ambiente()
-        ClTec = str(self.clave_tecnica)
-        
-        formatVars = [
-            '%s' % NumFac,
-            '%s' % FecFac,
-            '%s' % HoraFac,
-            '%.02f' % ValorBruto,
-            '%02d' % CodImpuesto1,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto1, 0.0),
-            '%02d' % CodImpuesto2,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto2, 0.0),
-            '%02d' % CodImpuesto3,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto3, 0.0),
-            '%.02f' % ValorTotalPagar,
-            '%s' % NitOFE,
-            '%s' % NumAdq,
-            '%s' % ClTec,
-            '%d' % TipoAmb,
-        ]
-        cufe = "".join(formatVars)
-
-        # crear hash...
-        h = hashlib.sha384()
-        h.update(cufe.encode('utf-8'))
-        return h.hexdigest()
 

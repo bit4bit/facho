@@ -136,7 +136,7 @@ class FachoXML:
                 elem = self.set_element('/'+ root_tag + xpath, elements)
             else:
                 for new_element in elements:
-                    elem = self.find_or_create_element('/'+ root_tag + xpath)
+                    elem = self.find_or_create_element('/' + root_tag + xpath)
                     self.builder.append(elem, new_element)
 
     def fragment(self, xpath, append=False):

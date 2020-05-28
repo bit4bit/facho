@@ -10,6 +10,7 @@ import zipfile
 import warnings
 import hashlib
 from contextlib import contextmanager
+from .data import dian
 
 NAMESPACES = {
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
@@ -39,7 +40,74 @@ class FeXML(FachoXML):
         #self.find_or_create_element(self._cn)
 
 
+class DianXMLExtensionCUFE(FachoXMLExtension):
+    AMBIENTE_PRUEBAS = 'Pruebas'
+    AMBIENTE_PRODUCCION = 'Producción'
+    
+    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
+        self.tipo_ambiente = tipo_ambiente
+        self.clave_tecnica = clave_tecnica
+        self.invoice = invoice
 
+    def _tipo_ambiente(self):
+        return int(dian.TipoAmbiente[self.tipo_ambiente]['code'])
+
+    def build(self, fachoxml):
+        cufe = self._generate_cufe(self.invoice, fachoxml)
+        fachoxml.set_element('/fe:Invoice/cbc:UUID[schemaName="CUFE-SHA384"]', cufe)
+        fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
+        return '', []
+        
+    def _generate_cufe(self, invoice, fachoxml):
+        NumFac = invoice.invoice_ident
+        FecFac = fachoxml.issue_date(invoice.invoice_issue)
+        HoraFac = fachoxml.issue_time(invoice.invoice_issue)
+        ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
+        ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
+        ValorImpuestoPara = {}
+        ValorImpuesto1 = 0.0
+        CodImpuesto1 = 1
+        ValorImpuesto2 = 0.0
+        CodImpuesto2 = 4
+        ValorImpuesto3 = 0.0
+        CodImpuesto3 = 3
+        for invoice_line in invoice.invoice_lines:
+            for subtotal in invoice_line.tax.subtotals:
+                # TODO cual es la naturaleza de tax_scheme_ident?
+                codigo_impuesto = int(subtotal.tax_scheme_ident)
+                ValorImpuestoPara.setdefault(codigo_impuesto, 0.0)
+                ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
+
+        NitOFE = invoice.invoice_supplier.ident
+        NumAdq = invoice.invoice_customer.ident
+        TipoAmb = self._tipo_ambiente()
+        ClTec = str(self.clave_tecnica)
+        
+        formatVars = [
+            '%s' % NumFac,
+            '%s' % FecFac,
+            '%s' % HoraFac,
+            '%.02f' % ValorBruto,
+            '%02d' % CodImpuesto1,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto1, 0.0),
+            '%02d' % CodImpuesto2,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto2, 0.0),
+            '%02d' % CodImpuesto3,
+            '%.02f' % ValorImpuestoPara.get(CodImpuesto3, 0.0),
+            '%.02f' % ValorTotalPagar,
+            '%s' % NitOFE,
+            '%s' % NumAdq,
+            '%s' % ClTec,
+            '%d' % TipoAmb,
+        ]
+        cufe = "".join(formatVars)
+
+        # crear hash...
+        h = hashlib.sha384()
+        h.update(cufe.encode('utf-8'))
+        return h.hexdigest()
+
+    
 class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
     # RESOLUCION 0001: pagina 535
     

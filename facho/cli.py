@@ -80,12 +80,13 @@ def generate_invoice(private_key, passphrase, scriptname):
 
     invoice = module.invoice()
     invoice.calculate()
-    xml = form.DIANInvoiceXML(invoice)
+    params = module.params()
+    xml = form.DIANInvoiceXML(invoice, **params)
     
     extensions = module.extensions(invoice)
     for extension in extensions:
         xml.add_extension(extension)
-
+    
     if private_key:
         signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
         xml.add_extension(signer)
