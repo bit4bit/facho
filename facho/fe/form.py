@@ -182,8 +182,8 @@ class DIANInvoiceXML(fe.FeXML):
         invoice.calculate()
 
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
-        fexml.set_element('/fe:Invoice/cbc:IssueDate', self.issue_date(invoice.invoice_issue))
-        fexml.set_element('/fe:Invoice/cbc:IssueTime', self.issue_time(invoice.invoice_issue))
+        fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
+        fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S%z'))
         fexml.set_element('/fe:Invoice/cac:InvoicePeriod/cbc:StartDate', invoice.invoice_period_start.strftime('%Y-%m-%d'))
         fexml.set_element('/fe:Invoice/cac:InvoicePeriod/cbc:EndDate', invoice.invoice_period_end.strftime('%Y-%m-%d'))
 
@@ -248,9 +248,3 @@ class DIANInvoiceXML(fe.FeXML):
 
 
         return fexml
-
-    def issue_time(self, datetime_):
-        return datetime_.strftime('%H:%M:%S%z')
-    def issue_date(self, datetime_):
-        return datetime_.strftime('%Y-%m-%d')
-

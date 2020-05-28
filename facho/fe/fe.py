@@ -58,10 +58,15 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         return '', []
         
+    def issue_time(self, datetime_):
+        return datetime_.strftime('%H:%M:%S%z')
+    def issue_date(self, datetime_):
+        return datetime_.strftime('%Y-%m-%d')
+
     def _generate_cufe(self, invoice, fachoxml):
         NumFac = invoice.invoice_ident
-        FecFac = fachoxml.issue_date(invoice.invoice_issue)
-        HoraFac = fachoxml.issue_time(invoice.invoice_issue)
+        FecFac = self.issue_date(invoice.invoice_issue)
+        HoraFac = self.issue_time(invoice.invoice_issue)
         ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
         ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}

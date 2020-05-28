@@ -190,15 +190,15 @@ def test_invoice_cufe(simple_invoice_without_lines):
                 )])
     ))
             
-    class FakeDIANInvoiceXML(form.DIANInvoiceXML):
+    class FakeDianXMLExtensionCUFE(fe.DianXMLExtensionCUFE):
         def issue_time(self, datetime_):
             return '10:53:10-05:00'
         def issue_date(self, datetime_):
             return '2019-01-16'
 
-    xml_invoice = FakeDIANInvoiceXML(simple_invoice)
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
                                      
-    cufe_extension = fe.DianXMLExtensionCUFE(
+    cufe_extension = FakeDianXMLExtensionCUFE(
         simple_invoice,
         tipo_ambiente = fe.DianXMLExtensionCUFE.AMBIENTE_PRODUCCION,
         clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471'
