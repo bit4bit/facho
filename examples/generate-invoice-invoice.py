@@ -4,7 +4,8 @@ from datetime import datetime
 
 def extensions(inv):
     security_code = fe.DianXMLExtensionSoftwareSecurityCode('', '123', inv.invoice_ident)
-    return [security_code]
+    cufe = fe.DianXMLExtensionCUFE(inv)
+    return [security_code, cufe]
 
 def invoice():
     inv = form.Invoice()
