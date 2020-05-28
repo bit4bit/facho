@@ -96,7 +96,6 @@ def test_invoicesimple_build_with_cufe(simple_invoice):
     xml = form.DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
     xml.add_extension(cufe_extension)
-    xml.attach_extensions()
     cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
     assert cufe != ''
 
@@ -108,13 +107,13 @@ def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     xml = form.DIANInvoiceXML(simple_invoice)
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
-    xml.add_extension(signer)
+
 
     with monkeypatch.context() as m:
         import helpers
         helpers.mock_urlopen(m)
-        xml.attach_extensions()
-
+        xml.add_extension(signer)
+        
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     assert elem.text is not None
 
@@ -144,7 +143,6 @@ def test_invoice_profileexecutionid(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
     xml_invoice.add_extension(cufe_extension)
-    xml_invoice.attach_extensions()
     id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:ProfileExecutionID', format_=int)
     assert id_ == 2
 
@@ -204,7 +202,6 @@ def test_invoice_cufe(simple_invoice_without_lines):
         clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471'
     )
     xml_invoice.add_extension(cufe_extension)
-    xml_invoice.attach_extensions()
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
     # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'

@@ -17,11 +17,11 @@ def test_xmlsigned_build(monkeypatch):
 
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-    xml.add_extension(signer)
+
 
     with monkeypatch.context() as m:
         helpers.mock_urlopen(m)
-        xml.attach_extensions()
+        xml.add_extension(signer)
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     
     assert elem is not None
@@ -35,11 +35,11 @@ def test_xmlsigned_with_passphrase_build(monkeypatch):
 
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-    xml.add_extension(signer)
     
     with monkeypatch.context() as m:
         helpers.mock_urlopen(m)
-        xml.attach_extensions()
+        xml.add_extension(signer)
+
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     
     assert elem is not None
@@ -51,6 +51,5 @@ def test_dian_extension_software_security_code():
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
     xml.add_extension(security_code)
-    xml.attach_extensions()
     content = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode')
     assert content is not None

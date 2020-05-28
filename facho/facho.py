@@ -124,21 +124,17 @@ class FachoXML:
         self.extensions = []
 
     def add_extension(self, extension):
-        self.extensions.append(extension)
-
-    def attach_extensions(self):
         root_tag = self.builder.get_tag(self.root)
 
         # construir las extensiones o adicionar en caso de indicar
-        for extension in self.extensions:
-            xpath, elements = extension.build(self)
-            if isinstance(elements, str):
-                elem = self.set_element('/'+ root_tag + xpath, elements)
-            else:
-                for new_element in elements:
-                    elem = self.find_or_create_element('/' + root_tag + xpath)
-                    self.builder.append(elem, new_element)
-
+        xpath, elements = extension.build(self)
+        if isinstance(elements, str):
+            elem = self.set_element('/'+ root_tag + xpath, elements)
+        else:
+            for new_element in elements:
+                elem = self.find_or_create_element('/' + root_tag + xpath)
+                self.builder.append(elem, new_element)
+    
     def fragment(self, xpath, append=False):
         nodes = xpath.split('/')
         nodes.pop()
