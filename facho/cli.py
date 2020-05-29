@@ -1,4 +1,6 @@
 import sys
+import base64
+
 import click
 
 import logging.config
@@ -45,18 +47,40 @@ def consultaResolucionesFacturacion(nit, nit_proveedor, id_software, username, p
 @click.command()
 @click.option('--private-key', required=True)
 @click.option('--public-key', required=True)
+@click.option('--habilitacion/--produccion', default=False)
 @click.option('--password')
 @click.argument('filename', required=True)
 @click.argument('zipfile', type=click.Path(exists=True))
-def SendTestSetAsync(private_key, public_key, password, filename, zipfile):
+def soap_send_bill_sync(private_key, public_key, habilitacion, password, filename, zipfile):
     from facho.fe.client import dian
     
     client = dian.DianSignatureClient(private_key, public_key, password=password)
-    resp = client.request(dian.SendTestSetAsync(
-        filename, open(zipfile, 'r').read().encode('utf-8')
+    req = dian.SendBillSync
+    if habilitacion:
+        req = dian.Habilitacion.SendBillSync
+    resp = client.request(req(
+        filename,
+        open(zipfile, 'rb').read()
     ))
     print(resp)
 
+@click.command()
+@click.option('--private-key', required=True)
+@click.option('--public-key', required=True)
+@click.option('--habilitacion/--produccion', default=False)
+@click.option('--password')
+@click.option('--track-id', required=True)
+def soap_get_status(private_key, public_key, habilitacion, password, track_id):
+    from facho.fe.client import dian
+    
+    client = dian.DianSignatureClient(private_key, public_key, password=password)
+    req = dian.GetStatus
+    if habilitacion:
+        req = dian.Habilitacion.GetStatus
+    resp = client.request(req(
+        trackId = track_id
+    ))
+    print(resp)
 
 @click.command()
 @click.option('--private-key', type=click.Path(exists=True))
@@ -97,5 +121,6 @@ def main():
     pass
 
 main.add_command(consultaResolucionesFacturacion)
-main.add_command(SendTestSetAsync)
+main.add_command(soap_send_bill_sync)
+main.add_command(soap_get_status)
 main.add_command(generate_invoice)
