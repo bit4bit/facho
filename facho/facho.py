@@ -98,8 +98,10 @@ class LXMLBuilder:
     def set_attribute(self,  elem, key, value):
         elem.attrib[key] = value
 
-    def tostring(self, elem):
-        return tostring(elem).decode('utf-8')
+    def tostring(self, elem, **attrs):
+        attrs['pretty_print'] = attrs.pop('pretty_print', True)
+        attrs['encoding'] = attrs.pop('encoding', 'UTF-8')
+        return tostring(elem, **attrs).decode('utf-8')
 
 
 class FachoXML:
@@ -207,8 +209,8 @@ class FachoXML:
         text = self.builder.get_text(elem)
         return format_(text)
 
-    def tostring(self):
-        return self.builder.tostring(self.root)
+    def tostring(self, **kw):
+        return self.builder.tostring(self.root, **kw)
 
     def __str__(self):
         return self.tostring()

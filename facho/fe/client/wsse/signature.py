@@ -346,6 +346,9 @@ def _verify_envelope_with_key(envelope, key):
 
     security = header.find(QName(ns.WSSE, "Security"))
     signature = security.find(QName(ns.DS, "Signature"))
+    # la DIAN no cumple a cabalidad token-profile 1.0
+    if signature is None:
+        return SignatureVerificationFailed()
 
     ctx = xmlsec.SignatureContext()
 

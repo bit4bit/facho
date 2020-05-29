@@ -55,6 +55,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
     def build(self, fachoxml):
         cufe = self._generate_cufe(self.invoice, fachoxml)
         fachoxml.set_element('/fe:Invoice/cbc:UUID[schemaName="CUFE-SHA384"]', cufe)
+        fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         return '', []
         

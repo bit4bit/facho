@@ -181,6 +181,7 @@ class DIANInvoiceXML(fe.FeXML):
 
         invoice.calculate()
 
+        fexml.set_element('/fe:Invoice/cbc:UBLVersionID', 'UBL 2.1')
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
         fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
         fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S%z'))

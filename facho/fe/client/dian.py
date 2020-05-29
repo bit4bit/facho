@@ -80,7 +80,7 @@ class ConsultaResolucionesFacturacionPeticion(SOAPService):
         return ConsultaResolucionesFacturacionRespuesta.fromdict(as_dict)
 
 @dataclass
-class SendBillAsync:
+class SendBillAsync(SOAPService):
     fileName: str
     contentFile: str
 
@@ -91,7 +91,7 @@ class SendBillAsync:
         return 'SendBillAsync'
 
     def build_response(self, as_dict):
-        return {}
+        return as_dict
 
 
 
@@ -108,7 +108,7 @@ class SendTestSetAsync(SOAPService):
         return 'SendTestSetAsync'
 
     def build_response(self, as_dict):
-        return {}
+        return as_dict
 
 @dataclass
 class SendBillSync(SOAPService):
@@ -122,7 +122,7 @@ class SendBillSync(SOAPService):
         return 'SendBillSync'
 
     def build_response(self, as_dict):
-        return {}
+        return as_dict
 
 
 @dataclass
@@ -136,11 +136,30 @@ class GetStatus(SOAPService):
         return 'GetStatus'
 
     def build_response(self, as_dict):
-        return {}
+        return as_dict
+
+@dataclass
+class GetStatusZip(SOAPService):
+    trackId: bytes
+
+    def get_wsdl(self):
+        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+
+    def get_service(self):
+        return 'GetStatusZip'
+
+    def build_response(self, as_dict):
+        return as_dict
 
 
 class Habilitacion:
     WSDL = 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
+
+
+    class SendBillAsync(SendBillAsync):
+        def get_wsdl(self):
+            return Habilitacion.WSDL
+
 
     class SendBillSync(SendBillSync):
         def get_wsdl(self):
@@ -151,6 +170,10 @@ class Habilitacion:
             return Habilitacion.WSDL
 
     class GetStatus(GetStatus):
+        def get_wsdl(self):
+            return Habilitacion.WSDL
+
+    class GetStatusZip(GetStatusZip):
         def get_wsdl(self):
             return Habilitacion.WSDL
         
@@ -200,12 +223,11 @@ class DianSignatureClient(DianGateway):
         from zeep.wsse import utils
 
         client = zeep.Client(service.get_wsdl(), wsse=
-                           [
-                               BinarySignature(
-                                   self.private_key_path, self.public_key_path, self.password,
-                                   signature_method=xmlsec.Transform.RSA_SHA256,
-                                   digest_method=xmlsec.Transform.SHA256)
-                           ],
+                             BinarySignature(
+                                 self.private_key_path, self.public_key_path, self.password,
+                                 signature_method=xmlsec.Transform.RSA_SHA256,
+                                 digest_method=xmlsec.Transform.SHA256)
+                             ,
         )
         return client
     
