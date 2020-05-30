@@ -99,7 +99,7 @@ class LXMLBuilder:
         elem.attrib[key] = value
 
     def tostring(self, elem, **attrs):
-        attrs['pretty_print'] = attrs.pop('pretty_print', True)
+        attrs['pretty_print'] = attrs.pop('pretty_print', False)
         attrs['encoding'] = attrs.pop('encoding', 'UTF-8')
         return tostring(elem, **attrs).decode('utf-8')
 
