@@ -116,11 +116,11 @@ class Invoice:
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
 
-    def validate(self, validator):
-        validator.validate_customer(self.invoice_customer)
-        validator.validate_supplier(self.invoice_supplier)
+    def accept(self, visitor):
+        visitor.visit_customer(self.invoice_customer)
+        visitor.visit_supplier(self.invoice_supplier)
         for invline in self.invoice_lines:
-            validator.validate_invoice_line(self, invline)
+            visitor.visit_invoice_line(invline)
 
     def _calculate_legal_monetary_total(self):
         for invline in self.invoice_lines:
@@ -155,13 +155,17 @@ class DianResolucion0001Validator:
         except KeyError:
             self.errors.append(('organization_code', 'not found'))
 
-    def validate_customer(self, customer):
+    def validate(self, invoice):
+        invoice.accept(self)
+        return not self.errors
+
+    def visit_customer(self, customer):
         self._validate_party(customer)
 
-    def validate_supplier(self, supplier):
+    def visit_supplier(self, supplier):
         self._validate_party(supplier)
 
-    def validate_invoice_line(self, invoice, line):
+    def visit_invoice_line(self, line):
         pass
 
     def valid(self):
