@@ -185,6 +185,10 @@ class DIANInvoiceXML(fe.FeXML):
 
         invoice.calculate()
 
+        fexml.set_element('/fe:Invoice/cbc:InvoiceTypeCode', codelist.TipoDocumento['Factura de Venta Nacional']['code'],
+                          listAgencyID='195',
+                          listAgencyName='No matching global declaration available for the validation root',
+                          listURI='http://www.dian.gov.co')
         fexml.set_element('/fe:Invoice/cbc:UBLVersionID', 'UBL 2.1')
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
         fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))

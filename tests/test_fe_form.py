@@ -143,6 +143,11 @@ def test_invoice_profileexecutionid(simple_invoice):
     id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:ProfileExecutionID', format_=int)
     assert id_ == 2
 
+def test_invoice_invoice_type_code(simple_invoice):
+    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:InvoiceTypeCode', format_=int)
+    assert id_ == 1
+
 def test_invoice_totals(simple_invoice_without_lines):
     simple_invoice = simple_invoice_without_lines
     simple_invoice.invoice_ident = '323200000129'
