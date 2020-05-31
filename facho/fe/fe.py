@@ -10,7 +10,7 @@ import zipfile
 import warnings
 import hashlib
 from contextlib import contextmanager
-from .data import dian
+from .data.dian import codelist
 
 NAMESPACES = {
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
@@ -50,7 +50,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         self.invoice = invoice
 
     def _tipo_ambiente(self):
-        return int(dian.TipoAmbiente[self.tipo_ambiente]['code'])
+        return int(codelist.TipoAmbiente[self.tipo_ambiente]['code'])
 
     def build(self, fachoxml):
         cufe = self._generate_cufe(self.invoice, fachoxml)

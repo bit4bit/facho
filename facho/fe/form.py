@@ -7,7 +7,7 @@ import copy
 from dataclasses import dataclass
 from datetime import datetime
 
-from .data import dian
+from .data.dian import codelist
 from . import fe
 
 @dataclass
@@ -146,12 +146,12 @@ class DianResolucion0001Validator:
 
     def _validate_party(self, party):
         try:
-            dian.TipoResponsabilidad[party.responsability_code]
+            codelist.TipoResponsabilidad[party.responsability_code]
         except KeyError:
             self.errors.append(('responsability_code', 'not found'))
 
         try:
-            dian.TipoOrganizacion[party.organization_code]
+            codelist.TipoOrganizacion[party.organization_code]
         except KeyError:
             self.errors.append(('organization_code', 'not found'))
 

@@ -6,11 +6,11 @@
 """Tests for `facho` package."""
 
 import pytest
-import facho.fe.data.dian as dian
+from facho.fe.data.dian import codelist
 
 def test_dian():
-    assert dian.TipoResponsabilidad.short_name == 'TipoResponsabilidad'
-    assert dian.TipoResponsabilidad['Autorretenedor']['name'] == 'Autorretenedor'
+    assert codelist.TipoResponsabilidad.short_name == 'TipoResponsabilidad'
+    assert codelist.TipoResponsabilidad['Autorretenedor']['name'] == 'Autorretenedor'
 
-    assert dian.TipoOrganizacion.short_name == 'TipoOrganizacion'
-    assert dian.TipoOrganizacion['Persona Natural']['name'] == 'Persona Natural'
+    assert codelist.TipoOrganizacion.short_name == 'TipoOrganizacion'
+    assert codelist.TipoOrganizacion['Persona Natural']['name'] == 'Persona Natural'
