@@ -28,17 +28,13 @@ class FakeDianClient(dian.DianClient):
         return fake_remote
 
         
-
 def test_sopa_consultaresolucionesfacturacion():
     expected_resp = {
-        'CodigoOperacion': 'OK',
-        'DescripcionOperacion': '',
-        'IdentificadorOperacion': '',
-        'RangoFacturacion': []
+        'NumberRangeResponse': [['test1', '', 'test', 0, 10, '', '', 'abc']]
     }
 
     client_dian = FakeDianClient('user', 'pass', expected_resp)
-    resp = client_dian.request(dian.ConsultaResolucionesFacturacionPeticion(
+    resp = client_dian.request(dian.GetNumberingRange(
         '860046645', '800037646', '13a6a789-47ca-4728-adb8-372fca76e692'
     ))
-    assert resp.CodigoOperacion == 'OK'
+    assert len(resp.NumberRangeResponse) == 1
