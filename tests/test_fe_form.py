@@ -24,13 +24,15 @@ def simple_invoice_without_lines():
         name = 'facho-supplier',
         ident = 123,
         responsability_code = 'No aplica',
-        organization_code = 'Persona Natural'
+        organization_code = 'Persona Natural',
+        address = form.Address(name='Test Building')
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
         ident = 321,
         responsability_code = 'No aplica',
-        organization_code = 'Persona Natural'
+        organization_code = 'Persona Natural',
+        address = form.Address(name='Test Building')
     ))
     return inv
 

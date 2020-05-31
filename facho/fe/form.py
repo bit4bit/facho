@@ -11,6 +11,19 @@ from .data.dian import codelist
 from . import fe
 
 @dataclass
+class Country:
+    code: str
+    name: str
+
+@dataclass
+class Address:
+    name: str
+    street: str = ''
+    city: str = ''
+    department: str = ''
+    country: Country = Country('CO', 'COLOMBIA')
+    
+@dataclass
 class Party:
     name: str
     ident: str
@@ -18,7 +31,7 @@ class Party:
     organization_code: str
 
     phone: str = ''
-    address: str = ''
+    address: Address= Address('')
     email: str = ''
     legal_name: str = ''
     legal_company_ident: str = ''
@@ -210,8 +223,13 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_supplier.name)
         fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)
+        fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cbc:CityName', invoice.invoice_supplier.address.city)
+        fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_supplier.address.street)
+        fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_supplier.address.country.code)
+        fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cbc:name', invoice.invoice_supplier.address.country.name)
+        fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cac:AddressLine/cbc:Line', invoice.invoice_supplier.address.street)
         fexml.set_element('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/fe:PhysicalLocation/fe:Address/cac:AddressLine/cbc:Line',
-                          invoice.invoice_supplier.address)
+                          invoice.invoice_supplier.address.street)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyIdentification/cbc:ID',
                           invoice.invoice_customer.ident)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyTaxScheme/cbc:TaxLevelCode',
@@ -224,9 +242,14 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.ident)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)
+        fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cbc:CityName', invoice.invoice_customer.address.city)
+        fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_customer.address.country.code)
+        fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
+        fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_customer.address.street)
         fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PhysicalLocation/fe:Address/cac:AddressLine/cbc:Line',
-                          invoice.invoice_customer.address)
-
+                          invoice.invoice_customer.address.street)
+        fexml.set_element('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/fe:PartyLegalEntity/cbc:RegistrationAddress/cac:Country/cac:AddressLine/cbc:Line', invoice.invoice_customer.address.street)
+        
         fexml.set_element('/fe:Invoice/fe:LegalMonetaryTotal/cbc:LineExtensionAmount',
                           invoice.invoice_legal_monetary_total.line_extension_amount,
                           currencyID='COP')
