@@ -143,6 +143,30 @@ def soap_get_status(private_key, public_key, habilitacion, password, track_id):
     print(resp)
 
 @click.command()
+@click.option('--private-key', required=True)
+@click.option('--public-key', required=True)
+@click.option('--habilitacion/--produccion', default=False)
+@click.option('--password')
+@click.option('--nit', required=True)
+@click.option('--nit-proveedor', required=True)
+@click.option('--id-software', required=True)
+def soap_get_numbering_range(private_key,
+                             public_key,
+                             habilitacion,
+                             password,
+                             nit, nit_proveedor, id_software):
+    from facho.fe.client import dian
+    
+    client = dian.DianSignatureClient(private_key, public_key, password=password)
+    req = dian.GetNumberingRange
+    if habilitacion:
+        req = dian.Habilitacion.GetNumberingRange
+    resp = client.request(req(
+        nit, nit_proveedor, id_software
+    ))
+    print(resp)
+
+@click.command()
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--passphrase')
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
@@ -186,4 +210,5 @@ main.add_command(soap_send_bill_async)
 main.add_command(soap_send_bill_sync)
 main.add_command(soap_get_status)
 main.add_command(soap_get_status_zip)
+main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)

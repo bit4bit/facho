@@ -64,19 +64,20 @@ class ConsultaResolucionesFacturacionRespuesta:
 
 
 @dataclass
-class ConsultaResolucionesFacturacionPeticion(SOAPService):
-    NITObligadoFacturarElectronicamente: str
-    NITProveedorTecnologico: str
-    IdentificadorSoftware: str
+class GetNumberingRange(SOAPService):
+    accountCode: str
+    accountCodeT: str
+    softwareCode: str
 
     def get_wsdl(self):
-        return 'https://facturaelectronica.dian.gov.co/servicios/B2BIntegrationEngine-servicios/FacturaElectronica/consultaResolucionesFacturacion.wsdl'
+        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
-        return 'ConsultaResolucionesFacturacion'
+        return 'GetNumberingRange'
     
     def build_response(self, as_dict):
-        return ConsultaResolucionesFacturacionRespuesta.fromdict(as_dict)
+        return as_dict
+
 
 @dataclass
 class SendBillAsync(SOAPService):
@@ -154,11 +155,13 @@ class GetStatusZip(SOAPService):
 class Habilitacion:
     WSDL = 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
+    class GetNumberingRange(GetNumberingRange):
+        def get_wsdl(self):
+            return Habilitacion.WSDL
 
     class SendBillAsync(SendBillAsync):
         def get_wsdl(self):
             return Habilitacion.WSDL
-
 
     class SendBillSync(SendBillSync):
         def get_wsdl(self):
