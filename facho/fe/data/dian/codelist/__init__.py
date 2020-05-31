@@ -56,6 +56,10 @@ __all__ = ['TipoOrganizacion',
            'TipoResponsabilidad',
            'TipoAmbiente']
 
-TipoOrganizacion = CodeList(os.path.join(DATA_DIR, 'TipoOrganizacion-2.1.gc'), 'name')
-TipoResponsabilidad = CodeList(os.path.join(DATA_DIR, 'TipoResponsabilidad-2.1.gc'), 'name')
-TipoAmbiente = CodeList(os.path.join(DATA_DIR, 'TipoAmbiente-2.1.gc'), 'name')
+def path_for_codelist(name):
+    return os.path.join(DATA_DIR, name)
+
+TipoOrganizacion = CodeList(path_for_codelist('TipoOrganizacion-2.1.gc'), 'name')
+TipoResponsabilidad = CodeList(path_for_codelist('TipoResponsabilidad-2.1.gc'), 'name')
+TipoAmbiente = CodeList(path_for_codelist('TipoAmbiente-2.1.gc'), 'name')
+TipoDocumento = CodeList(path_for_codelist('TipoDocumento-2.1.gc'), 'name')
