@@ -34,32 +34,26 @@ class SOAPService:
         return asdict(self)
 
 @dataclass
-class ConsultaResolucionesFacturacionRespuesta:
+class GetNumberingRangeResponse:
 
     @dataclass
-    class RangoFacturacion:
-        NumeroResolucion: str
-        FechaResolucion: datetime
-        Prefijo: str
-        RangoInicial: int
-        RangoFinal: int
-        FechaVigenciaDesde: datetime
-        FechaVigenciaHasta: datetime
-        ClaveTecnica: str
-        
-    CodigoOperacion: str
-    DescripcionOperacion: str
-    IdentificadorOperacion: str
-    RangoFacturacion: List[RangoFacturacion]
+    class NumberRangeResponse:
+        ResolutionNumber: str
+        ResolutionDate: str
+        Prefix: str
+        FromNumber: int
+        ToNumber: int
+        ValidateDateFrom: str
+        ValidateDateTo: str
+        TechnicalKey: str
+
+    NumberRangeResponse: List[NumberRangeResponse]
 
 
     @classmethod
     def fromdict(cls, data):
         return cls(
-            data['CodigoOperacion'],
-            data['DescripcionOperacion'],
-            data['IdentificadorOperacion'],
-            data['RangoFacturacion']
+            data['NumberRangeResponse']
         )
 
 
@@ -76,7 +70,7 @@ class GetNumberingRange(SOAPService):
         return 'GetNumberingRange'
     
     def build_response(self, as_dict):
-        return as_dict
+        return GetNumberingRangeResponse.fromdict(as_dict)
 
 
 @dataclass

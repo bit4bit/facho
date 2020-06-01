@@ -57,7 +57,7 @@ def simple_invoice():
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item_ident = 9999,
+        item = form.StandarItem('test', 9999),
         price_amount = 100.0,
         tax = form.TaxTotal(
             tax_amount = 0.0,
@@ -159,7 +159,7 @@ def test_invoice_totals(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item_ident = 9999,
+        item = form.StandarItem('test', 9999),
         price_amount = 1_500_000,
         tax = form.TaxTotal(
             subtotals = [
@@ -182,7 +182,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item_ident = 9999,
+        item = form.StandarItem('test', 111),
         price_amount = 1_500_000,
         tax = form.TaxTotal(
             subtotals = [

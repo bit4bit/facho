@@ -10,11 +10,24 @@ from datetime import datetime
 from .data.dian import codelist
 from . import fe
 
+
+@dataclass
+class Item:
+    description: str
+    id: str
+
+    
+@dataclass
+class StandarItem(Item):
+    pass
+
+
 @dataclass
 class Country:
     code: str
     name: str
 
+    
 @dataclass
 class Address:
     name: str
@@ -22,6 +35,7 @@ class Address:
     city: str = ''
     department: str = ''
     country: Country = Country('CO', 'COLOMBIA')
+
     
 @dataclass
 class Party:
@@ -36,7 +50,6 @@ class Party:
     legal_name: str = ''
     legal_company_ident: str = ''
     legal_address: str = ''
-
 
 
 @dataclass
@@ -70,7 +83,7 @@ class InvoiceLine:
     # RESOLUCION 0004: pagina 155
     quantity: int
     description: str
-    item_ident: int
+    item: Item
     price_amount: float
     tax: TaxTotal
 
@@ -157,26 +170,26 @@ class DianResolucion0001Validator:
     def __init__(self):
         self.errors = []
 
-    def _validate_party(self, party):
+    def _validate_party(self, model, party):
         try:
             codelist.TipoResponsabilidad[party.responsability_code]
         except KeyError:
-            self.errors.append(('responsability_code', 'not found'))
+            self.errors.append((model, 'responsability_code', 'not found'))
 
         try:
             codelist.TipoOrganizacion[party.organization_code]
         except KeyError:
-            self.errors.append(('organization_code', 'not found'))
+            self.errors.append((model, 'organization_code', 'not found'))
 
     def validate(self, invoice):
         invoice.accept(self)
         return not self.errors
 
     def visit_customer(self, customer):
-        self._validate_party(customer)
+        self._validate_party('customer', customer)
 
     def visit_supplier(self, supplier):
-        self._validate_party(supplier)
+        self._validate_party('supplier', supplier)
 
     def visit_invoice_line(self, line):
         pass
@@ -276,7 +289,8 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/fe:InvoiceLine/cbc:InvoicedQuantity', invoice_line.quantity, unitCode = 'NAR')
             line.set_element('/fe:InvoiceLine/cbc:LineExtensionAmount', invoice_line.total_amount, currencyID="COP")
             line.set_element('/fe:InvoiceLine/fe:Price/cbc:PriceAmount', invoice_line.price_amount, currencyID="COP") 
-            line.set_element('/fe:InvoiceLine/fe:Item/cbc:Description', invoice_line.description)
-
+            line.set_element('/fe:InvoiceLine/fe:Item/cbc:Description', invoice_line.item.description)
+            # TODO
+            line.set_element('/fe:InvoiceLine/fe:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id) 
 
         return fexml
