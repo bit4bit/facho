@@ -41,8 +41,8 @@ class FeXML(FachoXML):
 
 
 class DianXMLExtensionCUFE(FachoXMLExtension):
-    AMBIENTE_PRUEBAS = 'Pruebas'
-    AMBIENTE_PRODUCCION = 'Producción'
+    AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
+    AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
     
     def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
         self.tipo_ambiente = tipo_ambiente
@@ -50,7 +50,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         self.invoice = invoice
 
     def _tipo_ambiente(self):
-        return int(codelist.TipoAmbiente[self.tipo_ambiente]['code'])
+        return int(self.tipo_ambiente)
 
     def build(self, fachoxml):
         cufe = self._generate_cufe(self.invoice, fachoxml)

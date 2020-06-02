@@ -18,7 +18,7 @@ class Item:
 
     
 @dataclass
-class StandarItem(Item):
+class StandardItem(Item):
     pass
 
 
@@ -174,12 +174,15 @@ class DianResolucion0001Validator:
         try:
             codelist.TipoResponsabilidad[party.responsability_code]
         except KeyError:
-            self.errors.append((model, 'responsability_code', 'not found'))
+            self.errors.append((model,
+                                'responsability_code',
+                                'not found %s' % (party.responsability_code)))
 
         try:
             codelist.TipoOrganizacion[party.organization_code]
         except KeyError:
-            self.errors.append((model, 'organization_code', 'not found'))
+            self.errors.append((model, 'organization_code' ,
+                                'not found %s' % (party.organization_code)))
 
     def validate(self, invoice):
         invoice.accept(self)
@@ -211,7 +214,7 @@ class DIANInvoiceXML(fe.FeXML):
 
         invoice.calculate()
 
-        fexml.set_element('/fe:Invoice/cbc:InvoiceTypeCode', codelist.TipoDocumento['Factura de Venta Nacional']['code'],
+        fexml.set_element('/fe:Invoice/cbc:InvoiceTypeCode', codelist.TipoDocumento.by_name('Factura de Venta Nacional')['code'],
                           listAgencyID='195',
                           listAgencyName='No matching global declaration available for the validation root',
                           listURI='http://www.dian.gov.co')

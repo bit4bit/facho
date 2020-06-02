@@ -91,13 +91,13 @@ class SendBillAsync(SOAPService):
 @dataclass
 class SendTestSetAsyncResponse:
     ZipKey: str
-    ErrorMessageList: List[str] = []
+    ErrorMessageList: List[str]
     
     @classmethod
     def fromdict(cls, data):
         return cls(
             data['ZipKey'],
-            data['ErrorMessageList']
+            data['ErrorMessageList'] or []
         )
     
 @dataclass

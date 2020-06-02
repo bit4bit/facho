@@ -23,15 +23,15 @@ def simple_invoice_without_lines():
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
-        responsability_code = 'No aplica',
-        organization_code = 'Persona Natural',
+        responsability_code = 'ZZ',
+        organization_code = '1',
         address = form.Address(name='Test Building')
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
         ident = 321,
-        responsability_code = 'No aplica',
-        organization_code = 'Persona Natural',
+        responsability_code = 'ZZ',
+        organization_code = '1',
         address = form.Address(name='Test Building')
     ))
     return inv
@@ -45,19 +45,19 @@ def simple_invoice():
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
-        responsability_code = 'No aplica',
-        organization_code = 'Persona Natural'
+        responsability_code = 'ZZ',
+        organization_code = '1'
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
         ident = 321,
-        responsability_code = 'No aplica',
-        organization_code = 'Persona Natural'
+        responsability_code = 'ZZ',
+        organization_code = '1'
     ))
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item = form.StandarItem('test', 9999),
+        item = form.StandardItem('test', 9999),
         price_amount = 100.0,
         tax = form.TaxTotal(
             tax_amount = 0.0,
@@ -159,7 +159,7 @@ def test_invoice_totals(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandarItem('test', 9999),
+        item = form.StandardItem('test', 9999),
         price_amount = 1_500_000,
         tax = form.TaxTotal(
             subtotals = [
@@ -182,7 +182,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandarItem('test', 111),
+        item = form.StandardItem('test', 111),
         price_amount = 1_500_000,
         tax = form.TaxTotal(
             subtotals = [
