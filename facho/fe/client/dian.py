@@ -129,7 +129,16 @@ class SendBillSync(SOAPService):
     def build_response(self, as_dict):
         return as_dict
 
+@dataclass
+class GetStatusResponse:
+    IsValid: bool
+    StatusDescription: str
 
+    @classmethod
+    def fromdict(cls, data):
+        return cls(data['IsValid'],
+                   data['StatusDescription'])
+    
 @dataclass
 class GetStatus(SOAPService):
     trackId: bytes
@@ -141,7 +150,7 @@ class GetStatus(SOAPService):
         return 'GetStatus'
 
     def build_response(self, as_dict):
-        return as_dict
+        return GetStatusResponse.fromdict(as_dict)
 
 @dataclass
 class GetStatusZip(SOAPService):
@@ -154,7 +163,7 @@ class GetStatusZip(SOAPService):
         return 'GetStatusZip'
 
     def build_response(self, as_dict):
-        return as_dict
+        return GetStatusResponse.fromdict(as_dict[0])
 
 
 class Habilitacion:
