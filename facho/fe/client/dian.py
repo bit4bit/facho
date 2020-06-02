@@ -88,7 +88,18 @@ class SendBillAsync(SOAPService):
         return as_dict
 
 
-
+@dataclass
+class SendTestSetAsyncResponse:
+    ZipKey: str
+    ErrorMessageList: List[str] = []
+    
+    @classmethod
+    def fromdict(cls, data):
+        return cls(
+            data['ZipKey'],
+            data['ErrorMessageList']
+        )
+    
 @dataclass
 class SendTestSetAsync(SOAPService):
     fileName: str
@@ -102,7 +113,7 @@ class SendTestSetAsync(SOAPService):
         return 'SendTestSetAsync'
 
     def build_response(self, as_dict):
-        return as_dict
+        return SendTestSetAsyncResponse.fromdict(as_dict)
 
 @dataclass
 class SendBillSync(SOAPService):
