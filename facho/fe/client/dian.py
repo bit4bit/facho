@@ -133,11 +133,15 @@ class SendBillSync(SOAPService):
 class GetStatusResponse:
     IsValid: bool
     StatusDescription: str
-
+    StatusCode: int
+    ErrorMessage: List[str]
+    
     @classmethod
     def fromdict(cls, data):
         return cls(data['IsValid'],
-                   data['StatusDescription'])
+                   data['StatusDescription'],
+                   data['StatusCode'],
+                   data['ErrorMessage']['string'])
     
 @dataclass
 class GetStatus(SOAPService):
