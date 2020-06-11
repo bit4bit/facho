@@ -217,7 +217,37 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         return (dian_path, [signature])
         
 
+class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
+    # RESOLUCION 0004: pagina 106
 
+    def __init__(self, authorization: str,
+                 period_startdate: datetime, period_enddate: datetime,
+                 prefix: str, from_: int, to: int):
+        self.authorization = authorization
+        self.period_startdate = period_startdate
+        self.period_enddate = period_enddate
+        self.prefix = prefix
+        self.from_ = from_
+        self.to = to
+
+    def build(self, fexml):
+        fexml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode', 'CO')
+        
+        invoice_control = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
+        invoice_control.set_element('/sts:InvoiceControl/sts:InvoiceAuthorization', self.authorization)
+        invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizationPeriod/cbc:StartDate',
+                                    self.period_startdate.strftime('%Y-%m-%d'))
+        invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizationPeriod/cbc:EndDate',
+                                    self.period_enddate.strftime('%Y-%m-%d'))
+        invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizedInvoices/sts:Prefix',
+                                    self.prefix)
+        invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizedInvoices/sts:From',
+                                    self.from_)
+        invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizedInvoices/sts:To',
+                                    self.to)
+        return '', []
+
+        
 class DianZIP:
     
     # RESOLUCION 0001: pagina 540

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
+from datetime import datetime
 
 import pytest
 from facho import fe
@@ -53,3 +54,15 @@ def test_dian_extension_software_security_code():
     xml.add_extension(security_code)
     content = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode')
     assert content is not None
+
+def test_dian_extension_invoice_authorization():
+    invoice_authorization = '18762002346472'
+    inv_auth_ext = fe.DianXMLExtensionInvoiceAuthorization(invoice_authorization,
+                                                           datetime(2017, 2, 23),
+                                                           datetime(2019, 8, 23),
+                                                           'MD', 100001, 174999)
+    xml = fe.FeXML('Invoice',
+                   'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.add_extension(inv_auth_ext)
+    auth = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl/sts:InvoiceAuthorization')
+    assert auth == invoice_authorization
