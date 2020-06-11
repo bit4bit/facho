@@ -66,3 +66,15 @@ def test_dian_extension_invoice_authorization():
     xml.add_extension(inv_auth_ext)
     auth = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl/sts:InvoiceAuthorization')
     assert auth == invoice_authorization
+
+def test_dian_extension_software_provider():
+    nit = '123456789'
+    id_software = 'ABCDASDF123'
+    software_provider_extension = fe.DianXMLExtensionSoftwareProvider(nit, id_software)
+    
+    xml = fe.FeXML('Invoice',
+                   'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.add_extension(software_provider_extension)
+    
+    give_nit = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider/sts:ProviderID')
+    assert nit == give_nit

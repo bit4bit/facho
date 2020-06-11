@@ -113,6 +113,20 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         h.update(cufe.encode('utf-8'))
         return h.hexdigest()
 
+
+class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
+    # RESOLUCION 0004: pagina 108
+
+    def __init__(self, nit: str, id_software: str):
+        self.nit = nit
+        self.id_software = id_software
+
+    def build(self, fexml):
+        software_provider = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
+        software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit)
+        software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software)
+        return '', []
+
     
 class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
     # RESOLUCION 0001: pagina 535
