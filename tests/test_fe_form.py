@@ -77,17 +77,11 @@ def test_invoicesimple_build(simple_invoice):
     assert invoice_validator.validate(simple_invoice) == True
     xml = form.DIANInvoiceXML(simple_invoice)
 
-    supplier_name = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyName/cbc:Name')
+    supplier_name = xml.get_element_text('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name')
     assert supplier_name == simple_invoice.invoice_supplier.name
 
-    supplier_identification_number = xml.get_element_text('/fe:Invoice/fe:AccountingSupplierParty/fe:Party/cac:PartyIdentification/cbc:ID')
-    assert int(supplier_identification_number) == simple_invoice.invoice_supplier.ident
-
-    customer_name = xml.get_element_text('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyName/cbc:Name')
+    customer_name = xml.get_element_text('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name')
     assert customer_name == simple_invoice.invoice_customer.name
-
-    customer_identification_number = xml.get_element_text('/fe:Invoice/fe:AccountingCustomerParty/fe:Party/cac:PartyIdentification/cbc:ID')
-    assert int(customer_identification_number) == simple_invoice.invoice_customer.ident
 
 
 def test_invoicesimple_build_with_cufe(simple_invoice):
@@ -130,7 +124,7 @@ def test_invoicesimple_zip(simple_invoice):
 
 def test_bug_cbcid_empty_on_invoice_line(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
-    cbc_id = xml_invoice.get_element_text('/fe:Invoice/fe:InvoiceLine[1]/cbc:ID', format_=int)
+    cbc_id = xml_invoice.get_element_text('/fe:Invoice/cac:InvoiceLine[1]/cbc:ID', format_=int)
     assert cbc_id == 1
 
 def test_invoice_line_count_numeric(simple_invoice):

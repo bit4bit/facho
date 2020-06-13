@@ -136,12 +136,13 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
         self.pin = pin
         self.invoice_ident = invoice_ident
 
-    def build(self, fachoxml):
-        dian_path = '/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode'
+    def build(self, fexml):
+        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode'
         code = str(self.id_software) + str(self.pin) + str(self.invoice_ident)
         m = hashlib.sha384()
         m.update(code.encode('utf-8'))
-        return dian_path, m.hexdigest()
+        fexml.set_element(dian_path, m.hexdigest())
+        return '', []
 
     
 class DianXMLExtensionSigner(FachoXMLExtension):
@@ -226,8 +227,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         #xmlsig take parent root
         fachoxml.root.remove(signature)
 
-
-        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append_not_exists=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
         

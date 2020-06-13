@@ -142,11 +142,16 @@ class FachoXML:
                 elem = self.find_or_create_element('/' + root_tag + xpath)
                 self.builder.append(elem, new_element)
     
-    def fragment(self, xpath, append=False):
+    def fragment(self, xpath, append=False, append_not_exists=False):
         nodes = xpath.split('/')
         nodes.pop()
         root_prefix = '/'.join(nodes)
-        parent = self.find_or_create_element(xpath, append=append)
+        parent = None
+        if append_not_exists:
+            parent = self.get_element(xpath)
+            
+        if parent is None:
+            parent = self.find_or_create_element(xpath, append=append)
         return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix)
 
     def register_alias_xpath(self, alias, xpath):
@@ -207,6 +212,10 @@ class FachoXML:
         for k, v in attrs.items():
             self.builder.set_attribute(elem, k, v)
         return elem
+
+    def get_element(self, xpath):
+        xpath = self.fragment_prefix + self._normalize_xpath(xpath)
+        return self.builder.xpath(self.root, xpath)
 
     def get_element_text(self, xpath, format_=str):
         xpath = self.fragment_prefix + self._normalize_xpath(xpath)
