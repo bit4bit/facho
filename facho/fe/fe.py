@@ -54,7 +54,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
 
     def build(self, fachoxml):
         cufe = self._generate_cufe(self.invoice, fachoxml)
-        fachoxml.set_element('/fe:Invoice/cbc:UUID[schemaName="CUFE-SHA384"]', cufe)
+        fachoxml.set_element('/fe:Invoice/cbc:UUID', cufe, schemeName='CUFE-SHA384')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         return '', []
@@ -161,8 +161,6 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
     # return (xpath, xml.Element)
     def build(self, fachoxml):
-        dian_path = '/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent'
-        
         signature = xmlsig.template.create(
             xmlsig.constants.TransformInclC14N,
             xmlsig.constants.TransformRsaSha256,
@@ -227,8 +225,13 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ctx.verify(signature)
         #xmlsig take parent root
         fachoxml.root.remove(signature)
+
+
+        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+        extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
+        fachoxml.append_element(extcontent, signature)
         
-        return (dian_path, [signature])
+        return '', []
         
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):

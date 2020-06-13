@@ -125,6 +125,11 @@ class FachoXML:
         self.xpath_for = {}
         self.extensions = []
 
+    def append_element(self, elem, new_elem):
+        #elem = self.find_or_create_element(xpath, append=append)
+        #self.builder.append(elem, new_elem)
+        self.builder.append(elem, new_elem)
+        
     def add_extension(self, extension):
         root_tag = self.builder.get_tag(self.root)
 
