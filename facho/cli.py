@@ -122,7 +122,13 @@ def soap_get_status_zip(private_key, public_key, habilitacion, password, track_i
     resp = client.request(req(
         trackId = track_id
     ))
-    print(resp)
+
+    print("StatusCode:", resp.StatusCode)
+    print("StatusDescription:", resp.StatusDescription)
+    print("===ERRORES NOTIFICADOS====")
+    for error_msg in resp.ErrorMessage:
+        print("*", error_msg)
+
 
 @click.command()
 @click.option('--private-key', required=True)
@@ -167,10 +173,25 @@ def soap_get_numbering_range(private_key,
     print(resp)
 
 @click.command()
+@click.argument('invoice_path')
+def validate_invoice(invoice_path):
+    from facho.fe.data.dian import XSD
+    content = open(invoice_path, 'r').read()
+    # TODO donde ubicar esta responsabilidad?
+    # esto es requerido por el XSD de la DIAN
+    content = content.replace(
+        'xmlns:fe="http://www.dian.gov.co/contratos/facturaelectronica/v1"',
+        'xmlns:fe="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"'
+    )
+    XSD.validate(content, XSD.UBLInvoice)
+
+
+@click.command()
 @click.option('--private-key', type=click.Path(exists=True))
+@click.option('--generate/--validate', default=False)
 @click.option('--passphrase')
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
-def generate_invoice(private_key, passphrase, scriptname):
+def generate_invoice(private_key, passphrase, scriptname, generate=False):
     """
     imprime xml en pantalla.
     SCRIPTNAME espera 
@@ -188,16 +209,24 @@ def generate_invoice(private_key, passphrase, scriptname):
 
     invoice = module.invoice()
     invoice.calculate()
-    xml = form.DIANInvoiceXML(invoice)
+    validator = form.DianResolucion0001Validator()
+    if not validator.validate(invoice):
+        for error in validator.errors:
+            print("ERROR:", error)
+
+    if generate:
+        xml = form.DIANInvoiceXML(invoice)
     
-    extensions = module.extensions(invoice)
-    for extension in extensions:
-        xml.add_extension(extension)
+        extensions = module.extensions(invoice)
+        for extension in extensions:
+            xml.add_extension(extension)
     
-    if private_key:
-        signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
-        xml.add_extension(signer)
-    print(xml.tostring(xml_declaration=True))
+        if private_key:
+            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+            xml.add_extension(signer)
+
+
+        print(xml.tostring(xml_declaration=True))
 
     
 @click.group()
@@ -212,3 +241,4 @@ main.add_command(soap_get_status)
 main.add_command(soap_get_status_zip)
 main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)
+main.add_command(validate_invoice)

@@ -19,3 +19,4 @@ def test_tipoorganizacion():
 def test_tipodocumento():
     assert codelist.TipoDocumento.short_name == 'TipoDocumento'
     assert codelist.TipoDocumento.by_name('Factura de Venta Nacional')['code'] == '01'
+

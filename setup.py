@@ -47,7 +47,7 @@ setup(
     include_package_data=True,
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
-        '': ['*.gc']
+        '': ['*.gc', '*.xsd']
     },
     keywords='facho',
     name='facho',
@@ -56,6 +56,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/bit4bit/facho',
-    version='0.1.0',
+    version='0.1.1',
     zip_safe=False,
 )
