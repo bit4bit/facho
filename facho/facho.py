@@ -213,6 +213,12 @@ class FachoXML:
             self.builder.set_attribute(elem, k, v)
         return elem
 
+    def set_attributes(self, xpath, **attrs):
+        xpath = self._normalize_xpath(xpath)
+        elem = self.get_element(xpath)
+        for k, v in attrs.items():
+            self.builder.set_attribute(elem, k, v)
+            
     def get_element(self, xpath):
         xpath = self.fragment_prefix + self._normalize_xpath(xpath)
         return self.builder.xpath(self.root, xpath)

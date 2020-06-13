@@ -12,6 +12,12 @@ import hashlib
 from contextlib import contextmanager
 from .data.dian import codelist
 
+SCHEME_AGENCY_ATTRS = {
+    'schemeAgencyName': 'CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)',
+    'schemeAgencyID': '195'
+}
+
+                      
 NAMESPACES = {
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
@@ -123,8 +129,10 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
 
     def build(self, fexml):
         software_provider = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
-        software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit)
-        software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software)
+        software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit,
+                                      **SCHEME_AGENCY_ATTRS)
+        software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software,
+                                      **SCHEME_AGENCY_ATTRS)
         return '', []
 
     
@@ -142,6 +150,7 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
         m = hashlib.sha384()
         m.update(code.encode('utf-8'))
         fexml.set_element(dian_path, m.hexdigest())
+        fexml.set_attributes(dian_path, **SCHEME_AGENCY_ATTRS)
         return '', []
 
     
@@ -233,6 +242,19 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         
         return '', []
         
+
+class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
+    # RESOLUCION 0004: pagina 176
+
+    def build(self, fexml):
+        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
+        fexml.set_element(dian_path, '800197268')
+        
+        attrs = {'schemeID': '4', 'schemeName': '31'}
+        attrs.update(SCHEME_AGENCY_ATTRS)
+        fexml.set_attributes(dian_path, **attrs)
+        return '', []
+    
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
     # RESOLUCION 0004: pagina 106

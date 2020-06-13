@@ -228,7 +228,8 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_supplier.address.street)
         
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
-                          invoice.invoice_supplier.ident)
+                          invoice.invoice_supplier.ident,
+                          **fe.SCHEME_AGENCY_ATTRS)
 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_supplier.responsability_code)
@@ -251,7 +252,8 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_customer.address.street)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
-                          invoice.invoice_customer.ident)
+                          invoice.invoice_customer.ident,
+                          **fe.SCHEME_AGENCY_ATTRS)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_customer.responsability_code)
         fexml.find_or_create_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
