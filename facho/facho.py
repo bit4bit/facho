@@ -151,6 +151,9 @@ class FachoXML:
 
     def _normalize_xpath(self, xpath):
         return xpath.replace('//', '/')
+
+    def placeholder_for(self, xpath):
+        return self.find_or_create_element(xpath)
     
     def find_or_create_element(self, xpath, append=False):
         """

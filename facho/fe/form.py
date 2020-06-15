@@ -216,8 +216,6 @@ class DIANInvoiceXML(fe.FeXML):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
         self.attach_invoice(invoice)
 
-    def placeholder_for(fexml, xpath):
-        fexml.find_or_create_element(xpath)
 
     def set_supplier(fexml, invoice):
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
@@ -234,7 +232,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_supplier.responsability_code)
 
-        fexml.find_or_create_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cbc:CityName', invoice.invoice_supplier.address.city)
@@ -256,7 +254,7 @@ class DIANInvoiceXML(fe.FeXML):
                           **fe.SCHEME_AGENCY_ATTRS)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_customer.responsability_code)
-        fexml.find_or_create_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
 
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)
