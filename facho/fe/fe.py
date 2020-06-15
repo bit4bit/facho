@@ -63,7 +63,6 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         fachoxml.set_element('/fe:Invoice/cbc:UUID', cufe, schemeName='CUFE-SHA384')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
-        return '', []
         
     def issue_time(self, datetime_):
         return datetime_.strftime('%H:%M:%S%z')
@@ -133,7 +132,7 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
                                       **SCHEME_AGENCY_ATTRS)
         software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software,
                                       **SCHEME_AGENCY_ATTRS)
-        return '', []
+
 
     
 class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
@@ -240,7 +239,6 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
         
-        return '', []
         
 
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
@@ -253,7 +251,7 @@ class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
         attrs = {'schemeID': '4', 'schemeName': '31'}
         attrs.update(SCHEME_AGENCY_ATTRS)
         fexml.set_attributes(dian_path, **attrs)
-        return '', []
+
     
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
@@ -284,7 +282,7 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
                                     self.from_)
         invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizedInvoices/sts:To',
                                     self.to)
-        return '', []
+
 
         
 class DianZIP:
