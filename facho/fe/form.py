@@ -78,6 +78,12 @@ class TaxTotal:
             self.tax_amount += subtax.tax_amount
             self.taxable_amount += subtax.taxable_amount
       
+@dataclass
+class Price:
+    amount: float
+    type_code: str
+    type: str
+    
 
 @dataclass
 class InvoiceLine:
@@ -85,12 +91,12 @@ class InvoiceLine:
     quantity: int
     description: str
     item: Item
-    price_amount: float
+    price: Price
     tax: TaxTotal
 
     @property
     def total_amount(self):
-        return self.quantity * self.price_amount
+        return self.quantity * self.price.amount
 
     @property
     def total_tax_inclusive_amount(self):
@@ -293,6 +299,12 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/cac:InvoiceLine/cbc:InvoicedQuantity', invoice_line.quantity, unitCode = 'NAR')
             line.set_element('/cac:InvoiceLine/cbc:LineExtensionAmount', invoice_line.total_amount, currencyID="COP")
             line.set_element('/cac:InvoiceLine/cac:TaxTotal/cbc:TaxAmount', invoice_line.tax_amount, currencyID='COP')
+
+            condition_price = line.fragment('/cac:InvoiceLine/cac:PricingReference/cac:AlternativeConditionPrice')
+            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceAmount', invoice_line.price.amount, currencyID='COP')
+            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceTypeCode', invoice_line.price.type_code)
+            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceType', invoice_line.price.type)
+            
             for subtotal in invoice_line.tax.subtotals:
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount', subtotal.taxable_amount, currencyID='COP')
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
@@ -302,7 +314,7 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/cac:InvoiceLine/cac:Item/cbc:Description', invoice_line.item.description)
             # TODO
             line.set_element('/cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id) 
-            line.set_element('/cac:InvoiceLine/cac:Price/cbc:PriceAmount', invoice_line.price_amount, currencyID="COP") 
+            line.set_element('/cac:InvoiceLine/cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP") 
 
     def attach_invoice(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML

@@ -58,7 +58,7 @@ def simple_invoice():
         quantity = 1,
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
-        price_amount = 100.0,
+        price = form.Price(100.0, '', ''),
         tax = form.TaxTotal(
             tax_amount = 0.0,
             taxable_amount = 0.0,
@@ -154,7 +154,7 @@ def test_invoice_totals(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 9999),
-        price_amount = 1_500_000,
+        price = form.Price(1_500_000, '', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
@@ -177,7 +177,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 111),
-        price_amount = 1_500_000,
+        price = form.Price(1_500_000, '', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
