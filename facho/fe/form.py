@@ -77,13 +77,32 @@ class TaxTotal:
             subtax.calculate(invline)
             self.tax_amount += subtax.tax_amount
             self.taxable_amount += subtax.taxable_amount
-      
+
+            
 @dataclass
 class Price:
     amount: float
     type_code: str
     type: str
-    
+
+
+@dataclass
+class PaymentMean:
+    id: str
+    code :str
+    due_at: datetime
+    payment_id: str
+
+        
+@dataclass
+class Payment:
+    amount: float
+    at: datetime
+
+@dataclass
+class PrePaidPayment(Payment):
+    pass
+
 
 @dataclass
 class InvoiceLine:
@@ -93,7 +112,7 @@ class InvoiceLine:
     item: Item
     price: Price
     tax: TaxTotal
-
+    
     @property
     def total_amount(self):
         return self.quantity * self.price.amount
@@ -136,6 +155,8 @@ class Invoice:
         self.invoice_legal_monetary_total = LegalMonetaryTotal(0, 0, 0, 0, 0)
         self.invoice_customer = None
         self.invoice_supplier = None
+        self.invoice_payment_mean = None
+        self.invoice_payments = []
         self.invoice_lines = []
         
     def set_period(self, startdate, enddate):
@@ -154,12 +175,18 @@ class Invoice:
     def set_customer(self, party: Party):
         self.invoice_customer = party
 
+    def set_payment_mean_debit(self, payment_id, code, due_at):
+        self.invoice_payment_mean = PaymentMean('01', code, due_at, payment_id)
+
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
 
     def accept(self, visitor):
+        visitor.visit_payment_mean(self.invoice_payment_mean)
         visitor.visit_customer(self.invoice_customer)
         visitor.visit_supplier(self.invoice_supplier)
+        for payment in self.invoice_payments:
+            visitor.visit_payment(payment)
         for invline in self.invoice_lines:
             visitor.visit_invoice_line(invline)
 
@@ -203,11 +230,21 @@ class DianResolucion0001Validator:
         invoice.accept(self)
         return not self.errors
 
+    def visit_payment_mean(self, mean):
+        try:
+            codelist.MediosPago[mean.code]
+        except KeyError:
+            self.errors.append(('payment_mean', 'code',
+                                'not found %s' % (mean.code)))
+
     def visit_customer(self, customer):
         self._validate_party('customer', customer)
 
     def visit_supplier(self, supplier):
         self._validate_party('supplier', supplier)
+
+    def visit_payment(self, payment):
+        pass
 
     def visit_invoice_line(self, line):
         try:
@@ -276,6 +313,13 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_customer.address.country.code)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
 
+    def set_payment_mean(fexml, invoice):
+        payment_mean = invoice.invoice_payment_mean
+        fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:ID', payment_mean.id)
+        fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentMeansCode', payment_mean.code)
+        fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentDueDate', payment_mean.due_at.strftime('%Y-%m-%d'))
+        fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentID', payment_mean.payment_id)
+        
     def set_legal_monetary(fexml, invoice):
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:LineExtensionAmount',
                           invoice.invoice_legal_monetary_total.line_extension_amount,
@@ -346,6 +390,6 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_customer(invoice)
         fexml.set_legal_monetary(invoice)
         fexml.set_invoice_lines(invoice)
-
+        fexml.set_payment_mean(invoice)
 
         return fexml

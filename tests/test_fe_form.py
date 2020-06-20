@@ -20,6 +20,7 @@ def simple_invoice_without_lines():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
+    inv.set_payment_mean_debit('1234', '41', datetime.now())
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
@@ -42,6 +43,7 @@ def simple_invoice():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
+    inv.set_payment_mean_debit('1234', '41', datetime.now())
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
@@ -204,3 +206,8 @@ def test_invoice_cufe(simple_invoice_without_lines):
     # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
 
+
+
+def test_invoice_payment_mean(monkeypatch, simple_invoice):
+    invoice_validator = form.DianResolucion0001Validator()
+    assert invoice_validator.validate(simple_invoice) == True
