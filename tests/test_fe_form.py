@@ -58,7 +58,7 @@ def simple_invoice():
         quantity = 1,
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
-        price = form.Price(100.0, '', ''),
+        price = form.Price(100.0, '01', ''),
         tax = form.TaxTotal(
             tax_amount = 0.0,
             taxable_amount = 0.0,

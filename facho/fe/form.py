@@ -210,7 +210,11 @@ class DianResolucion0001Validator:
         self._validate_party('supplier', supplier)
 
     def visit_invoice_line(self, line):
-        pass
+        try:
+            codelist.CodigoPrecioReferencia[line.price.type_code]
+        except KeyError:
+            self.errors.append(('invoice_line', 'line.price',
+                               'not found %s' % (line.price.type_code)))
 
     def valid(self):
         return not self.errors
