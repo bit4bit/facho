@@ -88,10 +88,14 @@ class Price:
 
 @dataclass
 class PaymentMean:
-    id: str
-    code :str
-    due_at: datetime
-    payment_id: str
+    DEBIT = '01'
+    CREDIT = '02'
+    
+    def __init__(self, id: str, code: str, due_at: datetime, payment_id: str):
+        self.id = id
+        self.code = code
+        self.due_at = due_at
+        self.payment_id = payment_id
 
         
 @dataclass
@@ -175,8 +179,8 @@ class Invoice:
     def set_customer(self, party: Party):
         self.invoice_customer = party
 
-    def set_payment_mean_debit(self, payment_id, code, due_at):
-        self.invoice_payment_mean = PaymentMean('01', code, due_at, payment_id)
+    def set_payment_mean(self, payment_mean: PaymentMean):
+        self.invoice_payment_mean = payment_mean
 
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)

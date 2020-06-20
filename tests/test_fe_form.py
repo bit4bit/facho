@@ -20,7 +20,7 @@ def simple_invoice_without_lines():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
-    inv.set_payment_mean_debit('1234', '41', datetime.now())
+    inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
@@ -43,7 +43,7 @@ def simple_invoice():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
-    inv.set_payment_mean_debit('1234', '41', datetime.now())
+    inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), ' 1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
         ident = 123,
