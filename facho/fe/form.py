@@ -262,6 +262,10 @@ class DianResolucion0001Validator:
 
 
 class DIANInvoiceXML(fe.FeXML):
+    """
+    DianInvoiceXML mapea objeto form.Invoice a XML segun
+    lo indicado para la facturacion electronica.
+    """
 
     def __init__(self, invoice):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')

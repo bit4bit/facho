@@ -188,6 +188,8 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         serial = xmlsig.template.x509_data_add_issuer_serial(data)
         xmlsig.template.x509_issuer_serial_add_issuer_name(serial)
         xmlsig.template.x509_issuer_serial_add_serial_number(serial)
+
+
         xmlsig.template.add_key_value(ki)
         qualifying = xades.template.create_qualifying_properties(signature)
         xades.utils.ensure_id(qualifying)

@@ -149,9 +149,17 @@ class FachoXML:
     def register_alias_xpath(self, alias, xpath):
         self.xpath_for[alias] = xpath
 
+    def _translate_xpath_for(self, xpath):
+        if xpath in self.xpath_for:
+            xpath = self.xpath_for[xpath]
+        return xpath
+        
     def _normalize_xpath(self, xpath):
         return xpath.replace('//', '/')
 
+    def _path_xpath_for(self, xpath):
+        return self._normalize_xpath(self._translate_xpath_for(xpath))
+    
     def placeholder_for(self, xpath):
         return self.find_or_create_element(xpath)
     
@@ -161,10 +169,7 @@ class FachoXML:
         @param append True si se debe adicionar en la ruta xpath indicada
         @return elemento segun self.builder
         """
-        xpath = self._normalize_xpath(xpath)
-        if xpath in self.xpath_for:
-            xpath = self.xpath_for[xpath]
-
+        xpath = self._path_xpath_for(xpath)
         node_paths = xpath.split('/')
         node_paths.pop(0) #remove empty /
 
@@ -198,7 +203,13 @@ class FachoXML:
         return current_elem
       
     def set_element(self, xpath, content, **attrs):
-        xpath = self._normalize_xpath(xpath)
+        """
+        asigna contenido ubicado por ruta tipo XPATH.
+        @param xpath ruta tipo XPATH
+        @param content contenido
+        @return lxml.Element
+        """
+        xpath = self._path_xpath_for(xpath)
         format_ = attrs.pop('format_', '%s')
         append_ = attrs.pop('append_', False)
         elem = self.find_or_create_element(xpath, append=append_)
@@ -209,18 +220,23 @@ class FachoXML:
         return elem
 
     def set_attributes(self, xpath, **attrs):
-        xpath = self._normalize_xpath(xpath)
+        """
+        asigna atributos a elemento xml ubicador por ruta XPATH
+        @param xpath ruta tipo  XPATH
+        @param keywords clave valor de los atributos
+        """
+        xpath = self._path_xpath_for(xpath)
         elem = self.get_element(xpath)
         for k, v in attrs.items():
             self.builder.set_attribute(elem, k, v)
         return self
 
     def get_element(self, xpath):
-        xpath = self.fragment_prefix + self._normalize_xpath(xpath)
+        xpath = self.fragment_prefix + self._path_xpath_for(xpath)
         return self.builder.xpath(self.root, xpath)
 
     def get_element_text(self, xpath, format_=str):
-        xpath = self.fragment_prefix + self._normalize_xpath(xpath)
+        xpath = self.fragment_prefix + self._path_xpath_for(xpath)
         elem = self.builder.xpath(self.root, xpath)
         text = self.builder.get_text(elem)
         return format_(text)
