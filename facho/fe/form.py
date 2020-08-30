@@ -36,7 +36,21 @@ class Address:
     department: str = ''
     country: Country = Country('CO', 'COLOMBIA')
 
-    
+
+@dataclass
+class PartyIdentification:
+    number: str
+    dv: str
+
+    def __str__(self):
+        return self.number
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+    def full(self):
+        return "%s%s" % [self.number, self.dv]
+        
 @dataclass
 class Party:
     name: str
@@ -279,7 +293,15 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_supplier.name)
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_supplier.address.street)
-        
+
+
+        supplier_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
+        supplier_company_id_attrs.update({'schemeID': invoice.invoice_supplier.ident.dv,
+                                          'schemeName': '31'})
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
+                          invoice.invoice_supplier.ident,
+                          **supplier_company_id_attrs)
+
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
                           **fe.SCHEME_AGENCY_ATTRS)

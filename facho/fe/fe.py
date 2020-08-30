@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from .data.dian import codelist
 
 SCHEME_AGENCY_ATTRS = {
-    'schemeAgencyName': 'CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)',
+    'schemeAgencyName': 'CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)',
     'schemeAgencyID': '195'
 }
 
@@ -248,7 +248,7 @@ class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
 
     def build(self, fexml):
-        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
+        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
         fexml.set_element(dian_path, '800197268')
         
         attrs = {'schemeID': '4', 'schemeName': '31'}
