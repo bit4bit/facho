@@ -304,7 +304,7 @@ class DIANInvoiceXML(fe.FeXML):
 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
-                          **fe.SCHEME_AGENCY_ATTRS)
+                          **supplier_company_id_attrs)
 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           invoice.invoice_supplier.responsability_code)
