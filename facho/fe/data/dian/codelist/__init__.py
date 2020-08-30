@@ -55,7 +55,12 @@ class CodeList:
             if v[self.name_column] == name:
                 return v
         raise KeyError
-    
+
+    def update(self, other):
+        for k, v in other.rows.items():
+            self.rows[k] = v
+        return self
+
 # nombres de variables igual a ./Identification/ShortName
 # TODO: garantizar unica carga en python
 
@@ -70,7 +75,8 @@ def path_for_codelist(name):
     return os.path.join(DATA_DIR, name)
 
 TipoOrganizacion = CodeList(path_for_codelist('TipoOrganizacion-2.1.gc'), 'code', 'name')
-TipoResponsabilidad = CodeList(path_for_codelist('TipoResponsabilidad-2.1.gc'), 'code', 'name')
+TipoResponsabilidad = CodeList(path_for_codelist('TipoResponsabilidad-2.1.gc'), 'code', 'name')\
+    .update(CodeList(path_for_codelist('TipoResponsabilidad-2.1.custom.gc'), 'code', 'name'))
 TipoAmbiente = CodeList(path_for_codelist('TipoAmbiente-2.1.gc'), 'code', 'name')
 TipoDocumento = CodeList(path_for_codelist('TipoDocumento-2.1.gc'), 'code', 'name')
 CodigoPrecioReferencia = CodeList(path_for_codelist('CodigoPrecioReferencia-2.1.gc'), 'code', 'name')
