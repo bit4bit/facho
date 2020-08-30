@@ -13,7 +13,12 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=6.0', 'zeep>=3.4.0', 'pyOpenSSL>=19.1.0', 'xmlsig>=0.1.3', 'xades>=0.2.1']
+requirements = ['Click>=6.0',
+                'zeep>=3.4.0',
+                'pyOpenSSL>=19.1.0',
+                'xmlsig>=0.1.3',
+                'xades>=0.2.1',
+                'xmlsec>=1.3.8']
 
 setup_requirements = ['pytest-runner', ]
 
