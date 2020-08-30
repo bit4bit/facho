@@ -1,5 +1,6 @@
 import sys
 import base64
+import warnings
 
 import click
 
@@ -190,14 +191,25 @@ def validate_invoice(invoice_path):
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--generate/--validate', default=False)
 @click.option('--passphrase')
+@click.option('--ssl/--no-ssl', default=False)
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
-def generate_invoice(private_key, passphrase, scriptname, generate=False):
+def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True):
     """
     imprime xml en pantalla.
     SCRIPTNAME espera 
      def invoice() -> form.Invoice
      def extensions(form.Invoice): -> List[facho.FachoXMLExtension]
     """
+
+    # MACHETE
+    if not ssl:
+        import ssl
+        if getattr(ssl, '_create_unverified_context', None):
+            ssl._create_default_https_context = ssl._create_unverified_context
+            warnings.warn("be sure!! ssl disable")
+        else:
+            warnings.warn("can't disable ssl")
+            
     import importlib.util
     
     spec = importlib.util.spec_from_file_location('invoice', scriptname)
