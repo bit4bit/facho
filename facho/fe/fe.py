@@ -123,14 +123,16 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
 class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 108
 
-    def __init__(self, nit: str, id_software: str):
+    def __init__(self, nit, id_software: str):
         self.nit = nit
         self.id_software = id_software
 
     def build(self, fexml):
         software_provider = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
+        provider_id_attrs = SCHEME_AGENCY_ATTRS.copy()
+        provider_id_attrs.update({'schemeID': self.nit.dv})
         software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit,
-                                      **SCHEME_AGENCY_ATTRS)
+                                      **provider_id_attrs)
         software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software,
                                       **SCHEME_AGENCY_ATTRS)
 
