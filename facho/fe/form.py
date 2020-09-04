@@ -409,7 +409,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.placeholder_for('/fe:Invoice/cbc:ProfileExecutionID')
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
         fexml.placeholder_for('/fe:Invoice/cbc:UUID')
-        
+        fexml.set_element('/fe:Invoice/cbc:DocumentCurrencyCode', 'COP')
         fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
         fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S%z'))
         fexml.set_element('/fe:Invoice/cbc:InvoiceTypeCode', codelist.TipoDocumento.by_name('Factura de Venta Nacional')['code'],
