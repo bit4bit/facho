@@ -38,5 +38,965 @@
 				<SimpleValue>Otro tipo de obligado</SimpleValue>
 			</Value>
 		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-06</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Ingresos y patrimonio</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-07</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retención en la fuente a título de renta</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-08</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retención timbre nacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-09</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Retención en la fuente en el impuesto sobre las ventas</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Gran contribuyente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-14</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Informante de exógena</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Autorretenedor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-16</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Obligación de facturar por ingresos de bienes y/o servicios excluidos</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-17</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Profesionales de compra y venta de divisas</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-19</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Productor y/o exportador de bienes exentos</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-22</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Obligado a cumplir deberes formales a nombre de terceros</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente de retención en el impuesto sobre las ventas</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-32</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Impuesto Nacional a la Gasolina y al ACPM</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-33</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Impuesto Nacional al consumo</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-34</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Régimen simplificado impuesto nacional consumo rest y bares</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-36</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Establecimiento Permanente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-37</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Obligado a Facturar Electrónicamente Modelo 2242</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-38</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Facturación Electrónica Voluntaria Modelo 2242</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-39</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Proveedor de Servicios Tecnológicos PST Modelo 2242</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Régimen Simple de Tributación – SIMPLE</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-48</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Impuesto sobre las ventas – IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-49</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No responsable de IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-52</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Facturador electrónico</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-99</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Otro tipo de obligado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-00-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Clientes del Exterior</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-12-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Factor PN</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-16-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Mandatario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-25-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente Interventor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-99-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No responsable</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-06-PJ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Apoderado especial</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-07-PJ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Apoderado general</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-12-PJ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Factor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-16-PJ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Mandatario</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-99-PJ</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Otro tipo de responsable</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-01</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente de carga internacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-02</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente marítimo</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-03</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Almacén general de depósito</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-04</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comercializadora internacional (C.I.)</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-05</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comerciante de la zona aduanera especial de Inírida, Puerto Carreño, Cumaribo y Primavera</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-06</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comerciantes de la zona de régimen aduanero especial de Leticia</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-07</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comerciantes de la zona de régimen aduanero especial de Maicao, Uribia y Manaure</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-08</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comerciantes de la zona de régimen aduanero especial de Urabá, Tumaco y Guapí</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-09</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Comerciantes del puerto libre de San Andrés, Providencia y Santa Catalina</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-10</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito público de apoyo logístico internacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-11</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado para procesamiento industrial</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-12</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado de transformación o ensamble</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito franco</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-14</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado aeronáutico</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado para distribución internacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-16</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado de provisiones de a bordo para consumo y para llevar</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-17</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado para envíos urgentes</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-18</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito privado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-19</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito público</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-20</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósito público para distribución internacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-21</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Exportador de café</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-22</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Exportador</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Importador</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-24</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Intermediario de tráfico postal y envíos urgentes</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-25</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Operador de transporte multimodal</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-26</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Sociedad de intermediación aduanera</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-27</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Titular de puertos y muelles de servicio público o privado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-28</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador 263nfor régimen de importación y/o exportación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-29</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportista nacional para operaciones del régimen de tránsito aduanero</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-30</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario comercial zona franca</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-32</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario industrial de bienes zona franca</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-34</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario industrial de servicios zona franca</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-36</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario operador de zona franca</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-37</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario aduanero permanente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-38</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario altamente exportador</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-39</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario de zonas económicas especiales de exportación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-40</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Deposito privado de instalaciones industriales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-41</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Beneficiarios de programas especiales de exportación PEX</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-42</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Depósitos privados para mercancías en tránsito San Andrés</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-43</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Observadores de las operaciones de importación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-44</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuarios sistemas especiales Importación exportación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-46</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador 263nformac régimen de importación y/o exportación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador terrestre régimen de importación y/o exportación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-48</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Aeropuerto de servicio publico o privado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-49</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador fluvial régimen de importación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-50</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario industrial zona franca especial</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-53</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agencias de aduanas 1</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-54</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Usuario Operador Zona Franca Especial</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-55</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agencias de aduanas 2</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-56</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agencias de aduanas 3</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-57</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agencias de aduanas 4</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-58</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador aéreo nacional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-60</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Transportador aéreo, marítimo o fluvial modalidad Cabotaje</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-61</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Importador de alimentos de consumo humano y animal</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-62</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Importador Ocasional</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-63</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Importador de maquinaría y sus partes Decreto 2261 de 2012</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-64</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Beneficiario Programa de Fomento Industria Automotriz-PROFIA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>A-99</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Otro tipo de agente aduanero</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-01</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agencia</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-02</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Establecimiento de comercio</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-03</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Centro de explotación agrícola</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-04</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Centro de explotación animal</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-05</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Centro de explotación minera</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-06</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Centro de explotación de transformación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-07</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Centro de explotación de servicios</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-08</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Oficina</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-09</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Sede</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-10</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Sucursal</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-11</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Consultorio</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-12</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Administraciones</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Seccionales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-14</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Regionales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Intendencias</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-16</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Local o negocio</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-17</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Punto de venta</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-18</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Fábrica</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-19</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Taller</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-20</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cantera</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-21</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pozo de Petróleo y Gas</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-22</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Otro lug de tipo de extrac explotación de recursos naturales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>E-99</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Otro tipo de establecimiento</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-13</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Gran contribuyente</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-15</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Autorretenedor</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Agente de retención IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Régimen simple de tributación</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-99-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No responsable</SimpleValue>
+			</Value>
+		</Row>
 	</SimpleCodeList>
 </gc:CodeList>
