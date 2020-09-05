@@ -50,12 +50,27 @@ class PartyIdentification:
 
     def full(self):
         return "%s%s" % [self.number, self.dv]
+
+@dataclass
+class Responsability:
+    codes: list
+
+    def __str__(self):
+        return ';'.join(self.codes)
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+    def __iter__(self):
+        return iter(self.codes)
+
         
 @dataclass
 class Party:
     name: str
     ident: str
     responsability_code: str
+    responsability_regime_code: str
     organization_code: str
 
     phone: str = ''
@@ -231,12 +246,11 @@ class DianResolucion0001Validator:
         self.errors = []
 
     def _validate_party(self, model, party):
-        try:
-            codelist.TipoResponsabilidad[party.responsability_code]
-        except KeyError:
-            self.errors.append((model,
-                                'responsability_code',
-                                'not found %s' % (party.responsability_code)))
+        for code in party.responsability_code:
+            if code not in codelist.TipoResponsabilidad:
+                self.errors.append((model,
+                                    'responsability_code',
+                                    'not found %s' % (code)))
 
         try:
             codelist.TipoOrganizacion[party.organization_code]
@@ -309,7 +323,10 @@ class DIANInvoiceXML(fe.FeXML):
                           **supplier_company_id_attrs)
 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
-                          invoice.invoice_supplier.responsability_code)
+                          #DIAN 1.7.-2020: FAJ26
+                          invoice.invoice_supplier.responsability_code,
+                          #DIAN 1.7.-2020: FAJ27
+                          listName=invoice.invoice_supplier.responsability_regime_code)
 
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',

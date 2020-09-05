@@ -49,6 +49,8 @@ class CodeList:
     def __getitem__(self, key):
         return self.rows[str(key)]
 
+    def __contains__(self, key):
+        return key in self.rows
 
     def by_name(self, name):
         for k, v in self.rows.items():
@@ -69,7 +71,8 @@ __all__ = ['TipoOrganizacion',
            'TipoAmbiente',
            'TipoDocumento',
            'CodigoPrecioReferencia',
-           'MediosPago']
+           'MediosPago',
+           'RegimenFiscal']
 
 def path_for_codelist(name):
     return os.path.join(DATA_DIR, name)
@@ -81,3 +84,4 @@ TipoAmbiente = CodeList(path_for_codelist('TipoAmbiente-2.1.gc'), 'code', 'name'
 TipoDocumento = CodeList(path_for_codelist('TipoDocumento-2.1.gc'), 'code', 'name')
 CodigoPrecioReferencia = CodeList(path_for_codelist('CodigoPrecioReferencia-2.1.gc'), 'code', 'name')
 MediosPago = CodeList(path_for_codelist('MediosPago-2.1.gc'), 'code', 'name')
+RegimenFiscal = CodeList(path_for_codelist('RegimenFiscal-2.1.custom.gc'), 'code', 'name')
