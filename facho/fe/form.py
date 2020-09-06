@@ -178,13 +178,13 @@ class LegalMonetaryTotal:
     charge_total_amount: float = 0.0
     payable_amount: float = 0.0
 
-
 class Invoice:
     def __init__(self):
         self.invoice_period_start = None
         self.invoice_period_end = None
         self.invoice_issue = None
         self.invoice_ident = None
+        self.invoice_operation_type = None
         self.invoice_legal_monetary_total = LegalMonetaryTotal(0, 0, 0, 0, 0)
         self.invoice_customer = None
         self.invoice_supplier = None
@@ -210,6 +210,9 @@ class Invoice:
 
     def set_payment_mean(self, payment_mean: PaymentMean):
         self.invoice_payment_mean = payment_mean
+
+    def set_operation_type(self, operation):
+        self.invoice_operation_type = operation
 
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
@@ -258,8 +261,17 @@ class DianResolucion0001Validator:
             self.errors.append((model, 'organization_code' ,
                                 'not found %s' % (party.organization_code)))
 
+    def _validate_invoice(self, invoice):
+        try:
+            codelist.TipoOperacionF[invoice.invoice_operation_type]
+        except KeyError:
+            self.errors.append(('invoice', 'operation_type',
+                                'not found %s' % (invoice.invoice_operation_type)))
+            
     def validate(self, invoice):
         invoice.accept(self)
+        self._validate_invoice(invoice)
+
         return not self.errors
 
     def visit_payment_mean(self, mean):
@@ -423,6 +435,7 @@ class DIANInvoiceXML(fe.FeXML):
         invoice.calculate()
         fexml.placeholder_for('/fe:Invoice/ext:UBLExtensions')
         fexml.set_element('/fe:Invoice/cbc:UBLVersionID', 'UBL 2.1')
+        fexml.set_element('/fe:Invoice/cbc:CustomizationID', invoice.invoice_operation_type)
         fexml.placeholder_for('/fe:Invoice/cbc:ProfileID')
         fexml.placeholder_for('/fe:Invoice/cbc:ProfileExecutionID')
         fexml.set_element('/fe:Invoice/cbc:ID', invoice.invoice_ident)
