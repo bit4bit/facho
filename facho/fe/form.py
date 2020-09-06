@@ -298,8 +298,7 @@ class DIANInvoiceXML(fe.FeXML):
     def __init__(self, invoice):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
         self.attach_invoice(invoice)
-
-
+    
     def set_supplier(fexml, invoice):
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
                           invoice.invoice_supplier.organization_code)

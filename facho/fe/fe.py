@@ -46,7 +46,13 @@ class FeXML(FachoXML):
         self._cn = root.rstrip('/')
         #self.find_or_create_element(self._cn)
 
+    # MACHETE se elimina xml namespace fe
+    def tostring(self, **kw):
+        return super().tostring(**kw)\
+            .replace("fe:", "")\
+            .replace("xmlns:fe", "xmlns")
 
+    
 class DianXMLExtensionCUFE(FachoXMLExtension):
     AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
     AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']

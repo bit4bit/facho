@@ -87,6 +87,11 @@ def test_dian_extension_authorization_provider():
     dian_nit = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID')
     assert dian_nit == '800197268'
 
+def test_dian_invoice_with_fe():
+    xml = fe.FeXML('Invoice',
+                   'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    
+    assert "<Invoice" in xml.tostring()
 
 
 
