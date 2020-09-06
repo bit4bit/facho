@@ -20,10 +20,11 @@ def simple_invoice_without_lines():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
+    inv.set_operation_type('10')
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
-        ident = form.PartyIdentification('123',''),
+        ident = form.PartyIdentification('123','', '31'),
         responsability_code = form.Responsability(['ZZ']),
         responsability_regime_code = '48',
         organization_code = '1',
@@ -31,7 +32,7 @@ def simple_invoice_without_lines():
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
-        ident = form.PartyIdentification('321', ''),
+        ident = form.PartyIdentification('321', '', '31'),
         responsability_code = form.Responsability(['ZZ']),
         responsability_regime_code = '48',
         organization_code = '1',
@@ -45,17 +46,18 @@ def simple_invoice():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
+    inv.set_operation_type('10')
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), ' 1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
-        ident = form.PartyIdentification('123',''),
+        ident = form.PartyIdentification('123','', '31'),
         responsability_code = form.Responsability(['ZZ']),
         responsability_regime_code = '48',
         organization_code = '1'
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
-        ident = form.PartyIdentification('321',''),
+        ident = form.PartyIdentification('321','', '31'),
         responsability_code = form.Responsability(['ZZ']),
         responsability_regime_code = '48',
         organization_code = '1'
@@ -80,7 +82,9 @@ def simple_invoice():
 
 def test_invoicesimple_build(simple_invoice):
     invoice_validator = form.DianResolucion0001Validator()
-    assert invoice_validator.validate(simple_invoice) == True
+    
+    invoice_validator.validate(simple_invoice)
+    assert invoice_validator.errors == []
     xml = form.DIANInvoiceXML(simple_invoice)
 
     supplier_name = xml.get_element_text('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name')
@@ -177,8 +181,8 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice = simple_invoice_without_lines
     simple_invoice.invoice_ident = '323200000129'
     simple_invoice.invoice_issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
-    simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '')
-    simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '')
+    simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '', '31')
+    simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
@@ -192,24 +196,50 @@ def test_invoice_cufe(simple_invoice_without_lines):
                 )])
     ))
             
-    class FakeDianXMLExtensionCUFE(fe.DianXMLExtensionCUFE):
-        def issue_time(self, datetime_):
-            return '10:53:10-05:00'
-        def issue_date(self, datetime_):
-            return '2019-01-16'
-
+    simple_invoice.calculate()
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
                                      
-    cufe_extension = FakeDianXMLExtensionCUFE(
+    cufe_extension = fe.DianXMLExtensionCUFE(
         simple_invoice,
         tipo_ambiente = fe.DianXMLExtensionCUFE.AMBIENTE_PRODUCCION,
         clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471'
     )
+    formatVars = cufe_extension.formatVars(simple_invoice)
+    #NumFac
+    assert formatVars[0] == '323200000129', "NumFac"
+    #FecFac
+    assert formatVars[1] == '2019-01-16', "FecFac"
+    #HoraFac
+    assert formatVars[2] == '10:53:10-05:00', "HoraFac"
+    #ValorBruto
+    assert formatVars[3] == '1500000.00', "ValorBruto"
+    #CodImpuesto1
+    assert formatVars[4] == '01', "CodImpuesto1"
+    #ValorImpuesto1
+    assert formatVars[5] == '285000.00', "ValorImpuesto1"
+    #CodImpuesto2
+    assert formatVars[6] == '04', "CodImpuesto2"
+    #ValorImpuesto2
+    assert formatVars[7] == '0.00', "ValorImpuesto2"
+    #CodImpuesto3
+    assert formatVars[8] == '03', "CodImpuesto3"
+    #ValorImpuesto3
+    assert formatVars[9] == '0.00', "ValorImpuesto3"
+    #ValTotFac
+    assert formatVars[10] == '1785000.00', "ValTotFac"
+    #NitOFE
+    assert formatVars[11] == '700085371', "NitOFE"
+    #NumAdq
+    assert formatVars[12] == '800199436', "NumAdq"
+    #ClTec
+    assert formatVars[13] == '693ff6f2a553c3646a063436fd4dd9ded0311471', "ClTec"
+    #TipoAmbiente
+    assert formatVars[14] == '1', "TipoAmbiente"
+    
     xml_invoice.add_extension(cufe_extension)
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
     # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
-
 
 
 def test_invoice_payment_mean(monkeypatch, simple_invoice):

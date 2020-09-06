@@ -74,15 +74,16 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         
     def issue_time(self, datetime_):
-        return datetime_.strftime('%H:%M:%S%z')
+        return datetime_.strftime('%H:%M:%S-05:00')
+    
     def issue_date(self, datetime_):
         return datetime_.strftime('%Y-%m-%d')
 
-    def _generate_cufe(self, invoice, fachoxml):
+    def formatVars(self, invoice):
         NumFac = invoice.invoice_ident
         FecFac = self.issue_date(invoice.invoice_issue)
         HoraFac = self.issue_time(invoice.invoice_issue)
-        ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
+        ValorBruto = invoice.invoice_legal_monetary_total.tax_exclusive_amount
         ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}
         ValorImpuesto1 = 0.0
@@ -103,7 +104,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         TipoAmb = self._tipo_ambiente()
         ClTec = str(self.clave_tecnica)
         
-        formatVars = [
+        return [
             '%s' % NumFac,
             '%s' % FecFac,
             '%s' % HoraFac,
@@ -120,6 +121,9 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
             '%s' % ClTec,
             '%d' % TipoAmb,
         ]
+
+    def _generate_cufe(self, invoice, fachoxml):
+        formatVars = self.formatVars(invoice)
         cufe = "".join(formatVars)
 
         # crear hash...

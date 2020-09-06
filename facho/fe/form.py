@@ -232,7 +232,7 @@ class Invoice:
             self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
             self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
             self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
-            self.invoice_legal_monetary_total.charge_total_amount += invline.total_amount
+            self.invoice_legal_monetary_total.charge_total_amount += invline.tax_amount
         #self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_exclusive_amount \
         #    + self.invoice_legal_monetary_total.line_extension_amount \
         #    + self.invoice_legal_monetary_total.tax_inclusive_amount
@@ -268,6 +268,11 @@ class DianResolucion0001Validator:
         except KeyError:
             self.errors.append(('invoice', 'operation_type',
                                 'not found %s' % (invoice.invoice_operation_type)))
+
+        # MACHETE se espera en zona horario colombia
+        if invoice.invoice_issue.tzname() not in ['UTC-05:00', '-05', None]:
+            self.errors.append(('invoice', 'invoice_issue',
+                                'expected timezone UTC-05:00 or -05 or empty got %s' % (invoice.invoice_issue.tzname())))
             
     def validate(self, invoice):
         invoice.accept(self)
@@ -437,7 +442,6 @@ class DIANInvoiceXML(fe.FeXML):
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""
 
-        invoice.calculate()
         fexml.placeholder_for('/fe:Invoice/ext:UBLExtensions')
         fexml.set_element('/fe:Invoice/cbc:UBLVersionID', 'UBL 2.1')
         fexml.set_element('/fe:Invoice/cbc:CustomizationID', invoice.invoice_operation_type)
