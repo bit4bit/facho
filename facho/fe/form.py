@@ -35,7 +35,7 @@ class Address:
     street: str = ''
     city: str = ''
     department: str = ''
-    country: Country = Country('CO', 'COLOMBIA')
+    country: Country = Country('CO', 'Colombia')
 
 
 @dataclass
@@ -326,11 +326,12 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ09
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:ID',
                           invoice.invoice_supplier.address.city)
-
-
+        #DIAN 1.7.-2020: FAJ14
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_supplier.address.street)
-
+        #DIAN 1.7.-2020: FAJ17
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
+                          invoice.invoice_supplier.address.country.name)
 
         supplier_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
         supplier_company_id_attrs.update({'schemeID': invoice.invoice_supplier.ident.dv,
