@@ -275,7 +275,15 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
         self.to = to
 
     def build(self, fexml):
-        fexml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode', 'CO')
+        fexml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode',
+                          'CO',
+                          #DIAN 1.7.-2020: FAB15
+                          listAgencyID="6",
+                          #DIAN 1.7.-2020: FAB16
+                          listAgencyName="United Nations Economic Commission for Europe",
+                          #DIAN 1.7.-2020: FAB17
+                          listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"
+                          )
         
         invoice_control = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
         invoice_control.set_element('/sts:InvoiceControl/sts:InvoiceAuthorization', self.authorization)
