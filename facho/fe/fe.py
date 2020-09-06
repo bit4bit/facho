@@ -140,6 +140,8 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
         software_provider = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
         provider_id_attrs = SCHEME_AGENCY_ATTRS.copy()
         provider_id_attrs.update({'schemeID': self.dv})
+        #DIAN 1.7.-2020: FAB23
+        provider_id_attrs.update({'schemaName': '31'})
         software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit,
                                       **provider_id_attrs)
         software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software,
