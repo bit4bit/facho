@@ -376,6 +376,9 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_customer.address.street)
         customer_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
+        #DIAN 1.7.-2020: FAK16
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
+                          invoice.invoice_supplier.address.country.code)
         #DIAN 1.7.-2020: FAK25
         customer_company_id_attrs.update({'schemeID': invoice.invoice_customer.ident.dv,
                                           'schemeName': invoice.invoice_customer.ident.type_fiscal})
