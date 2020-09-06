@@ -41,6 +41,7 @@ class Address:
 class PartyIdentification:
     number: str
     dv: str
+    type_fiscal: str
 
     def __str__(self):
         return self.number
@@ -322,7 +323,7 @@ class DIANInvoiceXML(fe.FeXML):
 
         supplier_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
         supplier_company_id_attrs.update({'schemeID': invoice.invoice_supplier.ident.dv,
-                                          'schemeName': '31'})
+                                          'schemeName': invoice.invoice_supplier.ident.type_fiscal})
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
                           **supplier_company_id_attrs)
@@ -358,9 +359,13 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.name)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_customer.address.street)
+        customer_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
+        #DIAN 1.7.-2020: FAK25
+        customer_company_id_attrs.update({'schemeID': invoice.invoice_customer.ident.dv,
+                                          'schemeName': invoice.invoice_customer.ident.type_fiscal})
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_customer.ident,
-                          **fe.SCHEME_AGENCY_ATTRS)
+                          **customer_company_id_attrs)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)  
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
