@@ -83,7 +83,8 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         NumFac = invoice.invoice_ident
         FecFac = self.issue_date(invoice.invoice_issue)
         HoraFac = self.issue_time(invoice.invoice_issue)
-        ValorBruto = invoice.invoice_legal_monetary_total.tax_exclusive_amount
+        # PAG 601
+        ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
         ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}
         ValorImpuesto1 = 0.0

@@ -6,6 +6,7 @@ from functools import reduce
 import copy
 from dataclasses import dataclass
 from datetime import datetime
+from collections import defaultdict
 
 from .data.dian import codelist
 from . import fe
@@ -396,21 +397,47 @@ class DIANInvoiceXML(fe.FeXML):
         
     def set_legal_monetary(fexml, invoice):
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:LineExtensionAmount',
-                          invoice.invoice_legal_monetary_total.line_extension_amount,
+                          #MACHETE redondeo en valor
+                          '%.02f' % (invoice.invoice_legal_monetary_total.line_extension_amount),
                           currencyID='COP')
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount',
-                          invoice.invoice_legal_monetary_total.tax_exclusive_amount,
+                          #MACHETE redondeo en valor
+                          '%.02f' % (invoice.invoice_legal_monetary_total.tax_exclusive_amount),
                           currencyID='COP')
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount',
-                          invoice.invoice_legal_monetary_total.tax_inclusive_amount,
+                          #MACHETE ...
+                          '%.02f' % (invoice.invoice_legal_monetary_total.tax_inclusive_amount),
                           currencyID='COP')
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:ChargeTotalAmount',
-                          invoice.invoice_legal_monetary_total.charge_total_amount,
+                          #MACHETE ...
+                          '%.02f' % (invoice.invoice_legal_monetary_total.charge_total_amount),
                           currencyID='COP')
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount',
-                          invoice.invoice_legal_monetary_total.payable_amount,
+                          #MACHETE ...
+                          '%.02f' % (invoice.invoice_legal_monetary_total.payable_amount),
                           currencyID='COP')
 
+    def set_invoice_totals(fexml, invoice):
+        tax_amount_for = defaultdict(lambda: 0)
+
+        #requeridos para CUFE
+        tax_amount_for['01'] = 0.0
+        tax_amount_for['04'] = 0.0
+        tax_amount_for['03'] = 0.0
+        
+        for index, invoice_line in enumerate(invoice.invoice_lines):
+            tax_amount_for[invoice_line.price.type_code] += invoice_line.tax_amount
+
+        next_append = False
+        for cod_impuesto, tax_amount in tax_amount_for.items():
+            next_append = True
+            line = fexml.fragment('/fe:Invoice/cac:TaxTotal', append=next_append)
+            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
+                             cod_impuesto)
+            line.set_element('/cac:TaxTotal/cbc:TaxAmount',
+                             # MACHETE
+                             '%.02f' % (tax_amount))
+            
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
@@ -464,6 +491,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_supplier(invoice)
         fexml.set_customer(invoice)
         fexml.set_legal_monetary(invoice)
+        fexml.set_invoice_totals(invoice)
         fexml.set_invoice_lines(invoice)
         fexml.set_payment_mean(invoice)
 
