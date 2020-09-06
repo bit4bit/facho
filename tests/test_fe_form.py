@@ -23,15 +23,17 @@ def simple_invoice_without_lines():
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
-        ident = 123,
-        responsability_code = 'ZZ',
+        ident = form.PartyIdentification('123',''),
+        responsability_code = form.Responsability(['ZZ']),
+        responsability_regime_code = '48',
         organization_code = '1',
         address = form.Address(name='Test Building')
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
-        ident = 321,
-        responsability_code = 'ZZ',
+        ident = form.PartyIdentification('321', ''),
+        responsability_code = form.Responsability(['ZZ']),
+        responsability_regime_code = '48',
         organization_code = '1',
         address = form.Address(name='Test Building')
     ))
@@ -46,14 +48,16 @@ def simple_invoice():
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), ' 1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
-        ident = 123,
-        responsability_code = 'ZZ',
+        ident = form.PartyIdentification('123',''),
+        responsability_code = form.Responsability(['ZZ']),
+        responsability_regime_code = '48',
         organization_code = '1'
     ))
     inv.set_customer(form.Party(
         name = 'facho-customer',
-        ident = 321,
-        responsability_code = 'ZZ',
+        ident = form.PartyIdentification('321',''),
+        responsability_code = form.Responsability(['ZZ']),
+        responsability_regime_code = '48',
         organization_code = '1'
     ))
     inv.add_invoice_line(form.InvoiceLine(
@@ -173,8 +177,8 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice = simple_invoice_without_lines
     simple_invoice.invoice_ident = '323200000129'
     simple_invoice.invoice_issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
-    simple_invoice.invoice_supplier.ident = '700085371'
-    simple_invoice.invoice_customer.ident = '800199436'
+    simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '')
+    simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '')
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
