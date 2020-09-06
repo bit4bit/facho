@@ -378,6 +378,9 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.responsability_code)
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
 
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
+                          invoice.invoice_customer.ident,
+                          **customer_company_id_attrs)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)
         
