@@ -28,6 +28,10 @@ class Country:
     code: str
     name: str
 
+@dataclass
+class CountrySubentity:
+    code: str
+    name: str
     
 @dataclass
 class Address:
@@ -36,7 +40,7 @@ class Address:
     city: str = ''
     department: str = ''
     country: Country = Country('CO', 'Colombia')
-
+    countrysubentity: CountrySubentity = CountrySubentity('05', 'Antioquia')
 
 @dataclass
 class PartyIdentification:
@@ -326,6 +330,12 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ09
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:ID',
                           invoice.invoice_supplier.address.city)
+        #DIAN 1.7.-2020: FAJ11
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:CountrySubentity',
+                          invoice.invoice_supplier.address.countrysubentity.name)
+        #DIAN 1.7.-2020: FAJ12
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:CountrySubentityCode',
+                          invoice.invoice_supplier.address.countrysubentity.code)
         #DIAN 1.7.-2020: FAJ14
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
                           invoice.invoice_supplier.address.street)
