@@ -375,7 +375,11 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)  
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
-                          invoice.invoice_customer.responsability_code)
+                          #DIAN 1.7.-2020: FAK26
+                          invoice.invoice_customer.responsability_code,
+                          #DIAN 1.7.-2020: FAK27
+                          listName=invoice.invoice_customer.responsability_regime_code)
+
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
 
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
