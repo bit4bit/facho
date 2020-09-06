@@ -181,8 +181,8 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice = simple_invoice_without_lines
     simple_invoice.invoice_ident = '323200000129'
     simple_invoice.invoice_issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
-    simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '', '31')
-    simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '', '31')
+    simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '5', '31')
+    simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '5', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',

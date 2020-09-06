@@ -451,7 +451,8 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.placeholder_for('/fe:Invoice/cbc:UUID')
         fexml.set_element('/fe:Invoice/cbc:DocumentCurrencyCode', 'COP')
         fexml.set_element('/fe:Invoice/cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
-        fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S%z'))
+        #DIAN 1.7.-2020: FAD10
+        fexml.set_element('/fe:Invoice/cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S-05:00'))
         fexml.set_element('/fe:Invoice/cbc:InvoiceTypeCode', codelist.TipoDocumento.by_name('Factura de Venta Nacional')['code'],
                           listAgencyID='195',
                           listAgencyName='No matching global declaration available for the validation root',
