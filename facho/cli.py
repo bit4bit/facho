@@ -29,6 +29,15 @@ logging.config.dictConfig({
     }
 })
 
+def disable_ssl():
+    # MACHETE
+    import ssl
+    if getattr(ssl, '_create_unverified_context', None):
+        ssl._create_default_https_context = ssl._create_unverified_context
+        warnings.warn("be sure!! ssl disable")
+    else:
+        warnings.warn("can't disable ssl")
+
 
 # MACHETE se corrige
 # lxml.etree.DocumentInvalid: Element '{http://www.w3.org/2000/09/xmldsig#}X509SerialNumber': '34255301462796514282327995225552892834' is not a valid value of the atomic type 'xs:integer'.
@@ -202,6 +211,20 @@ def validate_invoice(invoice_path):
 
 @click.command()
 @click.option('--private-key', type=click.Path(exists=True))
+@click.option('--passphrase')
+@click.option('--ssl/--no-ssl', default=False)
+@click.argument('xmlfile', type=click.Path(exists=True), required=True)
+def sign_xml(private_key, passphrase, xmlfile, ssl=True):
+    if not ssl:
+        disable_ssl()
+        
+    from facho import fe
+    signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+    document = open(xmlfile, 'r').read().encode('utf-8')
+    print(signer.sign_xml_string(document))
+        
+@click.command()
+@click.option('--private-key', type=click.Path(exists=True))
 @click.option('--generate/--validate', default=False)
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
@@ -214,15 +237,9 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
      def extensions(form.Invoice): -> List[facho.FachoXMLExtension]
     """
 
-    # MACHETE
     if not ssl:
-        import ssl
-        if getattr(ssl, '_create_unverified_context', None):
-            ssl._create_default_https_context = ssl._create_unverified_context
-            warnings.warn("be sure!! ssl disable")
-        else:
-            warnings.warn("can't disable ssl")
-            
+        disable_ssl()
+        
     import importlib.util
     
     spec = importlib.util.spec_from_file_location('invoice', scriptname)
@@ -245,11 +262,6 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         extensions = module.extensions(invoice)
         for extension in extensions:
             xml.add_extension(extension)
-    
-        if private_key:
-            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
-            xml.add_extension(signer)
-
 
         print(xml.tostring(xml_declaration=True))
 
@@ -267,3 +279,4 @@ main.add_command(soap_get_status_zip)
 main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)
 main.add_command(validate_invoice)
+main.add_command(sign_xml)

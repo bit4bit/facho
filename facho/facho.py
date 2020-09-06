@@ -98,6 +98,7 @@ class LXMLBuilder:
     def set_attribute(self,  elem, key, value):
         elem.attrib[key] = value
 
+    @classmethod
     def tostring(self, elem, **attrs):
         attrs['pretty_print'] = attrs.pop('pretty_print', False)
         attrs['encoding'] = attrs.pop('encoding', 'UTF-8')

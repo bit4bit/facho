@@ -1,7 +1,7 @@
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
 
-from ..facho import FachoXML, FachoXMLExtension
+from ..facho import FachoXML, FachoXMLExtension, LXMLBuilder
 import xmlsig
 import xades
 from datetime import datetime
@@ -187,8 +187,9 @@ class DianXMLExtensionSigner(FachoXMLExtension):
     def from_pkcs12(self, filepath, password=None):
         p12 = OpenSSL.crypto.load_pkcs12(open(filepath, 'rb').read(), password)
 
-    # return (xpath, xml.Element)
-    def build(self, fachoxml):
+    def sign_xml_string(self, document):
+        xml = LXMLBuilder.from_string(document)
+        
         signature = xmlsig.template.create(
             xmlsig.constants.TransformInclC14N,
             xmlsig.constants.TransformRsaSha256,
@@ -217,31 +218,8 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
         props = xades.template.create_signed_properties(qualifying, datetime=datetime.now())
         xades.template.add_claimed_role(props, "supplier")
-        #signed_do = xades.template.ensure_signed_data_object_properties(props)
-        #xades.template.add_data_object_format(
-        #    signed_do, "#R1",
-        #    identifier=xades.ObjectIdentifier("Idenfitier0", "Description")
-        #)
-        #xades.template.add_commitment_type_indication(
-        #    signed_do,
-        #    xades.ObjectIdentifier("Idenfitier0", "Description"),
-        #    qualifiers_type=["Tipo"],
-        #)
 
-        #xades.template.add_commitment_type_indication(
-        #    signed_do,
-        #    xades.ObjectIdentifier("Idenfitier1", references=["#R1"]),
-        #    references=["#R1"],
-        #)
-        #xades.template.add_data_object_format(
-        #    signed_do,
-        #    "#RKI",
-        #    description="Desc",
-        #    mime_type="application/xml",
-        #    encoding="UTF-8",
-        #)
-
-        fachoxml.root.append(signature)
+        xml.append(signature)
 
         policy = xades.policy.GenericPolicyId(
             self.POLICY_ID,
@@ -254,12 +232,20 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ctx.sign(signature)
         ctx.verify(signature)
         #xmlsig take parent root
-        fachoxml.root.remove(signature)
-
+        xml.remove(signature)
+        
+        fachoxml = FachoXML(xml,nsmap=NAMESPACES)
         ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append_not_exists=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
+        return fachoxml.tostring()
         
+    # return (xpath, xml.Element)
+    def build(self, fachoxml):
+        xmlsigned = self.sign_xml_string(fachoxml.tostring())
+        xml = LXMLBuilder.from_string(xmlsigned)
+        fachoxml.root = xml
+        return fachoxml
         
 
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):

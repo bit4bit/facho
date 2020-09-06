@@ -94,5 +94,15 @@ def test_dian_invoice_with_fe():
     assert "<Invoice" in xml.tostring()
 
 
+def test_xml_sign_dian(monkeypatch):
+    xml = fe.FeXML('Invoice',
+                'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xmlstring = xml.tostring()
+    signer = fe.DianXMLExtensionSigner('./tests/example.p12')
+    
+    with monkeypatch.context() as m:
+        helpers.mock_urlopen(m)
+        xmlsigned = signer.sign_xml_string(xmlstring)
+    assert "Signature" in xmlsigned
 
     
