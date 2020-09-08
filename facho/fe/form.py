@@ -331,10 +331,10 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:ID',
                           invoice.invoice_supplier.address.city)
         #DIAN 1.7.-2020: FAJ11
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:CountrySubentity',
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:CountrySubentity',
                           invoice.invoice_supplier.address.countrysubentity.name)
         #DIAN 1.7.-2020: FAJ12
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:CountrySubentityCode',
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:CountrySubentityCode',
                           invoice.invoice_supplier.address.countrysubentity.code)
         #DIAN 1.7.-2020: FAJ14
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
