@@ -72,7 +72,10 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
                              schemeName='CUFE-SHA384')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
-        
+        #DIAN 1.7.-2020: FAB36
+        fachoxml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode', 
+                'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='+cufe)
+
     def issue_time(self, datetime_):
         return datetime_.strftime('%H:%M:%S-05:00')
     
