@@ -323,6 +323,7 @@ class DIANInvoiceXML(fe.FeXML):
         self.attach_invoice(invoice)
     
     def set_supplier(fexml, invoice):
+        #DIAN 1.7.-2020: FAK61 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
                           invoice.invoice_supplier.organization_code)
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name',
@@ -378,9 +379,13 @@ class DIANInvoiceXML(fe.FeXML):
 
 
     def set_customer(fexml, invoice):
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID',
+                          invoice.invoice_customer.ident)
+      
+
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cbc:AdditionalAccountID',
                           invoice.invoice_customer.organization_code)
-
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name',
                           invoice.invoice_customer.name)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
