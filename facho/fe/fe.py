@@ -146,7 +146,7 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
         provider_id_attrs = SCHEME_AGENCY_ATTRS.copy()
         provider_id_attrs.update({'schemeID': self.dv})
         #DIAN 1.7.-2020: FAB23
-        provider_id_attrs.update({'schemaName': '31'})
+        provider_id_attrs.update({'schemeName': '31'})
         software_provider.set_element('/sts:SoftwareProvider/sts:ProviderID', self.nit,
                                       **provider_id_attrs)
         software_provider.set_element('/sts:SoftwareProvider/sts:SoftwareID', self.id_software,
