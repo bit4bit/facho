@@ -237,7 +237,9 @@ class Invoice:
             self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
             self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
             self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
-            self.invoice_legal_monetary_total.charge_total_amount += invline.tax_amount
+            #DIAN 1.7.-2020: FAU10 
+            #self.invoice_legal_monetary_total.charge_total_amount += invline.tax_amount
+            self.invoice_legal_monetary_total.charge_total_amount += 0.0
         #self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_exclusive_amount \
         #    + self.invoice_legal_monetary_total.line_extension_amount \
         #    + self.invoice_legal_monetary_total.tax_inclusive_amount
