@@ -72,7 +72,9 @@ __all__ = ['TipoOrganizacion',
            'TipoDocumento',
            'CodigoPrecioReferencia',
            'MediosPago',
-           'RegimenFiscal']
+           'RegimenFiscal',
+           'Municipio',
+           'Departamento']
 
 def path_for_codelist(name):
     return os.path.join(DATA_DIR, name)
@@ -86,3 +88,6 @@ CodigoPrecioReferencia = CodeList(path_for_codelist('CodigoPrecioReferencia-2.1.
 MediosPago = CodeList(path_for_codelist('MediosPago-2.1.gc'), 'code', 'name')
 RegimenFiscal = CodeList(path_for_codelist('RegimenFiscal-2.1.custom.gc'), 'code', 'name')
 TipoOperacionF = CodeList(path_for_codelist('TipoOperacionF-2.1.gc'), 'code', 'name')
+Municipio = CodeList(path_for_codelist('Municipio-2.1.gc'), 'code', 'name')
+Departamento = CodeList(path_for_codelist('Departamentos-2.1.gc'), 'code', 'name')
+
