@@ -240,7 +240,8 @@ class Invoice:
         for invline in self.invoice_lines:
             self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
             self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
-            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
+            #DIAN 1.7.-2020: FAU6
+            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_exclusive_amount
             #DIAN 1.7.-2020: FAU10 
             #self.invoice_legal_monetary_total.charge_total_amount += invline.tax_amount
             self.invoice_legal_monetary_total.charge_total_amount += 0.0
@@ -498,11 +499,12 @@ class DIANInvoiceXML(fe.FeXML):
         for cod_impuesto, tax_amount in tax_amount_for.items():
             next_append = True
             line = fexml.fragment('/fe:Invoice/cac:TaxTotal', append=next_append)
-            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
-                             cod_impuesto)
-            line.set_element('/cac:TaxTotal/cbc:TaxAmount',
+            #DIAN 1.7.-2020: FAU06
+            #line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
+                             #cod_impuesto)
+            #line.set_element('/cac:TaxTotal/cbc:TaxAmount',
                              # MACHETE
-                             '%.02f' % (tax_amount))
+                             #'%.02f' % (tax_amount))
             
     def set_invoice_lines(fexml, invoice):
         next_append = False
