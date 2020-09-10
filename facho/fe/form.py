@@ -340,6 +340,7 @@ class DIANInvoiceXML(fe.FeXML):
         self.attach_invoice(invoice)
     
     def set_supplier(fexml, invoice):
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty')
         #DIAN 1.7.-2020: FAK61 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
                           invoice.invoice_supplier.organization_code)
@@ -365,7 +366,6 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ16
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_supplier.address.country.code)
-
         #DIAN 1.7.-2020: FAJ17
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
                           invoice.invoice_supplier.address.country.name)
@@ -373,67 +373,64 @@ class DIANInvoiceXML(fe.FeXML):
         supplier_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
         supplier_company_id_attrs.update({'schemeID': invoice.invoice_supplier.ident.dv,
                                           'schemeName': invoice.invoice_supplier.ident.type_fiscal})
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
-                          invoice.invoice_supplier.ident,
-                          **supplier_company_id_attrs)
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme')
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)  
-
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
                           **supplier_company_id_attrs)
-
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           #DIAN 1.7.-2020: FAJ26
                           invoice.invoice_supplier.responsability_code,
                           #DIAN 1.7.-2020: FAJ27
                           listName=invoice.invoice_supplier.responsability_regime_code)
-
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress')
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:ID',
+                          invoice.invoice_supplier.address.city.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CityName', invoice.invoice_supplier.address.city.name)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentity',
+                          invoice.invoice_supplier.address.countrysubentity.name)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentityCode',
+                          invoice.invoice_supplier.address.countrysubentity.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:AddressLine/cbc:Line',
+                          invoice.invoice_supplier.address.street)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
+                          invoice.invoice_supplier.address.country.code)
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+
+
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity')
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
+                          invoice.invoice_supplier.ident,
+                          **supplier_company_id_attrs)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
+                          invoice.invoice_supplier.legal_name)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_supplier.address.street)
+
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_supplier.address.country.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_supplier.address.country.name)
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail',
                           invoice.invoice_supplier.email)
 
 
     def set_customer(fexml, invoice):
-        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification')
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID',
-                          invoice.invoice_customer.ident)
-      
-
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty')
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cbc:AdditionalAccountID',
                           invoice.invoice_customer.organization_code)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID',
+                          invoice.invoice_customer.ident)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name',
                           invoice.invoice_customer.name)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
-                          invoice.invoice_customer.address.street)
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation')
         customer_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
-        #DIAN 1.7.-2020: FAK16
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
-                          invoice.invoice_supplier.address.country.code)
         #DIAN 1.7.-2020: FAK25
         customer_company_id_attrs.update({'schemeID': invoice.invoice_customer.ident.dv,
                                           'schemeName': invoice.invoice_customer.ident.type_fiscal})
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
-                          invoice.invoice_customer.ident,
-                          **customer_company_id_attrs)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
-                          invoice.invoice_customer.legal_name)  
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
-                          #DIAN 1.7.-2020: FAK26
-                          invoice.invoice_customer.responsability_code,
-                          #DIAN 1.7.-2020: FAK27
-                          listName=invoice.invoice_customer.responsability_regime_code)
-
-        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
-
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
-                          invoice.invoice_customer.ident,
-                          **customer_company_id_attrs)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
-                          invoice.invoice_customer.legal_name)
-
         #DIAN 1.7.-2020: FAK07
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address')
         #DIAN 1.7.-2020: FAK08
@@ -447,9 +444,49 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAK12
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:CountrySubentityCode',
                           invoice.invoice_customer.address.countrysubentity.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:AddressLine/cbc:Line',
+                          invoice.invoice_customer.address.street)
+        #DIAN 1.7.-2020: FAK16
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
+                          invoice.invoice_customer.address.country.code)
         #DIAN 1.7.-2020: FAK17
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
                           invoice.invoice_customer.address.country.name)
+
+
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
+                          invoice.invoice_customer.legal_name)  
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
+                          invoice.invoice_customer.ident,
+                          **customer_company_id_attrs)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
+                          #DIAN 1.7.-2020: FAK26
+                          invoice.invoice_customer.responsability_code,
+                          #DIAN 1.7.-2020: FAK27
+                          listName=invoice.invoice_customer.responsability_regime_code)
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:ID',
+                          invoice.invoice_customer.address.city.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CityName', invoice.invoice_customer.address.city.name)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentity',
+                          invoice.invoice_customer.address.countrysubentity.name)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentityCode',
+                          invoice.invoice_customer.address.countrysubentity.code)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:AddressLine/cbc:Line',
+                          invoice.invoice_customer.address.street)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
+                          invoice.invoice_customer.address.country.code)
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
+                          invoice.invoice_customer.legal_name)
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
+                          invoice.invoice_customer.ident,
+                          **customer_company_id_attrs)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_customer.address.street)
 
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_customer.address.country.code)
@@ -491,21 +528,27 @@ class DIANInvoiceXML(fe.FeXML):
         tax_amount_for['01'] = 0.0
         tax_amount_for['04'] = 0.0
         tax_amount_for['03'] = 0.0
-        
+        tax_amount_tax_for =  0.0
+
         for index, invoice_line in enumerate(invoice.invoice_lines):
             tax_amount_for[invoice_line.price.type_code] += invoice_line.tax_amount
+            tax_amount_tax_for += invoice_line.tax_amount
+        
+        fexml.placeholder_for('/fe:Invoice/cac:TaxTotal')
+        fexml.set_element('/fe:Invoice/cac:TaxTotal/cbc:TaxAmount', tax_amount_tax_for,
+                          currencyID='COP')
 
         next_append = False
         for cod_impuesto, tax_amount in tax_amount_for.items():
+            line = fexml.fragment('/fe:Invoice/cac:TaxTotal/cac:TaxSubtotal', append=next_append)
             next_append = True
-            line = fexml.fragment('/fe:Invoice/cac:TaxTotal', append=next_append)
             #DIAN 1.7.-2020: FAU06
-            #line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
-                             #cod_impuesto)
-            #line.set_element('/cac:TaxTotal/cbc:TaxAmount',
+            line.set_element('/cac:TaxSubtotal/cbc:TaxAmount',
                              # MACHETE
-                             #'%.02f' % (tax_amount))
-            
+                             '%.02f' % (tax_amount), currencyID='COP')
+            line.set_element('/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
+                             cod_impuesto)
+                        
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
@@ -517,10 +560,10 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/cac:InvoiceLine/cbc:LineExtensionAmount', invoice_line.total_amount, currencyID="COP")
             line.set_element('/cac:InvoiceLine/cac:TaxTotal/cbc:TaxAmount', invoice_line.tax_amount, currencyID='COP')
 
-            condition_price = line.fragment('/cac:InvoiceLine/cac:PricingReference/cac:AlternativeConditionPrice')
-            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceAmount', invoice_line.price.amount, currencyID='COP')
-            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceTypeCode', invoice_line.price.type_code)
-            condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceType', invoice_line.price.type)
+            #condition_price = line.fragment('/cac:InvoiceLine/cac:PricingReference/cac:AlternativeConditionPrice')
+            #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceAmount', invoice_line.price.amount, currencyID='COP')
+            #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceTypeCode', invoice_line.price.type_code)
+            #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceType', invoice_line.price.type)
             
             for subtotal in invoice_line.tax.subtotals:
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount', subtotal.taxable_amount, currencyID='COP')
