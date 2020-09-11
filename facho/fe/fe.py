@@ -238,7 +238,8 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xml.remove(signature)
         
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
-        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append_not_exists=True)
+        #DIAN 1.7.-2020: FAB01
+        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
         return fachoxml.tostring()
