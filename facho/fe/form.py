@@ -154,6 +154,10 @@ class InvoiceLine:
     description: str
     item: Item
     price: Price
+    # TODO mover a Invoice
+    # ya que al reportar los totales es sobre
+    # la factura y el percent es unico por type_code
+    # de subtotal
     tax: TaxTotal
     
     @property
@@ -241,14 +245,15 @@ class Invoice:
             self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
             self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
             #DIAN 1.7.-2020: FAU6
-            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_exclusive_amount
-            #DIAN 1.7.-2020: FAU10 
-            #self.invoice_legal_monetary_total.charge_total_amount += invline.tax_amount
-            self.invoice_legal_monetary_total.charge_total_amount += 0.0
-        #self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_exclusive_amount \
-        #    + self.invoice_legal_monetary_total.line_extension_amount \
-        #    + self.invoice_legal_monetary_total.tax_inclusive_amount
-        self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount
+            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
+
+    
+        #DIAN 1.7.-2020: FAU10
+        # se omite revisar como implementar el booleano
+        self.invoice_legal_monetary_total.charge_total_amount = 0
+
+        #DIAN 1.7.-2020: FAU14 parcial
+        self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount + self.invoice_legal_monetary_total.charge_total_amount
         
     def calculate(self):
         for invline in self.invoice_lines:
@@ -522,33 +527,67 @@ class DIANInvoiceXML(fe.FeXML):
                           currencyID='COP')
 
     def set_invoice_totals(fexml, invoice):
-        tax_amount_for = defaultdict(lambda: 0)
-
-        #requeridos para CUFE
-        tax_amount_for['01'] = 0.0
-        tax_amount_for['04'] = 0.0
-        tax_amount_for['03'] = 0.0
-        tax_amount_tax_for =  0.0
-
-        for index, invoice_line in enumerate(invoice.invoice_lines):
-            tax_amount_for[invoice_line.price.type_code] += invoice_line.tax_amount
-            tax_amount_tax_for += invoice_line.tax_amount
+        tax_amount_for = defaultdict(lambda: defaultdict(lambda: 0.0))
+        percent_for = defaultdict(lambda: None)
         
+        #requeridos para CUFE
+        tax_amount_for['01']['tax_amount'] = 0.0
+        tax_amount_for['01']['taxable_amount'] = 0.0
+        tax_amount_for['04']['tax_amount'] = 0.0
+        tax_amount_for['04']['taxable_amount'] = 0.0
+        tax_amount_for['03']['tax_amount'] = 0.0
+        tax_amount_for['03']['taxable_amount'] = 0.0
+
+        total_tax_amount = 0.0
+
+        for invoice_line in invoice.invoice_lines:
+            for subtotal in invoice_line.tax.subtotals:
+                tax_amount_for[subtotal.tax_scheme_ident]['tax_amount'] += subtotal.tax_amount
+                tax_amount_for[subtotal.tax_scheme_ident]['taxable_amount'] += subtotal.taxable_amount
+                total_tax_amount += subtotal.tax_amount
+                # MACHETE ojo InvoiceLine.tax pasar a Invoice
+                percent_for[subtotal.tax_scheme_ident] = subtotal.percent
+
         fexml.placeholder_for('/fe:Invoice/cac:TaxTotal')
-        fexml.set_element('/fe:Invoice/cac:TaxTotal/cbc:TaxAmount', tax_amount_tax_for,
+        fexml.set_element('/fe:Invoice/cac:TaxTotal/cbc:TaxAmount', total_tax_amount,
                           currencyID='COP')
 
-        next_append = False
-        for cod_impuesto, tax_amount in tax_amount_for.items():
-            line = fexml.fragment('/fe:Invoice/cac:TaxTotal/cac:TaxSubtotal', append=next_append)
-            next_append = True
+        for index, item in enumerate(tax_amount_for.items()):
+            cod_impuesto, amount_of = item
+            next_append = index > 0
+
+            #DIAN 1.7.-2020: FAS01
+            line = fexml.fragment('/fe:Invoice/cac:TaxTotal', append=next_append)
+
             #DIAN 1.7.-2020: FAU06
-            line.set_element('/cac:TaxSubtotal/cbc:TaxAmount',
+            tax_amount = amount_of['tax_amount']
+            line.set_element('/cac:TaxTotal/cbc:TaxAmount',
                              # MACHETE
                              '%.02f' % (tax_amount), currencyID='COP')
-            line.set_element('/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
+
+            #DIAN 1.7.-2020: FAS05
+            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
+                             # MACHETE
+                             '%.02f' % (amount_of['taxable_amount']), currencyID='COP')
+
+            #DIAN 1.7.-2020: FAU06
+            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount',
+                             # MACHETE
+                             '%.02f' % (amount_of['tax_amount']), currencyID='COP')
+
+            #DIAN 1.7.-2020: FAS07
+            if percent_for[cod_impuesto]:
+                line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cbc:Percent',
+                                 percent_for[cod_impuesto])
+
+
+            if percent_for[cod_impuesto]:
+                line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent',
+                                 percent_for[cod_impuesto])
+            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
                              cod_impuesto)
-                        
+
+
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
