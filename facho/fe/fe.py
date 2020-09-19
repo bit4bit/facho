@@ -192,7 +192,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
     def sign_xml_string(self, document):
         xml = LXMLBuilder.from_string(document)
-        
+
         signature = xmlsig.template.create(
             xmlsig.constants.TransformInclC14N,
             xmlsig.constants.TransformRsaSha256,
@@ -240,7 +240,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
         #DIAN 1.7.-2020: FAB01
         ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
-        extcontent = ublextension.find_or_create_element('/ext:UBLExtension:/ext:ExtensionContent')
+        extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
         return fachoxml.tostring()
         
