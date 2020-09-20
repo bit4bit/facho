@@ -181,9 +181,10 @@ class DianXMLExtensionSigner(FachoXMLExtension):
     POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
     POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
     
-    def __init__(self, pkcs12_path, passphrase=None):
+    def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
         self._pkcs12_path = pkcs12_path
         self._passphrase = None
+        self._mockpolicy = mockpolicy
         if passphrase:
             self._passphrase = passphrase.encode('utf-8')
 
@@ -216,7 +217,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         )
         xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
 
-        id_keyinfo = "%s-KeyInfo" % (id_uuid)
+        id_keyinfo = "xmldsig-%s-KeyInfo" % (id_uuid)
         xmlsig.template.add_reference(
             signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_keyinfo),
         )
@@ -255,8 +256,24 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(open(self._pkcs12_path, 'rb').read(),
                                                    self._passphrase))
 
-        ctx.sign(signature)
-        ctx.verify(signature)
+        if self._mockpolicy:
+            from mock import patch
+            import os.path
+            with patch('xades.policy.urllib.urlopen') as mock:
+                class UrllibPolicyMock:
+                    def read(self):
+                        cur_dir = os.path.dirname(os.path.abspath(__file__))
+                        data_dir = os.path.join(cur_dir, 'data', 'dian')
+                        policy_file = os.path.join(data_dir, 'politicadefirmav2.pdf')
+                        with open(policy_file, 'rb') as f:
+                            return f.read()
+                            
+                mock.return_value = UrllibPolicyMock()
+                ctx.sign(signature)
+                ctx.verify(signature)
+        else:
+            ctx.sign(signature)
+            ctx.verify(signature)
         #xmlsig take parent root
         xml.remove(signature)
         return signature

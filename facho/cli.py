@@ -213,13 +213,17 @@ def validate_invoice(invoice_path):
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
+@click.option('--use-cache-policy/--no-use-cache-policy', default=False)
 @click.argument('xmlfile', type=click.Path(exists=True), required=True)
-def sign_xml(private_key, passphrase, xmlfile, ssl=True):
+def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False):
     if not ssl:
         disable_ssl()
         
     from facho import fe
-    signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+    if use_cache_policy:
+        warnings.warn("xades using cache policy")
+    print(use_cache_policy)
+    signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
     document = open(xmlfile, 'r').read().encode('utf-8')
     print(signer.sign_xml_string(document))
         
@@ -229,8 +233,9 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True):
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
 @click.option('--sign/--no-sign', default=False)
+@click.option('--use-cache-policy/--no-use-cache-policy', default=False)
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
-def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False):
+def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False, use_cache_policy=False):
     """
     imprime xml en pantalla.
     SCRIPTNAME espera 
@@ -265,7 +270,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
             xml.add_extension(extension)
 
         if sign:
-            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
             xml.add_extension(signer)
             
         print(xml.tostring(xml_declaration=True))

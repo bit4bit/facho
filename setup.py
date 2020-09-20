@@ -18,6 +18,7 @@ requirements = ['Click>=6.0',
                 'pyOpenSSL>=19.1.0',
                 'xmlsig>=0.1.3',
                 'xades>=0.2.1',
+                'mock==2.0.0',
                 'xmlsec>=1.3.8']
 
 setup_requirements = ['pytest-runner', ]
@@ -52,7 +53,7 @@ setup(
     include_package_data=True,
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
-        '': ['*.gc', '*.xsd']
+        '': ['*.gc', '*.xsd', 'politicadefirmav2.pdf']
     },
     keywords='facho',
     name='facho',
