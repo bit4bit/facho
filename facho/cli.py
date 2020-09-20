@@ -228,8 +228,9 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True):
 @click.option('--generate/--validate', default=False)
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
+@click.option('--sign/--no-sign', default=False)
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
-def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True):
+def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False):
     """
     imprime xml en pantalla.
     SCRIPTNAME espera 
@@ -263,6 +264,10 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         for extension in extensions:
             xml.add_extension(extension)
 
+        if sign:
+            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase)
+            xml.add_extension(signer)
+            
         print(xml.tostring(xml_declaration=True))
 
     

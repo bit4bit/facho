@@ -2,6 +2,7 @@
 # this repository contains the full copyright notices and license terms.
 
 from ..facho import FachoXML, FachoXMLExtension, LXMLBuilder
+import uuid
 import xmlsig
 import xades
 from datetime import datetime
@@ -178,7 +179,7 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
 class DianXMLExtensionSigner(FachoXMLExtension):
     # RESOLUCION 0001: pagina 516
     POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
-    POLICY_NAME = 'Dian'
+    POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
     
     def __init__(self, pkcs12_path, passphrase=None):
         self._pkcs12_path = pkcs12_path
@@ -192,20 +193,34 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
     def sign_xml_string(self, document):
         xml = LXMLBuilder.from_string(document)
+        signature = self.sign_xml_element(xml)
 
+        fachoxml = FachoXML(xml,nsmap=NAMESPACES)
+        #DIAN 1.7.-2020: FAB01
+        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+        extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
+        fachoxml.append_element(extcontent, signature)
+
+        return fachoxml.tostring()
+
+    def sign_xml_element(self, xml):
         signature = xmlsig.template.create(
             xmlsig.constants.TransformInclC14N,
             xmlsig.constants.TransformRsaSha256,
             "Signature",
         )
+        id_uuid = str(uuid.uuid4())
+        
         ref = xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha256, uri="", name="R1"
+            signature, xmlsig.constants.TransformSha256, uri="", name="xmldsig-%s-ref0" % (id_uuid)
         )
         xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
+
+        id_keyinfo = "%s-KeyInfo" % (id_uuid)
         xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha256, uri="#KI", name="RKI"
+            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_keyinfo),
         )
-        ki = xmlsig.template.ensure_key_info(signature, name="KI")
+        ki = xmlsig.template.ensure_key_info(signature, name=id_keyinfo)
         data = xmlsig.template.add_x509_data(ki)
         xmlsig.template.x509_data_add_certificate(data)
         serial = xmlsig.template.x509_data_add_issuer_serial(data)
@@ -216,12 +231,20 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xmlsig.template.add_key_value(ki)
         qualifying = xades.template.create_qualifying_properties(signature)
         xades.utils.ensure_id(qualifying)
-        xades.utils.ensure_id(qualifying)
 
         # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
+        id_props = "xmldsig-%s-signedprops" % (id_uuid)
         props = xades.template.create_signed_properties(qualifying, datetime=datetime.now())
+        props.set('Id', id_props)
         xades.template.add_claimed_role(props, "supplier")
 
+        
+        props_ref = xmlsig.template.add_reference(
+            props, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
+        )
+        props_ref.set('Type', "http://uri.etsi.org/01903#SignedProperties")        
+        xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformEnveloped)
+        
         xml.append(signature)
 
         policy = xades.policy.GenericPolicyId(
@@ -236,21 +259,16 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ctx.verify(signature)
         #xmlsig take parent root
         xml.remove(signature)
-        
-        fachoxml = FachoXML(xml,nsmap=NAMESPACES)
+        return signature
+
+    # return (xpath, xml.Element)
+    def build(self, fachoxml):
+        signature = self.sign_xml_element(fachoxml.root)
         #DIAN 1.7.-2020: FAB01
         ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
-        return fachoxml.tostring()
-        
-    # return (xpath, xml.Element)
-    def build(self, fachoxml):
-        xmlsigned = self.sign_xml_string(fachoxml.tostring())
-        xml = LXMLBuilder.from_string(xmlsigned)
-        fachoxml.root = xml
-        return fachoxml
-        
+     
 
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
