@@ -210,6 +210,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
             xmlsig.constants.TransformRsaSha256,
             "Signature",
         )
+        xml.append(signature)
         id_uuid = str(uuid.uuid4())
         
         ref = xmlsig.template.add_reference(
@@ -240,13 +241,10 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xades.template.add_claimed_role(props, "supplier")
 
         
-        #props_ref = xmlsig.template.add_reference(
-        #    props, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
-        #)
-        #props_ref.set('Type', "http://uri.etsi.org/01903#SignedProperties")        
-        #xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformSha256)
-        
-        xml.append(signature)
+        props_ref = xmlsig.template.add_reference(
+            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
+            uri_type="http://uri.etsi.org/01903#SignedProperties"
+        )
 
         policy = xades.policy.GenericPolicyId(
             self.POLICY_ID,
