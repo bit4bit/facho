@@ -222,7 +222,7 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False)
     from facho import fe
     if use_cache_policy:
         warnings.warn("xades using cache policy")
-    print(use_cache_policy)
+
     signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
     document = open(xmlfile, 'r').read().encode('utf-8')
     print(signer.sign_xml_string(document))

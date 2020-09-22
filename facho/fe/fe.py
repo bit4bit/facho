@@ -219,7 +219,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
         id_keyinfo = "xmldsig-%s-KeyInfo" % (id_uuid)
         xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_keyinfo),
+            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_keyinfo), name="xmldsig-%s-ref1" % (id_uuid),
         )
         ki = xmlsig.template.ensure_key_info(signature, name=id_keyinfo)
         data = xmlsig.template.add_x509_data(ki)
@@ -232,7 +232,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xmlsig.template.add_key_value(ki)
         qualifying = xades.template.create_qualifying_properties(signature)
         xades.utils.ensure_id(qualifying)
-
+         
         # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
         id_props = "xmldsig-%s-signedprops" % (id_uuid)
         props = xades.template.create_signed_properties(qualifying, datetime=datetime.now())
@@ -240,11 +240,11 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xades.template.add_claimed_role(props, "supplier")
 
         
-        props_ref = xmlsig.template.add_reference(
-            props, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
-        )
-        props_ref.set('Type', "http://uri.etsi.org/01903#SignedProperties")        
-        xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformEnveloped)
+        #props_ref = xmlsig.template.add_reference(
+        #    props, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
+        #)
+        #props_ref.set('Type', "http://uri.etsi.org/01903#SignedProperties")        
+        #xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformSha256)
         
         xml.append(signature)
 
@@ -267,7 +267,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
                         policy_file = os.path.join(data_dir, 'politicadefirmav2.pdf')
                         with open(policy_file, 'rb') as f:
                             return f.read()
-                            
+
                 mock.return_value = UrllibPolicyMock()
                 ctx.sign(signature)
                 ctx.verify(signature)
