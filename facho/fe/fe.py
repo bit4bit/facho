@@ -224,9 +224,6 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ki = xmlsig.template.ensure_key_info(signature, name=id_keyinfo)
         data = xmlsig.template.add_x509_data(ki)
         xmlsig.template.x509_data_add_certificate(data)
-        serial = xmlsig.template.x509_data_add_issuer_serial(data)
-        xmlsig.template.x509_issuer_serial_add_issuer_name(serial)
-        xmlsig.template.x509_issuer_serial_add_serial_number(serial)
 
 
         xmlsig.template.add_key_value(ki)
