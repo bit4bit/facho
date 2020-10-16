@@ -485,6 +485,10 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.address.country.code)
 
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:ID',
+                          'Zy')
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:Name',
+                          'No causa')
 
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity')
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
@@ -496,6 +500,9 @@ class DIANInvoiceXML(fe.FeXML):
 
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_customer.address.country.code)
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
+        #DIAN 1.7.-2020: FAK55
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail',
+                          invoice.invoice_customer.email)
 
     def set_payment_mean(fexml, invoice):
         payment_mean = invoice.invoice_payment_mean
@@ -533,10 +540,11 @@ class DIANInvoiceXML(fe.FeXML):
         #requeridos para CUFE
         tax_amount_for['01']['tax_amount'] = 0.0
         tax_amount_for['01']['taxable_amount'] = 0.0
-        tax_amount_for['04']['tax_amount'] = 0.0
-        tax_amount_for['04']['taxable_amount'] = 0.0
-        tax_amount_for['03']['tax_amount'] = 0.0
-        tax_amount_for['03']['taxable_amount'] = 0.0
+        #DIAN 1.7.-2020: FAS07 => Se debe construir estrategia para  su manejo
+        #tax_amount_for['04']['tax_amount'] = 0.0
+        #tax_amount_for['04']['taxable_amount'] = 0.0
+        #tax_amount_for['03']['tax_amount'] = 0.0
+        #tax_amount_for['03']['taxable_amount'] = 0.0
 
         total_tax_amount = 0.0
 
@@ -613,7 +621,9 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('/cac:InvoiceLine/cac:Item/cbc:Description', invoice_line.item.description)
             # TODO
             line.set_element('/cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id) 
-            line.set_element('/cac:InvoiceLine/cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP") 
+            line.set_element('/cac:InvoiceLine/cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP")
+            #DIAN 1.7.-2020: FBB04
+            line.set_element('/cac:InvoiceLine/cac:Price/cbc:BaseQuantity', invoice_line.price.amount) 
 
     def attach_invoice(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
