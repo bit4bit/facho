@@ -96,7 +96,7 @@ def simple_invoice():
 
 def test_invoicesimple_build(simple_invoice):
     invoice_validator = form.DianResolucion0001Validator()
-    
+
     invoice_validator.validate(simple_invoice)
     assert invoice_validator.errors == []
     xml = form.DIANInvoiceXML(simple_invoice)
@@ -125,7 +125,7 @@ def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
 
-
+    print(xml.tostring())
     with monkeypatch.context() as m:
         import helpers
         helpers.mock_urlopen(m)
@@ -136,7 +136,7 @@ def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
 
 def test_invoicesimple_zip(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
-    
+
     zipdata = io.BytesIO()
     with fe.DianZIP(zipdata) as dianzip:
         name_invoice = dianzip.add_invoice_xml(simple_invoice.invoice_ident, str(xml_invoice))
@@ -155,7 +155,7 @@ def test_invoice_line_count_numeric(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
     count = xml_invoice.get_element_text('/fe:Invoice/cbc:LineCountNumeric', format_=int)
     assert count == len(simple_invoice.invoice_lines)
-    
+
 def test_invoice_profileexecutionid(simple_invoice):
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
@@ -209,10 +209,10 @@ def test_invoice_cufe(simple_invoice_without_lines):
                     percent = 19.0
                 )])
     ))
-            
+
     simple_invoice.calculate()
     xml_invoice = form.DIANInvoiceXML(simple_invoice)
-                                     
+
     cufe_extension = fe.DianXMLExtensionCUFE(
         simple_invoice,
         tipo_ambiente = fe.DianXMLExtensionCUFE.AMBIENTE_PRODUCCION,
@@ -249,7 +249,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     assert formatVars[13] == '693ff6f2a553c3646a063436fd4dd9ded0311471', "ClTec"
     #TipoAmbiente
     assert formatVars[14] == '1', "TipoAmbiente"
-    
+
     xml_invoice.add_extension(cufe_extension)
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
     # RESOLUCION 004: pagina 689

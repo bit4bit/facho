@@ -51,7 +51,7 @@ with open(path_schema, 'r+') as f:
     f.write(content)
     warnings.warn("!!MACHETE fix xmlsig X509SerialNumber type")
 
-    
+
 @click.command()
 @click.option('--nit', required=True)
 @click.option('--nit-proveedor', required=True)
@@ -67,7 +67,7 @@ def consultaResolucionesFacturacion(nit, nit_proveedor, id_software, username, p
     ))
     print(str(resp))
 
-    
+
 @click.command()
 @click.option('--private-key', required=True)
 @click.option('--public-key', required=True)
@@ -78,7 +78,7 @@ def consultaResolucionesFacturacion(nit, nit_proveedor, id_software, username, p
 @click.argument('zipfile', type=click.Path(exists=True))
 def soap_send_test_set_async(private_key, public_key, habilitacion, password, test_setid, filename, zipfile):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.SendTestSetAsync
     if habilitacion:
@@ -99,7 +99,7 @@ def soap_send_test_set_async(private_key, public_key, habilitacion, password, te
 @click.argument('zipfile', type=click.Path(exists=True))
 def soap_send_bill_async(private_key, public_key, habilitacion, password, filename, zipfile):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.SendBillAsync
     if habilitacion:
@@ -119,7 +119,7 @@ def soap_send_bill_async(private_key, public_key, habilitacion, password, filena
 @click.argument('zipfile', type=click.Path(exists=True))
 def soap_send_bill_sync(private_key, public_key, habilitacion, password, filename, zipfile):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.SendBillSync
     if habilitacion:
@@ -138,7 +138,7 @@ def soap_send_bill_sync(private_key, public_key, habilitacion, password, filenam
 @click.option('--track-id', required=True)
 def soap_get_status_zip(private_key, public_key, habilitacion, password, track_id):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.GetStatusZip
     if habilitacion:
@@ -162,7 +162,7 @@ def soap_get_status_zip(private_key, public_key, habilitacion, password, track_i
 @click.option('--track-id', required=True)
 def soap_get_status(private_key, public_key, habilitacion, password, track_id):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.GetStatus
     if habilitacion:
@@ -186,7 +186,7 @@ def soap_get_numbering_range(private_key,
                              password,
                              nit, nit_proveedor, id_software):
     from facho.fe.client import dian
-    
+
     client = dian.DianSignatureClient(private_key, public_key, password=password)
     req = dian.GetNumberingRange
     if habilitacion:
@@ -199,6 +199,8 @@ def soap_get_numbering_range(private_key,
 @click.command()
 @click.argument('invoice_path')
 def validate_invoice(invoice_path):
+    warnings.warn("!! NO APROBADO FUNCIONAMIENTO")
+
     from facho.fe.data.dian import XSD
     content = open(invoice_path, 'r').read()
     # TODO donde ubicar esta responsabilidad?
@@ -220,7 +222,7 @@ def validate_invoice(invoice_path):
 def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False, output=None):
     if not ssl:
         disable_ssl()
-        
+
     from facho import fe
     if use_cache_policy:
         warnings.warn("xades using cache policy")
@@ -229,7 +231,7 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False,
     document = open(xmlfile, 'r').read().encode('utf-8')
     with open(output, 'w') as f:
         f.write(signer.sign_xml_string(document))
-        
+
 @click.command()
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--generate/--validate', default=False)
@@ -242,16 +244,16 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False,
 def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False, use_cache_policy=False, output=None):
     """
     imprime xml en pantalla.
-    SCRIPTNAME espera 
+    SCRIPTNAME espera
      def invoice() -> form.Invoice
      def extensions(form.Invoice): -> List[facho.FachoXMLExtension]
     """
 
     if not ssl:
         disable_ssl()
-        
+
     import importlib.util
-    
+
     spec = importlib.util.spec_from_file_location('invoice', scriptname)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -268,7 +270,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
 
     if generate:
         xml = form.DIANInvoiceXML(invoice)
-    
+
         extensions = module.extensions(invoice)
         for extension in extensions:
             xml.add_extension(extension)
@@ -292,7 +294,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
 def sign_verify_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False, output=None):
     if not ssl:
         disable_ssl()
-        
+
     from facho.fe import fe
     if use_cache_policy:
         warnings.warn("xades using cache policy")

@@ -66,7 +66,7 @@ class MemorySignature(object):
         self.digest_method = digest_method
         self.signature_method = signature_method
         self.expires_dt = expires_dt
-        
+
     def apply(self, envelope, headers):
         key = _make_sign_key(self.key_data, self.cert_data, self.password)
         _sign_envelope_with_key(
@@ -225,7 +225,7 @@ def get_timestamp(timestamp = None, delta=None):
     timestamp = timestamp or datetime.utcnow()
     if delta:
         timestamp += delta
-        
+
     format_ = '%Y-%m-%dT%H:%M:%SZ'
     timestamp = timestamp.replace(tzinfo=pytz.utc, microsecond=0)
     return timestamp.strftime(format_)
@@ -233,7 +233,7 @@ def get_timestamp(timestamp = None, delta=None):
 def _append_timestamp(security, expires_dt=None):
     if expires_dt is None:
         expires_dt = timedelta(seconds=6000)
-        
+
     etimestamp = utils.WSU.Timestamp({'{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Id': utils.get_unique_id()})
     etimestamp.append(utils.WSU.Created(get_timestamp()))
     etimestamp.append(utils.WSU.Expires(get_timestamp(delta=expires_dt)))

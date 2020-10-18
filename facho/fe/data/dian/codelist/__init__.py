@@ -45,7 +45,7 @@ class CodeList:
             row[value.attrib['ColumnRef']] = value.getchildren()[0].text
 
         return row
-    
+
     def __getitem__(self, key):
         return self.rows[str(key)]
 
@@ -90,4 +90,3 @@ RegimenFiscal = CodeList(path_for_codelist('RegimenFiscal-2.1.custom.gc'), 'code
 TipoOperacionF = CodeList(path_for_codelist('TipoOperacionF-2.1.gc'), 'code', 'name')
 Municipio = CodeList(path_for_codelist('Municipio-2.1.gc'), 'code', 'name')
 Departamento = CodeList(path_for_codelist('Departamentos-2.1.gc'), 'code', 'name')
-

@@ -27,7 +27,7 @@ class FakeDianClient(dian.DianClient):
             return self.response
         return fake_remote
 
-        
+
 def test_sopa_consultaresolucionesfacturacion():
     expected_resp = {
         'NumberRangeResponse': [['test1', '', 'test', 0, 10, '', '', 'abc']]

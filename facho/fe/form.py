@@ -17,7 +17,7 @@ class Item:
     description: str
     id: str
 
-    
+
 @dataclass
 class StandardItem(Item):
     pass
@@ -74,7 +74,7 @@ class Responsability:
     def __iter__(self):
         return iter(self.codes)
 
-        
+
 @dataclass
 class Party:
     name: str
@@ -96,7 +96,7 @@ class TaxSubTotal:
     percent: float
     tax_scheme_ident: str = '01'
     tax_scheme_name: str = 'IVA'
-    
+
     tax_amount: float = 0.0
     taxable_amount: float = 0.0
 
@@ -117,7 +117,7 @@ class TaxTotal:
             self.tax_amount += subtax.tax_amount
             self.taxable_amount += subtax.taxable_amount
 
-            
+
 @dataclass
 class Price:
     amount: float
@@ -129,14 +129,14 @@ class Price:
 class PaymentMean:
     DEBIT = '01'
     CREDIT = '02'
-    
+
     def __init__(self, id: str, code: str, due_at: datetime, payment_id: str):
         self.id = id
         self.code = code
         self.due_at = due_at
         self.payment_id = payment_id
 
-        
+
 @dataclass
 class Payment:
     amount: float
@@ -159,7 +159,7 @@ class InvoiceLine:
     # la factura y el percent es unico por type_code
     # de subtotal
     tax: TaxTotal
-    
+
     @property
     def total_amount(self):
         return self.quantity * self.price.amount
@@ -179,7 +179,7 @@ class InvoiceLine:
     @property
     def taxable_amount(self):
         return self.tax.taxable_amount
-    
+
     def calculate(self):
         self.tax.calculate(self)
 
@@ -205,7 +205,7 @@ class Invoice:
         self.invoice_payment_mean = None
         self.invoice_payments = []
         self.invoice_lines = []
-        
+
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
         self.invoice_period_end = enddate
@@ -247,14 +247,14 @@ class Invoice:
             #DIAN 1.7.-2020: FAU6
             self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
 
-    
+
         #DIAN 1.7.-2020: FAU10
         # se omite revisar como implementar el booleano
         self.invoice_legal_monetary_total.charge_total_amount = 0
 
         #DIAN 1.7.-2020: FAU14 parcial
         self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount + self.invoice_legal_monetary_total.charge_total_amount
-        
+
     def calculate(self):
         for invline in self.invoice_lines:
             invline.calculate()
@@ -300,7 +300,7 @@ class DianResolucion0001Validator:
         if invoice.invoice_issue.tzname() not in ['UTC-05:00', '-05', None]:
             self.errors.append(('invoice', 'invoice_issue',
                                 'expected timezone UTC-05:00 or -05 or empty got %s' % (invoice.invoice_issue.tzname())))
-            
+
     def validate(self, invoice):
         invoice.accept(self)
         self._validate_invoice(invoice)
@@ -342,15 +342,16 @@ class DIANInvoiceXML(fe.FeXML):
 
     def __init__(self, invoice):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+        self.placeholder_for('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
 
         # ZE02 se requiere existencia para firmar
         ublextension = self.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         self.attach_invoice(invoice)
-    
+
     def set_supplier(fexml, invoice):
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty')
-        #DIAN 1.7.-2020: FAJ02 
+        #DIAN 1.7.-2020: FAJ02
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
                           invoice.invoice_supplier.organization_code)
         #DIAN 1.7.-2020: FAJ06
@@ -377,7 +378,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_supplier.address.country.code)
 
-        supplier_address_id_attrs = {'languageID' : 'es'} 
+        supplier_address_id_attrs = {'languageID' : 'es'}
         #DIAN 1.7.-2020: FAJ17
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
                           invoice.invoice_supplier.address.country.name,
@@ -392,7 +393,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme')
         #DIAN 1.7.-2020: FAJ20
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
-                          invoice.invoice_supplier.legal_name)  
+                          invoice.invoice_supplier.legal_name)
         #DIAN 1.7.-2020: FAJ21
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
@@ -422,7 +423,7 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ35,FAJ36
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_supplier.address.country.code)
-        supplier_address_id_attrs = {'languageID' : 'es'} 
+        supplier_address_id_attrs = {'languageID' : 'es'}
         #DIAN 1.7.-2020: FAJ37,FAJ38
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:Name',
                           invoice.invoice_supplier.address.country.name,
@@ -482,7 +483,7 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAK16
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_customer.address.country.code)
-        customer_address_id_attrs = {'languageID' : 'es'} 
+        customer_address_id_attrs = {'languageID' : 'es'}
         #DIAN 1.7.-2020: FAK17
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
                           invoice.invoice_customer.address.country.name,
@@ -492,7 +493,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme')
         #DIAN 1.7.-2020: FAK17,FAK20
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
-                          invoice.invoice_customer.legal_name)  
+                          invoice.invoice_customer.legal_name)
         #DIAN 1.7.-2020: FAK21
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_customer.ident,
@@ -529,7 +530,7 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAK37
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
         #DIAN 1.7.-2020: FAK38
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', 
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_customer.address.country.code,
                           **customer_address_id_attrs)
         #DIAN 1.7.-2020: FAK39
@@ -561,7 +562,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentMeansCode', payment_mean.code)
         fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentDueDate', payment_mean.due_at.strftime('%Y-%m-%d'))
         fexml.set_element('/fe:Invoice/cac:PaymentMeans/cbc:PaymentID', payment_mean.payment_id)
-        
+
     def set_legal_monetary(fexml, invoice):
         fexml.set_element('/fe:Invoice/cac:LegalMonetaryTotal/cbc:LineExtensionAmount',
                           #MACHETE redondeo en valor
@@ -587,7 +588,7 @@ class DIANInvoiceXML(fe.FeXML):
     def set_invoice_totals(fexml, invoice):
         tax_amount_for = defaultdict(lambda: defaultdict(lambda: 0.0))
         percent_for = defaultdict(lambda: None)
-        
+
         #requeridos para CUFE
         tax_amount_for['01']['tax_amount'] = 0.0
         tax_amount_for['01']['taxable_amount'] = 0.0
@@ -662,7 +663,7 @@ class DIANInvoiceXML(fe.FeXML):
             #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceAmount', invoice_line.price.amount, currencyID='COP')
             #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceTypeCode', invoice_line.price.type_code)
             #condition_price.set_element('/cac:AlternativeConditionPrice/cbc:PriceType', invoice_line.price.type)
-            
+
             for subtotal in invoice_line.tax.subtotals:
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount', subtotal.taxable_amount, currencyID='COP')
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
@@ -671,10 +672,10 @@ class DIANInvoiceXML(fe.FeXML):
                 line.set_element('/cac:InvoiceLine/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.tax_scheme_name)
             line.set_element('/cac:InvoiceLine/cac:Item/cbc:Description', invoice_line.item.description)
             # TODO
-            line.set_element('/cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id) 
+            line.set_element('/cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id)
             line.set_element('/cac:InvoiceLine/cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP")
             #DIAN 1.7.-2020: FBB04
-            line.set_element('/cac:InvoiceLine/cac:Price/cbc:BaseQuantity', invoice_line.price.amount) 
+            line.set_element('/cac:InvoiceLine/cac:Price/cbc:BaseQuantity', invoice_line.price.amount)
 
     def attach_invoice(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML

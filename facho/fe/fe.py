@@ -18,7 +18,7 @@ SCHEME_AGENCY_ATTRS = {
     'schemeAgencyID': '195'
 }
 
-        
+
 # RESOLUCION 0001: pagina 516
 POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
 POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
@@ -61,7 +61,7 @@ def mock_xades_policy():
 class FeXML(FachoXML):
 
     def __init__(self, root, namespace):
-        
+
         super().__init__("{%s}%s" % (namespace, root),
                          nsmap=NAMESPACES)
 
@@ -74,11 +74,11 @@ class FeXML(FachoXML):
             .replace("fe:", "")\
             .replace("xmlns:fe", "xmlns")
 
-    
+
 class DianXMLExtensionCUFE(FachoXMLExtension):
     AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
     AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
-    
+
     def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
         self.tipo_ambiente = tipo_ambiente
         self.clave_tecnica = clave_tecnica
@@ -95,12 +95,12 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
         #DIAN 1.7.-2020: FAB36
-        fachoxml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode', 
+        fachoxml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',
                 'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='+cufe)
 
     def issue_time(self, datetime_):
         return datetime_.strftime('%H:%M:%S-05:00')
-    
+
     def issue_date(self, datetime_):
         return datetime_.strftime('%Y-%m-%d')
 
@@ -129,7 +129,7 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         NumAdq = invoice.invoice_customer.ident
         TipoAmb = self._tipo_ambiente()
         ClTec = str(self.clave_tecnica)
-        
+
         return [
             '%s' % NumFac,
             '%s' % FecFac,
@@ -178,10 +178,10 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
                                       **SCHEME_AGENCY_ATTRS)
 
 
-    
+
 class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
     # RESOLUCION 0001: pagina 535
-    
+
     def __init__(self, id_software: str, pin: str, invoice_ident: str):
         self.id_software = id_software
         self.pin = pin
@@ -196,9 +196,9 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
         fexml.set_attributes(dian_path, **SCHEME_AGENCY_ATTRS)
         return '', []
 
-    
-class DianXMLExtensionSigner(FachoXMLExtension):
-    
+
+class DianXMLExtensionSigner:
+
     def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
         self._pkcs12_path = pkcs12_path
         self._passphrase = None
@@ -230,7 +230,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         )
         xml.append(signature)
 
-        
+
         ref = xmlsig.template.add_reference(
             signature, xmlsig.constants.TransformSha256, uri="", name="xmldsig-%s-ref0" % (id_uuid)
         )
@@ -247,7 +247,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
         qualifying = xades.template.create_qualifying_properties(signature, 'XadesObjects', 'xades')
         xades.utils.ensure_id(qualifying)
-         
+
         id_props = "xmldsig-%s-signedprops" % (id_uuid)
         props_ref = xmlsig.template.add_reference(
             signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
@@ -258,7 +258,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
         props = xades.template.create_signed_properties(qualifying, name=id_props, datetime=datetime.now())
         xades.template.add_claimed_role(props, "supplier")
-        
+
         policy = xades.policy.GenericPolicyId(
             POLICY_ID,
             POLICY_NAME,
@@ -278,14 +278,10 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         xml.remove(signature)
         return signature
 
-    # return (xpath, xml.Element)
     def build(self, fachoxml):
-        raise RuntimeError("no funciona correctamente habria que modificar todo para funcionar sin el namespace fe:")
         signature = self.sign_xml_element(fachoxml.root)
-        #DIAN 1.7.-2020: FAB01
         extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
-     
 
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
@@ -293,12 +289,12 @@ class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     def build(self, fexml):
         dian_path = '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
         fexml.set_element(dian_path, '800197268')
-        
+
         attrs = {'schemeID': '4', 'schemeName': '31'}
         attrs.update(SCHEME_AGENCY_ATTRS)
         fexml.set_attributes(dian_path, **attrs)
 
-    
+
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
     # RESOLUCION 0004: pagina 106
@@ -323,7 +319,7 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
                           #DIAN 1.7.-2020: FAB17
                           listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"
                           )
-        
+
         invoice_control = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
         invoice_control.set_element('/sts:InvoiceControl/sts:InvoiceAuthorization', self.authorization)
         invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizationPeriod/cbc:StartDate',
@@ -338,12 +334,12 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
                                     self.to)
 
 
-        
+
 class DianZIP:
-    
+
     # RESOLUCION 0001: pagina 540
     MAX_FILES = 50
-    
+
     def __init__(self, file_like):
         self.zipfile = zipfile.ZipFile(file_like, mode='w')
         self.num_files = 0
@@ -367,7 +363,7 @@ class DianZIP:
 
 
 class DianXMLExtensionSignerVerifier:
-    
+
     def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
         self._pkcs12_path = pkcs12_path
         self._passphrase = None
@@ -381,7 +377,7 @@ class DianXMLExtensionSignerVerifier:
 
         signature = fachoxml.builder.xpath(fachoxml.root, '//ds:Signature')
         assert signature is not None
-        
+
         signature.getparent().remove(signature)
         fachoxml.root.append(signature)
 
@@ -398,4 +394,3 @@ class DianXMLExtensionSignerVerifier:
             return True
         except:
             return False
-        

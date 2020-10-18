@@ -1,0 +1,26 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: debug-statements
+
+#-   repo: https://gitlab.com/pycqa/flake8
+#    rev: ''
+#    hooks:
+#    -   id: flake8
+#        args: [--max-line-length=100]
+
+-   repo: local
+    hooks:
+    -   id: tests
+        name: run tests
+        entry: pytest -v
+        language: system
+        types: [python]
+        stages: [push]

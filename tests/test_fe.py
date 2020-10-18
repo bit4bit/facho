@@ -12,7 +12,7 @@ import helpers
 
 
 def test_xmlsigned_build(monkeypatch):
-    #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem 
+    #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem
     #openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
 
@@ -22,27 +22,28 @@ def test_xmlsigned_build(monkeypatch):
 
     with monkeypatch.context() as m:
         helpers.mock_urlopen(m)
-        xml.add_extension(signer)
+        signer.sign_xml_element(xml.root)
+
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
-    
+
     assert elem is not None
     #assert elem.findall('ds:SignedInfo', fe.NAMESPACES) is not None
 
 
 def test_xmlsigned_with_passphrase_build(monkeypatch):
-    #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem 
+    #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem
     #openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
     signer = fe.DianXMLExtensionSigner('./tests/example-with-passphrase.p12', 'test')
 
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-    
+
     with monkeypatch.context() as m:
         helpers.mock_urlopen(m)
-        xml.add_extension(signer)
+        signer.sign_xml_element(xml.root)
 
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
-    
+
     assert elem is not None
     #assert elem.findall('ds:SignedInfo', fe.NAMESPACES) is not None
 
@@ -71,11 +72,11 @@ def test_dian_extension_software_provider():
     nit = '123456789'
     id_software = 'ABCDASDF123'
     software_provider_extension = fe.DianXMLExtensionSoftwareProvider(nit, '', id_software)
-    
+
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
     xml.add_extension(software_provider_extension)
-    
+
     give_nit = xml.get_element_text('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider/sts:ProviderID')
     assert nit == give_nit
 
@@ -90,19 +91,22 @@ def test_dian_extension_authorization_provider():
 def test_dian_invoice_with_fe():
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-    
-    assert "<Invoice" in xml.tostring()
+
+    assert "<fe:Invoice" in xml.tostring()
 
 
 def test_xml_sign_dian(monkeypatch):
     xml = fe.FeXML('Invoice',
                 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
+    ublextension = xml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+    extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
+
     xmlstring = xml.tostring()
+    print(xmlstring)
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
-    
+
     with monkeypatch.context() as m:
         helpers.mock_urlopen(m)
         xmlsigned = signer.sign_xml_string(xmlstring)
     assert "Signature" in xmlsigned
-
-    

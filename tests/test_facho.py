@@ -22,13 +22,13 @@ def test_facho_xml():
 
     invoice_line = xml.find_or_create_element('/root/Invoice/Line')
     assert xml.tostring() == '<root><Invoice>Test<Line/></Invoice></root>'
-    
+
 
 def test_facho_xml_with_attr():
     xml = facho.FachoXML('root')
     invoice = xml.find_or_create_element('/root/Invoice[id=123]')
     assert xml.tostring() == '<root><Invoice id="123"/></root>'
-    
+
 def test_facho_xml_idempotent():
     xml = facho.FachoXML('root')
     invoice = xml.find_or_create_element('/root/Invoice')
@@ -102,10 +102,10 @@ def test_facho_xml_fragment():
     invoice = xml.fragment('/root/Invoice')
     invoice.set_element('/Invoice/Id', 1)
     assert xml.tostring() == '<root><Invoice><Id>1</Id></Invoice></root>'
-    
+
 def test_facho_xml_fragments():
     xml = facho.FachoXML('Invoice')
-    
+
     line = xml.fragment('/Invoice/Line')
     line.set_element('/Line/Id', 1)
 
@@ -150,5 +150,3 @@ def test_facho_xml_get_element_text_next_child():
     line = xml.fragment('/Invoice/Line', append=True)
     line.set_element('/Line/Quantity', 6)
     assert line.get_element_text('/Line[2]/Quantity', format_=int) == 6
-    
-

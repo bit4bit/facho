@@ -29,7 +29,7 @@ class SOAPService:
 
     def builder_response(self, as_dict):
         raise NotImplementedError()
-    
+
     def todict(self):
         return asdict(self)
 
@@ -68,7 +68,7 @@ class GetNumberingRange(SOAPService):
 
     def get_service(self):
         return 'GetNumberingRange'
-    
+
     def build_response(self, as_dict):
         return GetNumberingRangeResponse.fromdict(as_dict)
 
@@ -92,14 +92,14 @@ class SendBillAsync(SOAPService):
 class SendTestSetAsyncResponse:
     ZipKey: str
     ErrorMessageList: List[str]
-    
+
     @classmethod
     def fromdict(cls, data):
         return cls(
             data['ZipKey'],
             data['ErrorMessageList'] or []
         )
-    
+
 @dataclass
 class SendTestSetAsync(SOAPService):
     fileName: str
@@ -135,14 +135,14 @@ class GetStatusResponse:
     StatusDescription: str
     StatusCode: int
     ErrorMessage: List[str]
-    
+
     @classmethod
     def fromdict(cls, data):
         return cls(data['IsValid'],
                    data['StatusDescription'],
                    data['StatusCode'],
                    data['ErrorMessage']['string'])
-    
+
 @dataclass
 class GetStatus(SOAPService):
     trackId: bytes
@@ -196,7 +196,7 @@ class Habilitacion:
     class GetStatusZip(GetStatusZip):
         def get_wsdl(self):
             return Habilitacion.WSDL
-        
+
 
 class DianGateway:
 
@@ -230,7 +230,7 @@ class DianClient(DianGateway):
     def _open(self, service):
         return zeep.Client(service.get_wsdl(), wsse=UsernameToken(self._username, self._password))
 
-    
+
 class DianSignatureClient(DianGateway):
 
     def __init__(self, private_key_path, public_key_path, password=None):
@@ -250,5 +250,3 @@ class DianSignatureClient(DianGateway):
                              ,
         )
         return client
-    
-

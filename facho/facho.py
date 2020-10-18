@@ -11,7 +11,7 @@ class FachoXMLExtension:
     def build(self, fachoxml):
         raise NotImplementedError
 
-    
+
 class LXMLBuilder:
     """
     extrae la manipulacion de XML
@@ -91,7 +91,7 @@ class LXMLBuilder:
             return elems[0]
 
         return None
-    
+
     def get_text(self, elem):
         return elem.text
 
@@ -130,11 +130,11 @@ class FachoXML:
         #elem = self.find_or_create_element(xpath, append=append)
         #self.builder.append(elem, new_elem)
         self.builder.append(elem, new_elem)
-        
+
     def add_extension(self, extension):
         extension.build(self)
 
-    
+
     def fragment(self, xpath, append=False, append_not_exists=False):
         nodes = xpath.split('/')
         nodes.pop()
@@ -142,7 +142,7 @@ class FachoXML:
         parent = None
         if append_not_exists:
             parent = self.get_element(xpath)
-            
+
         if parent is None:
             parent = self.find_or_create_element(xpath, append=append)
         return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix)
@@ -154,16 +154,16 @@ class FachoXML:
         if xpath in self.xpath_for:
             xpath = self.xpath_for[xpath]
         return xpath
-        
+
     def _normalize_xpath(self, xpath):
         return xpath.replace('//', '/')
 
     def _path_xpath_for(self, xpath):
         return self._normalize_xpath(self._translate_xpath_for(xpath))
-    
+
     def placeholder_for(self, xpath):
         return self.find_or_create_element(xpath)
-    
+
     def find_or_create_element(self, xpath, append=False):
         """
         @param xpath ruta xpath para crear o consultar de un solo elemendo
@@ -195,14 +195,14 @@ class FachoXML:
                 self.builder.append(current_elem, node)
                 current_elem = node
 
-        # se fuerza la adicion como un nuevo elemento 
+        # se fuerza la adicion como un nuevo elemento
         if append:
             node = self.builder.build_from_expression(node_paths[-1])
             self.builder.append(parent, node)
             return node
 
         return current_elem
-      
+
     def set_element(self, xpath, content, **attrs):
         """
         asigna contenido ubicado por ruta tipo XPATH.
