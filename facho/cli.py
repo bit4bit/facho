@@ -216,7 +216,8 @@ def validate_invoice(invoice_path):
 @click.option('--ssl/--no-ssl', default=False)
 @click.option('--use-cache-policy/--no-use-cache-policy', default=False)
 @click.argument('xmlfile', type=click.Path(exists=True), required=True)
-def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False):
+@click.argument('output', required=True)
+def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False, output=None):
     if not ssl:
         disable_ssl()
         
@@ -226,7 +227,8 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False)
 
     signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
     document = open(xmlfile, 'r').read().encode('utf-8')
-    print(signer.sign_xml_string(document))
+    with open(output, 'w') as f:
+        f.write(signer.sign_xml_string(document))
         
 @click.command()
 @click.option('--private-key', type=click.Path(exists=True))
@@ -236,7 +238,8 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False)
 @click.option('--sign/--no-sign', default=False)
 @click.option('--use-cache-policy/--no-use-cache-policy', default=False)
 @click.argument('scriptname', type=click.Path(exists=True), required=True)
-def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False, use_cache_policy=False):
+@click.argument('output', required=True)
+def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=True, sign=False, use_cache_policy=False, output=None):
     """
     imprime xml en pantalla.
     SCRIPTNAME espera 
@@ -270,12 +273,14 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         for extension in extensions:
             xml.add_extension(extension)
 
-        xmlstring = xml.tostringMACHETE(xml_declaration=True)
+        xmlstring = xml.tostringMACHETE(xml_declaration=True, encoding='UTF-8')
         if sign:
             signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
-            print(signer.sign_xml_string(xmlstring.encode('utf-8')))
+            with open(output, 'w') as f:
+                f.write(signer.sign_xml_string(xmlstring.encode('utf-8')))
         else:
-            print(xmlstring)
+            with open(output, 'w') as f:
+                f.write(xmlstring)
     
 @click.group()
 def main():

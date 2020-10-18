@@ -202,7 +202,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
 
-        return fachoxml.tostring(xml_declaration=True)
+        return fachoxml.tostring(xml_declaration=True, encoding='UTF-8')
 
     def sign_xml_element(self, xml):
         id_uuid = str(uuid.uuid4())
@@ -226,23 +226,17 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         ki = xmlsig.template.ensure_key_info(signature, name=id_keyinfo)
         data = xmlsig.template.add_x509_data(ki)
         xmlsig.template.x509_data_add_certificate(data)
-
-
         xmlsig.template.add_key_value(ki)
-        qualifying = xades.template.create_qualifying_properties(signature)
+
+        qualifying = xades.template.create_qualifying_properties(signature, 'XadesObjects', 'xades')
         xades.utils.ensure_id(qualifying)
          
-
         id_props = "xmldsig-%s-signedprops" % (id_uuid)
-        # MACHETE si no lo envio la dian no lo valida y pasa
-        # si lo adiciono https://tools.chilkat.io/xmlDsigVerify.cshtml
-        # falla en validar este reference..
-        
-        #props_ref = xmlsig.template.add_reference(
-        #    signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
-        #    uri_type="http://uri.etsi.org/01903#SignedProperties"
-        #)
-        #xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformInclC14N)
+        props_ref = xmlsig.template.add_reference(
+            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
+            uri_type="http://uri.etsi.org/01903#SignedProperties"
+        )
+        xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformInclC14N)
 
         # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
         props = xades.template.create_signed_properties(qualifying, name=id_props, datetime=datetime.now())
