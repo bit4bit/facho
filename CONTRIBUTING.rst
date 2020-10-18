@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/bit4bit/facho/issues.
+Report bugs at https://git.disroot.org/Etrivial/facho/issues.
 
 If you are reporting a bug, please include:
 
@@ -26,13 +26,13 @@ If you are reporting a bug, please include:
 Fix Bugs
 ~~~~~~~~
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
+Look through the Disroot issues for bugs. Anything tagged with "bug" and "help
 wanted" is open to whoever wants to implement it.
 
 Implement Features
 ~~~~~~~~~~~~~~~~~~
 
-Look through the GitHub issues for features. Anything tagged with "enhancement"
+Look through the Disroot issues for features. Anything tagged with "enhancement"
 and "help wanted" is open to whoever wants to implement it.
 
 Write Documentation
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/bit4bit/facho/issues.
+The best way to send feedback is to file an issue at https://git.disroot.org/Etrivial/facho/issues.
 
 If you are proposing a feature:
 
@@ -59,15 +59,16 @@ Get Started!
 
 Ready to contribute? Here's how to set up `facho` for local development.
 
-1. Fork the `facho` repo on GitHub.
+1. Fork the `facho` repo .
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/facho.git
+    $ git clone https://git.disroot.org/Etrivial/facho.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv facho
+    $ python3 -mvenv facho-venv && source facho-venv/bin/activate
     $ cd facho/
+    $ pre-commit install
     $ python setup.py develop
 
 4. Create a branch for local development::
