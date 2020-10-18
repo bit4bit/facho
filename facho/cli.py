@@ -281,7 +281,31 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         else:
             with open(output, 'w') as f:
                 f.write(xmlstring)
-    
+
+
+@click.command()
+@click.option('--private-key', type=click.Path(exists=True))
+@click.option('--passphrase')
+@click.option('--ssl/--no-ssl', default=False)
+@click.option('--use-cache-policy/--no-use-cache-policy', default=False)
+@click.argument('xmlfile', type=click.Path(exists=True), required=True)
+def sign_verify_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False, output=None):
+    if not ssl:
+        disable_ssl()
+        
+    from facho.fe import fe
+    if use_cache_policy:
+        warnings.warn("xades using cache policy")
+
+    print("THIS ONLY WORKS FOR DOCUMENTS GENERATE WITH FACHO")
+    signer = fe.DianXMLExtensionSignerVerifier(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
+    document = open(xmlfile, 'r').read().encode('utf-8')
+
+    if signer.verify_string(document):
+        print("+OK")
+    else:
+        print("-INVALID")
+
 @click.group()
 def main():
     pass
@@ -296,3 +320,4 @@ main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)
 main.add_command(validate_invoice)
 main.add_command(sign_xml)
+main.add_command(sign_verify_xml)
