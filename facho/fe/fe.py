@@ -48,7 +48,7 @@ class FeXML(FachoXML):
         #self.find_or_create_element(self._cn)
 
     # MACHETE se elimina xml namespace fe
-    def tostring(self, **kw):
+    def tostringMACHETE(self, **kw):
         return super().tostring(**kw)\
             .replace("fe:", "")\
             .replace("xmlns:fe", "xmlns")
@@ -181,6 +181,7 @@ class DianXMLExtensionSigner(FachoXMLExtension):
     POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
     POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
     
+    
     def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
         self._pkcs12_path = pkcs12_path
         self._passphrase = None
@@ -198,20 +199,20 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
         #DIAN 1.7.-2020: FAB01
-        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
-        extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
+        extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
 
-        return fachoxml.tostring()
+        return fachoxml.tostring(xml_declaration=True)
 
     def sign_xml_element(self, xml):
+        id_uuid = str(uuid.uuid4())
         signature = xmlsig.template.create(
             xmlsig.constants.TransformInclC14N,
             xmlsig.constants.TransformRsaSha256,
-            "Signature",
+            "xmlsig-%s" % (id_uuid),
         )
         xml.append(signature)
-        id_uuid = str(uuid.uuid4())
+
         
         ref = xmlsig.template.add_reference(
             signature, xmlsig.constants.TransformSha256, uri="", name="xmldsig-%s-ref0" % (id_uuid)
@@ -231,18 +232,22 @@ class DianXMLExtensionSigner(FachoXMLExtension):
         qualifying = xades.template.create_qualifying_properties(signature)
         xades.utils.ensure_id(qualifying)
          
-        # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
+
         id_props = "xmldsig-%s-signedprops" % (id_uuid)
-        props = xades.template.create_signed_properties(qualifying, datetime=datetime.now())
-        props.set('Id', id_props)
-        xades.template.add_claimed_role(props, "supplier")
-
+        # MACHETE si no lo envio la dian no lo valida y pasa
+        # si lo adiciono https://tools.chilkat.io/xmlDsigVerify.cshtml
+        # falla en validar este reference..
         
-        props_ref = xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
-            uri_type="http://uri.etsi.org/01903#SignedProperties"
-        )
+        #props_ref = xmlsig.template.add_reference(
+        #    signature, xmlsig.constants.TransformSha256, uri="#%s" % (id_props),
+        #    uri_type="http://uri.etsi.org/01903#SignedProperties"
+        #)
+        #xmlsig.template.add_transform(props_ref, xmlsig.constants.TransformInclC14N)
 
+        # TODO assert with http://www.sic.gov.co/hora-legal-colombiana
+        props = xades.template.create_signed_properties(qualifying, name=id_props, datetime=datetime.now())
+        xades.template.add_claimed_role(props, "supplier")
+        
         policy = xades.policy.GenericPolicyId(
             self.POLICY_ID,
             self.POLICY_NAME,
@@ -275,10 +280,10 @@ class DianXMLExtensionSigner(FachoXMLExtension):
 
     # return (xpath, xml.Element)
     def build(self, fachoxml):
+        raise RuntimeError("no funciona correctamente habria que modificar todo para funcionar sin el namespace fe:")
         signature = self.sign_xml_element(fachoxml.root)
         #DIAN 1.7.-2020: FAB01
-        ublextension = fachoxml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
-        extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
+        extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
      
 

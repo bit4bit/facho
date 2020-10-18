@@ -270,12 +270,12 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         for extension in extensions:
             xml.add_extension(extension)
 
+        xmlstring = xml.tostringMACHETE(xml_declaration=True)
         if sign:
             signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
-            xml.add_extension(signer)
-            
-        print(xml.tostring(xml_declaration=True))
-
+            print(signer.sign_xml_string(xmlstring.encode('utf-8')))
+        else:
+            print(xmlstring)
     
 @click.group()
 def main():

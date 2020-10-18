@@ -342,6 +342,10 @@ class DIANInvoiceXML(fe.FeXML):
 
     def __init__(self, invoice):
         super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+
+        # ZE02 se requiere existencia para firmar
+        ublextension = self.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+        extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         self.attach_invoice(invoice)
     
     def set_supplier(fexml, invoice):
