@@ -350,9 +350,10 @@ class DIANInvoiceXML(fe.FeXML):
     
     def set_supplier(fexml, invoice):
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty')
-        #DIAN 1.7.-2020: FAK61 
+        #DIAN 1.7.-2020: FAJ02 
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cbc:AdditionalAccountID',
                           invoice.invoice_supplier.organization_code)
+        #DIAN 1.7.-2020: FAJ06
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name',
                           invoice.invoice_supplier.name)
         #DIAN 1.7.-2020: FAJ07
@@ -375,53 +376,76 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ16
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_supplier.address.country.code)
+
+        supplier_address_id_attrs = {'languageID' : 'es'} 
         #DIAN 1.7.-2020: FAJ17
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
-                          invoice.invoice_supplier.address.country.name)
+                          invoice.invoice_supplier.address.country.name,
+                         #DIAN 1.7.-2020: FAJ18
+                         **supplier_address_id_attrs)
 
         supplier_company_id_attrs = fe.SCHEME_AGENCY_ATTRS.copy()
         supplier_company_id_attrs.update({'schemeID': invoice.invoice_supplier.ident.dv,
                                           'schemeName': invoice.invoice_supplier.ident.type_fiscal})
 
+        #DIAN 1.7.-2020: FAJ19
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme')
+        #DIAN 1.7.-2020: FAJ20
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)  
+        #DIAN 1.7.-2020: FAJ21
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
+                          #DIAN 1.7.-2020: FAJ22,FAJ23,FAJ24,FAJ25
                           **supplier_company_id_attrs)
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode',
                           #DIAN 1.7.-2020: FAJ26
                           invoice.invoice_supplier.responsability_code,
                           #DIAN 1.7.-2020: FAJ27
                           listName=invoice.invoice_supplier.responsability_regime_code)
+        #DIAN 1.7.-2020: FAJ28
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress')
+        #DIAN 1.7.-2020: FAJ29
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:ID',
                           invoice.invoice_supplier.address.city.code)
+        #DIAN 1.7.-2020: FAJ30
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CityName', invoice.invoice_supplier.address.city.name)
+        #DIAN 1.7.-2020: FAJ31
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentity',
                           invoice.invoice_supplier.address.countrysubentity.name)
+        #DIAN 1.7.-2020: FAJ32
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentityCode',
                           invoice.invoice_supplier.address.countrysubentity.code)
+        #DIAN 1.7.-2020: FAJ33,FAJ34
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:AddressLine/cbc:Line',
                           invoice.invoice_supplier.address.street)
+        #DIAN 1.7.-2020: FAJ35,FAJ36
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_supplier.address.country.code)
+        supplier_address_id_attrs = {'languageID' : 'es'} 
+        #DIAN 1.7.-2020: FAJ37,FAJ38
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:Name',
+                          invoice.invoice_supplier.address.country.name,
+                          **supplier_address_id_attrs)
+        #DIAN 1.7.-2020: FAJ39
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
 
-
-
+        #DIAN 1.7.-2020: FAJ42
         fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity')
+        #DIAN 1.7.-2020: FAJ43
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_supplier.legal_name)
+        #DIAN 1.7.-2020: FAJ44,FAJ45,FAJ46,FAJ47,FAJ48
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
                           invoice.invoice_supplier.ident,
                           **supplier_company_id_attrs)
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
-                          invoice.invoice_supplier.legal_name)
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_supplier.address.street)
-
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_supplier.address.country.code)
-        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_supplier.address.country.name)
+        #DIAN 1.7.-2020: FAJ49
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme')
+        #DIAN 1.7.-2020: FAJ50
+        fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID',
+                          'SETP')
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:Contact')
+        #DIAN 1.7.-2020: FAJ71
         fexml.set_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail',
                           invoice.invoice_supplier.email)
 
@@ -458,15 +482,18 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAK16
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_customer.address.country.code)
+        customer_address_id_attrs = {'languageID' : 'es'} 
         #DIAN 1.7.-2020: FAK17
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PhysicalLocation/cac:Address/cac:Country/cbc:Name',
-                          invoice.invoice_customer.address.country.name)
-
-
-
+                          invoice.invoice_customer.address.country.name,
+                         #DIAN 1.7.-2020: FAK18
+                         **customer_address_id_attrs)
+        #DIAN 1.7.-2020: FAK17,FAK19
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme')
+        #DIAN 1.7.-2020: FAK17,FAK20
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)  
+        #DIAN 1.7.-2020: FAK21
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID',
                           invoice.invoice_customer.ident,
                           **customer_company_id_attrs)
@@ -475,35 +502,55 @@ class DIANInvoiceXML(fe.FeXML):
                           invoice.invoice_customer.responsability_code,
                           #DIAN 1.7.-2020: FAK27
                           listName=invoice.invoice_customer.responsability_regime_code)
+        #DIAN 1.7.-2020: FAK28
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress')
+        #DIAN 1.7.-2020: FAK29
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:ID',
                           invoice.invoice_customer.address.city.code)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CityName', invoice.invoice_customer.address.city.name)
+        #DIAN 1.7.-2020: FAK30
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CityName',
+                          invoice.invoice_customer.address.city.name)
+        #DIAN 1.7.-2020: FAK31
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentity',
                           invoice.invoice_customer.address.countrysubentity.name)
+        #DIAN 1.7.-2020: FAK32
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cbc:CountrySubentityCode',
                           invoice.invoice_customer.address.countrysubentity.code)
+        #DIAN 1.7.-2020: FAK33
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:AddressLine')
+        #DIAN 1.7.-2020: FAK34
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:AddressLine/cbc:Line',
                           invoice.invoice_customer.address.street)
+        #DIAN 1.7.-2020: FAK35
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country')
+        #DIAN 1.7.-2020: FAK36
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode',
                           invoice.invoice_customer.address.country.code)
-
+        #DIAN 1.7.-2020: FAK37
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
+        #DIAN 1.7.-2020: FAK38
+        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', 
+                          invoice.invoice_customer.address.country.code,
+                          **customer_address_id_attrs)
+        #DIAN 1.7.-2020: FAK39
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme')
+        #DIAN 1.7.-2020: FAK40 Machete Construir Validación
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:ID',
-                          'Zy')
+                          'ZY')
+        #DIAN 1.7.-2020: FAK41 Machete Construir Validación
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:Name',
                           'No causa')
-
+        #DIAN 1.7.-2020: FAK42
         fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity')
+        #DIAN 1.7.-2020: FAK43
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName',
                           invoice.invoice_customer.legal_name)
+        #DIAN 1.7.-2020: FAK44,FAK45,FAK46,FAK47,FAK48
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID',
                           invoice.invoice_customer.ident,
                           **customer_company_id_attrs)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:AddressLine/cbc:Line', invoice.invoice_customer.address.street)
-
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:IdentificationCode', invoice.invoice_customer.address.country.code)
-        fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cac:RegistrationAddress/cac:Country/cbc:Name', invoice.invoice_customer.address.country.name)
+        #DIAN 1.7.-2020: FAK51
+        fexml.placeholder_for('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity')
         #DIAN 1.7.-2020: FAK55
         fexml.set_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail',
                           invoice.invoice_customer.email)
