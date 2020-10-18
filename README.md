@@ -19,9 +19,7 @@ al instalar el paquete se genera el comando *facho*
 
 # CÓMO CONTRIBUIR?
 
-## INSTALAR USANDO python develop
-
-este enlaza el ejecutable **facho** en lugar de copiarlo.
+ver **CONTRIBUTING.rst**
 
 ## CUMPLIR ANEXO TECNICO
 
