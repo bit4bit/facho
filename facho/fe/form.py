@@ -192,6 +192,25 @@ class LegalMonetaryTotal:
     charge_total_amount: float = 0.0
     payable_amount: float = 0.0
 
+@dataclass
+class AllowanceCharge:
+    #DIAN 1.7.-2020: FAQ03
+    charge_indicator: bool = True
+    amount: float = 0.0
+
+    def isCharge(self):
+        return self.charge_indicator == True
+
+    def isDiscount(self):
+        return self.charge_indicator == False
+
+    def asCharge(self):
+        self.charge_indicator = True
+
+    def asDiscount(self):
+        self.charge_indicator = False
+
+
 class Invoice:
     def __init__(self):
         self.invoice_period_start = None
@@ -205,6 +224,7 @@ class Invoice:
         self.invoice_payment_mean = None
         self.invoice_payments = []
         self.invoice_lines = []
+        self.invoice_allowance_charge = []
 
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
@@ -228,6 +248,9 @@ class Invoice:
     def set_operation_type(self, operation):
         self.invoice_operation_type = operation
 
+    def add_allownace_charge(self, charge: AllowanceCharge):
+        self.invoice_allowance_charge.append(charge)
+
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
 
@@ -249,8 +272,9 @@ class Invoice:
 
 
         #DIAN 1.7.-2020: FAU10
-        # se omite revisar como implementar el booleano
-        self.invoice_legal_monetary_total.charge_total_amount = 0
+        allowance_charges = filter(lambda charge: charge.isCharge(), self.invoice_allowance_charge)
+        amounts_allowance_charge = map(lambda charge: charge.amount, allowance_charges)
+        self.invoice_legal_monetary_total.charge_total_amount = sum(amounts_allowance_charge)
 
         #DIAN 1.7.-2020: FAU14 parcial
         self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount + self.invoice_legal_monetary_total.charge_total_amount
