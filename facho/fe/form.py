@@ -138,13 +138,9 @@ class PaymentMean:
 
 
 @dataclass
-class Payment:
-    amount: float
-    at: datetime
-
-@dataclass
-class PrePaidPayment(Payment):
-    pass
+class PrePaidPayment:
+    #DIAN 1.7.-2020: FBD03
+    paid_amount: float = 0.0
 
 
 @dataclass
@@ -190,7 +186,9 @@ class LegalMonetaryTotal:
     tax_exclusive_amount: float = 0.0
     tax_inclusive_amount: float = 0.0
     charge_total_amount: float = 0.0
+    allowance_total_amount: float = 0.0
     payable_amount: float = 0.0
+    prepaid_amount: float = 0.0
 
 @dataclass
 class AllowanceCharge:
@@ -211,6 +209,7 @@ class AllowanceCharge:
         self.charge_indicator = False
 
 
+
 class Invoice:
     def __init__(self):
         self.invoice_period_start = None
@@ -225,6 +224,7 @@ class Invoice:
         self.invoice_payments = []
         self.invoice_lines = []
         self.invoice_allowance_charge = []
+        self.invoice_prepaid_payment = []
 
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
@@ -254,6 +254,9 @@ class Invoice:
     def add_invoice_line(self, line: InvoiceLine):
         self.invoice_lines.append(line)
 
+    def add_prepaid_payment(self, paid: PrePaidPayment):
+        self.invoice_prepaid_payment.append(paid)
+
     def accept(self, visitor):
         visitor.visit_payment_mean(self.invoice_payment_mean)
         visitor.visit_customer(self.invoice_customer)
@@ -270,14 +273,26 @@ class Invoice:
             #DIAN 1.7.-2020: FAU6
             self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
 
+        #DIAN 1.7.-2020: FAU08
+        allownaces = filter(lambda charge: charge.isDiscount(), self.invoice_allowance_charge)
+        amounts_allowance = map(lambda charge: charge.amount, allownaces)
+        self.invoice_legal_monetary_total.allowance_total_amount = sum(amounts_allowance)
 
         #DIAN 1.7.-2020: FAU10
         allowance_charges = filter(lambda charge: charge.isCharge(), self.invoice_allowance_charge)
         amounts_allowance_charge = map(lambda charge: charge.amount, allowance_charges)
         self.invoice_legal_monetary_total.charge_total_amount = sum(amounts_allowance_charge)
 
-        #DIAN 1.7.-2020: FAU14 parcial
-        self.invoice_legal_monetary_total.payable_amount = self.invoice_legal_monetary_total.tax_inclusive_amount + self.invoice_legal_monetary_total.charge_total_amount
+        #DIAN 1.7.-2020: FAU12
+        amounts_prepaid = map(lambda paid: paid.paid_amount, self.invoice_prepaid_payment)
+        self.invoice_legal_monetary_total.prepaid_amount = sum(amounts_prepaid)
+
+        #DIAN 1.7.-2020: FAU14
+        self.invoice_legal_monetary_total.payable_amount = \
+            self.invoice_legal_monetary_total.tax_inclusive_amount \
+            + self.invoice_legal_monetary_total.allowance_total_amount \
+            + self.invoice_legal_monetary_total.charge_total_amount \
+            - self.invoice_legal_monetary_total.prepaid_amount
 
     def calculate(self):
         for invline in self.invoice_lines:
