@@ -20,7 +20,7 @@ def test_invoice_legalmonetary():
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
         price = form.Price(
-            amount = 100.0,
+            amount = form.Amount(100.0),
             type_code = '01',
             type = 'x'
         ),
@@ -33,10 +33,10 @@ def test_invoice_legalmonetary():
         )
     ))
     inv.calculate()
-    assert inv.invoice_legal_monetary_total.line_extension_amount == 100.0
-    assert inv.invoice_legal_monetary_total.tax_exclusive_amount == 100.0
-    assert inv.invoice_legal_monetary_total.tax_inclusive_amount == 119.0
-    assert inv.invoice_legal_monetary_total.charge_total_amount == 0.0
+    assert inv.invoice_legal_monetary_total.line_extension_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_exclusive_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_inclusive_amount == form.Amount(119.0)
+    assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(0.0)
 
 
 def test_FAU10():
@@ -46,7 +46,7 @@ def test_FAU10():
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
         price = form.Price(
-            amount = 100.0,
+            amount = form.Amount(100.0),
             type_code = '01',
             type = 'x'
         ),
@@ -58,13 +58,13 @@ def test_FAU10():
             ]
         )
     ))
-    inv.add_allownace_charge(form.AllowanceCharge(amount=19.0))
+    inv.add_allownace_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
 
     inv.calculate()
-    assert inv.invoice_legal_monetary_total.line_extension_amount == 100.0
-    assert inv.invoice_legal_monetary_total.tax_exclusive_amount == 100.0
-    assert inv.invoice_legal_monetary_total.tax_inclusive_amount == 119.0
-    assert inv.invoice_legal_monetary_total.charge_total_amount == 19.0
+    assert inv.invoice_legal_monetary_total.line_extension_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_exclusive_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_inclusive_amount == form.Amount(119.0)
+    assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(19.0)
 
 
 def test_FAU14():
@@ -74,7 +74,7 @@ def test_FAU14():
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
         price = form.Price(
-            amount = 100.0,
+            amount = form.Amount(100.0),
             type_code = '01',
             type = 'x'
         ),
@@ -86,8 +86,10 @@ def test_FAU14():
             ]
         )
     ))
-    inv.add_allownace_charge(form.AllowanceCharge(amount=19.0))
-    inv.add_prepaid_payment(form.PrePaidPayment(paid_amount = 50.0))
+    inv.add_allownace_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
+    inv.add_prepaid_payment(form.PrePaidPayment(paid_amount = form.Amount(50.0)))
     inv.calculate()
 
-    assert inv.invoice_legal_monetary_total.payable_amount == 119.0 + 19.0 - 50.0
+    wants = form.Amount(119.0 + 19.0 - 50.0)
+
+    assert inv.invoice_legal_monetary_total.payable_amount == wants, "got %s want %s" % (inv.invoice_legal_monetary_total.payable_amount, wants)

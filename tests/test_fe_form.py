@@ -12,7 +12,7 @@ import zipfile
 
 import facho.fe.form as form
 from facho import fe
-
+from facho.fe.form_xml import DIANInvoiceXML
 
 @pytest.fixture
 def simple_invoice_without_lines():
@@ -80,10 +80,10 @@ def simple_invoice():
         quantity = 1,
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
-        price = form.Price(100.0, '01', ''),
+        price = form.Price(form.Amount(100.0), '01', ''),
         tax = form.TaxTotal(
-            tax_amount = 0.0,
-            taxable_amount = 0.0,
+            tax_amount = form.Amount(0.0),
+            taxable_amount = form.Amount(0.0),
             subtotals = [
                 form.TaxSubTotal(
                     percent = 19.0,
@@ -99,7 +99,7 @@ def test_invoicesimple_build(simple_invoice):
 
     invoice_validator.validate(simple_invoice)
     assert invoice_validator.errors == []
-    xml = form.DIANInvoiceXML(simple_invoice)
+    xml = DIANInvoiceXML(simple_invoice)
 
     supplier_name = xml.get_element_text('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name')
     assert supplier_name == simple_invoice.invoice_supplier.name
@@ -111,7 +111,7 @@ def test_invoicesimple_build(simple_invoice):
 def test_invoicesimple_build_with_cufe(simple_invoice):
     invoice_validator = form.DianResolucion0001Validator()
     assert invoice_validator.validate(simple_invoice) == True
-    xml = form.DIANInvoiceXML(simple_invoice)
+    xml = DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
     xml.add_extension(cufe_extension)
     cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
@@ -121,7 +121,7 @@ def test_invoicesimple_build_with_cufe(simple_invoice):
 def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     invoice_validator = form.DianResolucion0001Validator()
     assert invoice_validator.validate(simple_invoice) == True
-    xml = form.DIANInvoiceXML(simple_invoice)
+    xml = DIANInvoiceXML(simple_invoice)
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
 
@@ -135,7 +135,7 @@ def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     assert elem.text is not None
 
 def test_invoicesimple_zip(simple_invoice):
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
 
     zipdata = io.BytesIO()
     with fe.DianZIP(zipdata) as dianzip:
@@ -147,24 +147,24 @@ def test_invoicesimple_zip(simple_invoice):
 
 
 def test_bug_cbcid_empty_on_invoice_line(simple_invoice):
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
     cbc_id = xml_invoice.get_element_text('/fe:Invoice/cac:InvoiceLine[1]/cbc:ID', format_=int)
     assert cbc_id == 1
 
 def test_invoice_line_count_numeric(simple_invoice):
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
     count = xml_invoice.get_element_text('/fe:Invoice/cbc:LineCountNumeric', format_=int)
     assert count == len(simple_invoice.invoice_lines)
 
 def test_invoice_profileexecutionid(simple_invoice):
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
     xml_invoice.add_extension(cufe_extension)
     id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:ProfileExecutionID', format_=int)
     assert id_ == 2
 
 def test_invoice_invoice_type_code(simple_invoice):
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
     id_ = xml_invoice.get_element_text('/fe:Invoice/cbc:InvoiceTypeCode', format_=int)
     assert id_ == 1
 
@@ -178,7 +178,7 @@ def test_invoice_totals(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 9999),
-        price = form.Price(1_500_000, '', ''),
+        price = form.Price(form.Amount(1_500_000), '', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
@@ -188,8 +188,8 @@ def test_invoice_totals(simple_invoice_without_lines):
     ))
     simple_invoice.calculate()
     assert 1 == len(simple_invoice.invoice_lines)
-    assert 1_500_000 == simple_invoice.invoice_legal_monetary_total.line_extension_amount
-    assert 1_785_000 == simple_invoice.invoice_legal_monetary_total.payable_amount
+    assert form.Amount(1_500_000) == simple_invoice.invoice_legal_monetary_total.line_extension_amount
+    assert form.Amount(1_785_000) == simple_invoice.invoice_legal_monetary_total.payable_amount
 
 def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice = simple_invoice_without_lines
@@ -201,7 +201,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 111),
-        price = form.Price(1_500_000, '', ''),
+        price = form.Price(form.Amount(1_500_000), '', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
@@ -211,7 +211,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     ))
 
     simple_invoice.calculate()
-    xml_invoice = form.DIANInvoiceXML(simple_invoice)
+    xml_invoice = DIANInvoiceXML(simple_invoice)
 
     cufe_extension = fe.DianXMLExtensionCUFE(
         simple_invoice,

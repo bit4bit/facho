@@ -259,6 +259,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
     spec.loader.exec_module(module)
 
     import facho.fe.form as form
+    from facho.fe.form_xml import DIANInvoiceXML
     from facho import fe
 
     invoice = module.invoice()
@@ -269,7 +270,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
             print("ERROR:", error)
 
     if generate:
-        xml = form.DIANInvoiceXML(invoice)
+        xml = DIANInvoiceXML(invoice)
 
         extensions = module.extensions(invoice)
         for extension in extensions:

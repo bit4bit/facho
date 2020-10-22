@@ -12,6 +12,7 @@ import warnings
 import hashlib
 from contextlib import contextmanager
 from .data.dian import codelist
+from . import form
 
 SCHEME_AGENCY_ATTRS = {
     'schemeAgencyName': 'CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)',
@@ -112,17 +113,14 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
         ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}
-        ValorImpuesto1 = 0.0
         CodImpuesto1 = 1
-        ValorImpuesto2 = 0.0
         CodImpuesto2 = 4
-        ValorImpuesto3 = 0.0
         CodImpuesto3 = 3
         for invoice_line in invoice.invoice_lines:
             for subtotal in invoice_line.tax.subtotals:
                 # TODO cual es la naturaleza de tax_scheme_ident?
                 codigo_impuesto = int(subtotal.tax_scheme_ident)
-                ValorImpuestoPara.setdefault(codigo_impuesto, 0.0)
+                ValorImpuestoPara.setdefault(codigo_impuesto, form.Amount(0.0))
                 ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
 
         NitOFE = invoice.invoice_supplier.ident
@@ -134,14 +132,14 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
             '%s' % NumFac,
             '%s' % FecFac,
             '%s' % HoraFac,
-            '%.02f' % ValorBruto,
+            '%.02f' % round(ValorBruto, 2),
             '%02d' % CodImpuesto1,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto1, 0.0),
+            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto1, 0.0), 2),
             '%02d' % CodImpuesto2,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto2, 0.0),
+            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto2, 0.0), 2),
             '%02d' % CodImpuesto3,
-            '%.02f' % ValorImpuestoPara.get(CodImpuesto3, 0.0),
-            '%.02f' % ValorTotalPagar,
+            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto3, 0.0), 2),
+            '%.02f' % round(ValorTotalPagar, 2),
             '%s' % NitOFE,
             '%s' % NumAdq,
             '%s' % ClTec,
