@@ -247,7 +247,7 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
     spec.loader.exec_module(module)
 
     import facho.fe.form as form
-    from facho.fe.form_xml import DIANInvoiceXML
+    from facho.fe.form_xml import DIANInvoiceXML, DIANWriteSigned,DIANWrite
     from facho import fe
 
     invoice = module.invoice()
@@ -264,14 +264,10 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         for extension in extensions:
             xml.add_extension(extension)
 
-        xmlstring = xml.tostringMACHETE(xml_declaration=True, encoding='UTF-8')
         if sign:
-            signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
-            with open(output, 'w') as f:
-                f.write(signer.sign_xml_string(xmlstring.encode('utf-8')))
+            DIANWriteSigned(xml, output, private_key, passphrase, use_cache_policy)
         else:
-            with open(output, 'w') as f:
-                f.write(xmlstring)
+            DIANWrite(xml, output)
 
 
 @click.command()

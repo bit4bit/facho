@@ -69,8 +69,7 @@ class FeXML(FachoXML):
         self._cn = root.rstrip('/')
         #self.find_or_create_element(self._cn)
 
-    # MACHETE se elimina xml namespace fe
-    def tostringMACHETE(self, **kw):
+    def tostring(self, **kw):
         return super().tostring(**kw)\
             .replace("fe:", "")\
             .replace("xmlns:fe", "xmlns")
