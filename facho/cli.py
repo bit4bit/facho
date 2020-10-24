@@ -40,18 +40,6 @@ def disable_ssl():
         warnings.warn("can't disable ssl")
 
 
-# MACHETE se corrige
-# lxml.etree.DocumentInvalid: Element '{http://www.w3.org/2000/09/xmldsig#}X509SerialNumber': '34255301462796514282327995225552892834' is not a valid value of the atomic type 'xs:integer'.
-import xmlsig, os.path
-path_schema = os.path.join(os.path.dirname(xmlsig.__file__), 'data', 'xmldsig-core-schema.xsd')
-with open(path_schema, 'r+') as f:
-    content = f.read().replace('<element name="X509SerialNumber" type="integer"/>',
-                               '<element name="X509SerialNumber" type="string"/>')
-    f.seek(0)
-    f.write(content)
-    warnings.warn("!!MACHETE fix xmlsig X509SerialNumber type")
-
-
 @click.command()
 @click.option('--nit', required=True)
 @click.option('--nit-proveedor', required=True)
