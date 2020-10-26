@@ -175,7 +175,6 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
                                       **SCHEME_AGENCY_ATTRS)
 
 
-
 class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
     # RESOLUCION 0001: pagina 535
 
@@ -292,6 +291,15 @@ class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
         fexml.set_attributes(dian_path, **attrs)
 
 
+class DianXMLExtensionInvoiceSource(FachoXMLExtension):
+    # CAB13
+    def build(self, fexml):
+        dian_path = '/fe:CreditNote/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode'
+        fexml.set_element(dian_path, 'CO',
+                          listAgencyID="6",
+                          listAgencyName="United Nations Economic Commission for Europe",
+                          listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1")
+        
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
     # RESOLUCION 0004: pagina 106

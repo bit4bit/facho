@@ -70,6 +70,7 @@ __all__ = ['TipoOrganizacion',
            'TipoResponsabilidad',
            'TipoAmbiente',
            'TipoDocumento',
+           'TipoImpuesto',
            'CodigoPrecioReferencia',
            'MediosPago',
            'RegimenFiscal',
@@ -84,6 +85,7 @@ TipoResponsabilidad = CodeList(path_for_codelist('TipoResponsabilidad-2.1.gc'), 
     .update(CodeList(path_for_codelist('TipoResponsabilidad-2.1.custom.gc'), 'code', 'name'))
 TipoAmbiente = CodeList(path_for_codelist('TipoAmbiente-2.1.gc'), 'code', 'name')
 TipoDocumento = CodeList(path_for_codelist('TipoDocumento-2.1.gc'), 'code', 'name')
+TipoImpuesto = CodeList(path_for_codelist('TipoImpuesto-2.1.gc'), 'code', 'name')
 CodigoPrecioReferencia = CodeList(path_for_codelist('CodigoPrecioReferencia-2.1.gc'), 'code', 'name')
 MediosPago = CodeList(path_for_codelist('MediosPago-2.1.gc'), 'code', 'name')
 RegimenFiscal = CodeList(path_for_codelist('RegimenFiscal-2.1.custom.gc'), 'code', 'name')

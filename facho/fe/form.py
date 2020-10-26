@@ -153,7 +153,12 @@ class Responsability:
     def __iter__(self):
         return iter(self.codes)
 
+@dataclass
+class TaxScheme:
+    code: str
+    name: str = ''   
 
+    
 @dataclass
 class Party:
     name: str
@@ -161,6 +166,7 @@ class Party:
     responsability_code: str
     responsability_regime_code: str
     organization_code: str
+    tax_scheme: TaxScheme = TaxScheme('')
 
     phone: str = ''
     address: Address = Address('')
@@ -222,6 +228,14 @@ class PrePaidPayment:
     paid_amount: Amount = Amount(0.0)
 
 
+@dataclass
+class BillingReference:
+        def __init__(self, ident: str, uuid: str, date: str):
+            self.ident = ident
+            self.uuid = uuid
+            self.date = date
+    
+    
 @dataclass
 class InvoiceLine:
     # RESOLUCION 0004: pagina 155
@@ -336,6 +350,9 @@ class Invoice:
     def add_prepaid_payment(self, paid: PrePaidPayment):
         self.invoice_prepaid_payment.append(paid)
 
+    def set_billing_reference(self, billing_reference: BillingReference):
+        self.invoice_billing_reference = billing_reference
+        
     def accept(self, visitor):
         visitor.visit_payment_mean(self.invoice_payment_mean)
         visitor.visit_customer(self.invoice_customer)
@@ -400,6 +417,12 @@ class DianResolucion0001Validator:
         except KeyError:
             self.errors.append((model, 'organization_code' ,
                                 'not found %s' % (party.organization_code)))
+        try:
+            if isinstance(party.tax_scheme, (str, str)):
+                codelist.TipoImpuesto[party.tax_scheme.code]
+        except KeyError:
+            self.errors.append((model , 'tax_scheme' ,
+                                'not found %s' % (party.tax_scheme)))
         try:
             codelist.Departamento[party.address.countrysubentity.code]
         except KeyError:
