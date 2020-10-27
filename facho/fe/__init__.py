@@ -7,3 +7,4 @@ from .fe import DianXMLExtensionInvoiceAuthorization
 from .fe import DianXMLExtensionSoftwareProvider
 from .fe import DianXMLExtensionAuthorizationProvider
 from .fe import DianZIP
+from . import form_xml
