@@ -173,12 +173,17 @@ class FachoXML:
         xpath = self._path_xpath_for(xpath)
         node_paths = xpath.split('/')
         node_paths.pop(0) #remove empty /
+        root_tag = node_paths.pop(0)
 
-        root_node = self.builder.build_from_expression(node_paths[0])
+        root_node = self.builder.build_from_expression(root_tag)
+        if xpath.startswith('.'):
+            # restaurar ya que no es la raiz y asignar actual como raiz
+            node_paths.insert(0, root_tag)
+            root_node = self.root
+            
         if not self.builder.same_tag(root_node.tag, self.root.tag):
+            
             raise ValueError('xpath %s must be absolute to /%s' % (xpath, self.root.tag))
-        else:
-            node_paths.pop(0)
 
         # crea jerarquia segun xpath indicado
         parent = None

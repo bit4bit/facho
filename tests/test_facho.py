@@ -150,3 +150,23 @@ def test_facho_xml_get_element_text_next_child():
     line = xml.fragment('/Invoice/Line', append=True)
     line.set_element('/Line/Quantity', 6)
     assert line.get_element_text('/Line[2]/Quantity', format_=int) == 6
+
+
+def test_facho_xml_set_element_relative():
+    xml = facho.FachoXML('Invoice')
+    xml.set_element('./ID', 'ABC123')
+
+    assert xml.get_element_text('/Invoice/ID') == 'ABC123'
+
+def test_facho_xml_set_element_relative_with_namespace():
+    xml = facho.FachoXML('{%s}Invoice' % ('http://www.dian.gov.co/contratos/facturaelectronica/v1'),
+                         nsmap={'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1'})
+    xml.set_element('./ID', 'ABC123')
+
+    assert xml.get_element_text('/fe:Invoice/ID') == 'ABC123'
+
+def test_facho_xml_fragment_relative():
+    xml = facho.FachoXML('root')
+    invoice = xml.fragment('./Invoice')
+    invoice.set_element('./Id', 1)
+    assert xml.tostring() == '<root><Invoice><Id>1</Id></Invoice></root>'
