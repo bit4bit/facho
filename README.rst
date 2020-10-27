@@ -2,6 +2,8 @@
 facho
 =====
 
+!!INESTABLE NO RECOMENDAMOS USO PARA PRODUCION!!
+
 Libreria para facturacion electronica colombia.
 
 - facho/facho.py: abstracion para manipulacion del XML
@@ -10,6 +12,25 @@ Libreria para facturacion electronica colombia.
 - facho/fe/fe.py(DianXMLExtensionSigner): extension para firmar xml
 - facho/fe/client/dian.py(DianClient): cliente para consultas sincronicas a API de DIAN
 
+
+INSTALACION
+===========
+
+
+usando pip::
+  
+   pip install git+https://git.disroot.org/Etrivial/facho
+
+CLI
+===
+
+tambien se provee linea de comandos **facho** para firmado y envio de documentos::
+  facho --help
+
+CONTRIBUIR
+==========
+
+ver **CONTRIBUTING.rst**
 
 DIAN HABILITACION
 =================

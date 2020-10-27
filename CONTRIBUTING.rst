@@ -127,3 +127,13 @@ $ git push
 $ git push --tags
 
 Travis will then deploy to PyPI if tests pass.
+
+
+DIAN
+----
+
+El archivo **docs/DIAN/Anexo_Tecnico_Factura_Electronica_Vr1_7_2020.pdf** describe la facturación.
+
+La libreria **facho/facho.py** permite crear elementos xml usando XPath-Like con el proposito de facilitar la relación entre el anexo y la implementación.
+  * facho/form.py: generación de Invoice XML.
+  * facho/fe.py: extensiones XML, ejemplo CUFE, Firma, etc..
