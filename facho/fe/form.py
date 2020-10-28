@@ -9,7 +9,7 @@ from datetime import datetime
 from collections import defaultdict
 import decimal
 from decimal import Decimal
-
+import typing
 
 from .data.dian import codelist
 
@@ -105,25 +105,40 @@ class StandardItem(Item):
 @dataclass
 class Country:
     code: str
-    name: str
+    name: str = ''
 
+    def __post_init__(self):
+        if self.code not in codelist.Paises:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.Paises[self.code]['name']
+        
 @dataclass
 class CountrySubentity:
     code: str
-    name: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.Departamento:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.Departamento[self.code]['name']
 
 @dataclass
 class City:
     code: str
-    name: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.Municipio:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.Municipio[self.code]['name']
 
 @dataclass
 class Address:
     name: str
     street: str = ''
-    city: City = City('', '')
-    country: Country = Country('CO', 'Colombia')
-    countrysubentity: CountrySubentity = CountrySubentity('', '')
+    city: City = City('05001')
+    country: Country = Country('CO')
+    countrysubentity: CountrySubentity = CountrySubentity('05')
 
 @dataclass
 class PartyIdentification:
@@ -158,15 +173,20 @@ class TaxScheme:
     code: str
     name: str = ''   
 
-    
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoImpuesto:
+            raise ValueError("code not found")
+        self.name = codelist.TipoImpuesto[self.code]['name']
+
 @dataclass
 class Party:
     name: str
     ident: str
-    responsability_code: str
+    responsability_code: typing.List[Responsability]
     responsability_regime_code: str
     organization_code: str
-    tax_scheme: TaxScheme = TaxScheme('')
+    tax_scheme: TaxScheme = TaxScheme('01')
 
     phone: str = ''
     address: Address = Address('')
@@ -175,7 +195,14 @@ class Party:
     legal_company_ident: str = ''
     legal_address: str = ''
 
+    def __post_init__(self):
+        if self.organization_code not in codelist.TipoOrganizacion:
+            raise ValueError("organization_code not found")
 
+        for code in self.responsability_code:
+            if code not in codelist.TipoResponsabilidad:
+                raise ValueError("responsability_code %s not found" % (code))
+        
 @dataclass
 class TaxSubTotal:
     percent: float
@@ -209,13 +236,20 @@ class Price:
     type_code: str
     type: str
 
+    def __post_init__(self):
+        if self.type_code not in codelist.CodigoPrecioReferencia:
+            raise ValueError("type_code [%s] not found" % (self.type_code))
 
+        
 @dataclass
 class PaymentMean:
     DEBIT = '01'
     CREDIT = '02'
 
     def __init__(self, id: str, code: str, due_at: datetime, payment_id: str):
+        if code not in codelist.MediosPago:
+            raise ValueError("code not found")
+        
         self.id = id
         self.code = code
         self.due_at = due_at
@@ -325,6 +359,9 @@ class Invoice:
         self.invoice_period_end = enddate
 
     def set_issue(self, dtime: datetime):
+        if dtime.tzname() not in ['UTC-05:00', '-05', None]:
+            raise ValueError("dtime must be UTC-05:00")
+
         self.invoice_issue = dtime
 
     def set_ident(self, ident: str):
@@ -340,6 +377,9 @@ class Invoice:
         self.invoice_payment_mean = payment_mean
 
     def set_operation_type(self, operation):
+        if operation not in codelist.TipoOperacionF:
+            raise ValueError("operation not found")
+        
         self.invoice_operation_type = operation
 
     def add_allownace_charge(self, charge: AllowanceCharge):
@@ -399,82 +439,3 @@ class Invoice:
         for invline in self.invoice_lines:
             invline.calculate()
         self._calculate_legal_monetary_total()
-
-
-class DianResolucion0001Validator:
-
-    def __init__(self):
-        self.errors = []
-
-    def _validate_party(self, model, party):
-        for code in party.responsability_code:
-            if code not in codelist.TipoResponsabilidad:
-                self.errors.append((model,
-                                    'responsability_code',
-                                    'not found %s' % (code)))
-
-        try:
-            codelist.TipoOrganizacion[party.organization_code]
-        except KeyError:
-            self.errors.append((model, 'organization_code' ,
-                                'not found %s' % (party.organization_code)))
-        try:
-            if isinstance(party.tax_scheme, (str, str)):
-                codelist.TipoImpuesto[party.tax_scheme.code]
-        except KeyError:
-            self.errors.append((model , 'tax_scheme' ,
-                                'not found %s' % (party.tax_scheme)))
-        try:
-            codelist.Departamento[party.address.countrysubentity.code]
-        except KeyError:
-            self.errors.append((model, 'countrysubentity_code',
-                                'not found %s' % (party.address.countrysubentity.code)))
-        try:
-            codelist.Municipio[party.address.city.code]
-        except KeyError:
-            self.errors.append((model, 'city_code',
-                                'not found %s' % (party.address.city.code)))
-
-    def _validate_invoice(self, invoice):
-        try:
-            codelist.TipoOperacionF[invoice.invoice_operation_type]
-        except KeyError:
-            self.errors.append(('invoice', 'operation_type',
-                                'not found %s' % (invoice.invoice_operation_type)))
-
-        # MACHETE se espera en zona horario colombia
-        if invoice.invoice_issue.tzname() not in ['UTC-05:00', '-05', None]:
-            self.errors.append(('invoice', 'invoice_issue',
-                                'expected timezone UTC-05:00 or -05 or empty got %s' % (invoice.invoice_issue.tzname())))
-
-    def validate(self, invoice):
-        invoice.accept(self)
-        self._validate_invoice(invoice)
-
-        return not self.errors
-
-    def visit_payment_mean(self, mean):
-        try:
-            codelist.MediosPago[mean.code]
-        except KeyError:
-            self.errors.append(('payment_mean', 'code',
-                                'not found %s' % (mean.code)))
-
-    def visit_customer(self, customer):
-        self._validate_party('customer', customer)
-
-    def visit_supplier(self, supplier):
-        self._validate_party('supplier', supplier)
-
-    def visit_payment(self, payment):
-        pass
-
-    def visit_invoice_line(self, line):
-        try:
-            codelist.CodigoPrecioReferencia[line.price.type_code]
-        except KeyError:
-            self.errors.append(('invoice_line', 'line.price',
-                               'not found %s' % (line.price.type_code)))
-
-    def valid(self):
-        return not self.errors

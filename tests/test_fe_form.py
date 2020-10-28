@@ -95,10 +95,6 @@ def simple_invoice():
 
 
 def test_invoicesimple_build(simple_invoice):
-    invoice_validator = form.DianResolucion0001Validator()
-
-    invoice_validator.validate(simple_invoice)
-    assert invoice_validator.errors == []
     xml = DIANInvoiceXML(simple_invoice)
 
     supplier_name = xml.get_element_text('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name')
@@ -109,8 +105,6 @@ def test_invoicesimple_build(simple_invoice):
 
 
 def test_invoicesimple_build_with_cufe(simple_invoice):
-    invoice_validator = form.DianResolucion0001Validator()
-    assert invoice_validator.validate(simple_invoice) == True
     xml = DIANInvoiceXML(simple_invoice)
     cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
     xml.add_extension(cufe_extension)
@@ -119,8 +113,6 @@ def test_invoicesimple_build_with_cufe(simple_invoice):
 
 
 def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
-    invoice_validator = form.DianResolucion0001Validator()
-    assert invoice_validator.validate(simple_invoice) == True
     xml = DIANInvoiceXML(simple_invoice)
 
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
@@ -178,7 +170,7 @@ def test_invoice_totals(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 9999),
-        price = form.Price(form.Amount(1_500_000), '', ''),
+        price = form.Price(form.Amount(1_500_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
@@ -201,7 +193,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
         quantity = 1,
         description = 'producto',
         item = form.StandardItem('test', 111),
-        price = form.Price(form.Amount(1_500_000), '', ''),
+        price = form.Price(form.Amount(1_500_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
@@ -254,8 +246,3 @@ def test_invoice_cufe(simple_invoice_without_lines):
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
     # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
-
-
-def test_invoice_payment_mean(monkeypatch, simple_invoice):
-    invoice_validator = form.DianResolucion0001Validator()
-    assert invoice_validator.validate(simple_invoice) == True

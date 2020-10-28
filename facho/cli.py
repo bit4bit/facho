@@ -259,15 +259,6 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
     invoice = module.invoice()
     invoice.calculate()
 
-    try:
-        validator = module.validator()
-    except AttributeError:
-        validator = form.DianResolucion0001Validator()
-
-    if not validator.validate(invoice):
-        for error in validator.errors:
-            print("ERROR:", error)
-
     if generate:
         xml = invoice_xml(invoice)
 

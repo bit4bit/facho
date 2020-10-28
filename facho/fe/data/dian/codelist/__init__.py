@@ -93,3 +93,4 @@ TipoOperacionF = CodeList(path_for_codelist('TipoOperacionF-2.1.gc'), 'code', 'n
     .update(CodeList(path_for_codelist('TipoOperacionF-2.1.custom.gc'), 'code', 'name'))
 Municipio = CodeList(path_for_codelist('Municipio-2.1.gc'), 'code', 'name')
 Departamento = CodeList(path_for_codelist('Departamentos-2.1.gc'), 'code', 'name')
+Paises = CodeList(path_for_codelist('Paises-2.1.gc'), 'code', 'name')
