@@ -250,15 +250,26 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
     from facho.fe.form_xml import DIANInvoiceXML, DIANWriteSigned,DIANWrite
     from facho import fe
 
+    try:
+        invoice_xml = module.document_xml()
+    except AttributeError:
+        invoice_xml = DIANInvoiceXML
+
+    print("Using document xml:", invoice_xml)
     invoice = module.invoice()
     invoice.calculate()
-    validator = form.DianResolucion0001Validator()
+
+    try:
+        validator = module.validator()
+    except AttributeError:
+        validator = form.DianResolucion0001Validator()
+
     if not validator.validate(invoice):
         for error in validator.errors:
             print("ERROR:", error)
 
     if generate:
-        xml = DIANInvoiceXML(invoice)
+        xml = invoice_xml(invoice)
 
         extensions = module.extensions(invoice)
         for extension in extensions:
