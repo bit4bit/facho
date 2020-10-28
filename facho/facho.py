@@ -82,6 +82,9 @@ class LXMLBuilder:
     def append(self, elem, child):
         elem.append(child)
 
+    def remove(self, elem):
+        elem.getparent().remove(elem)
+
     def set_text(self, elem, text):
         elem.text = text
 
@@ -163,6 +166,11 @@ class FachoXML:
 
     def placeholder_for(self, xpath):
         return self.find_or_create_element(xpath)
+
+    def replacement_for(self, xpath, new_xpath, content, **attrs):
+        elem = self.get_element(xpath)
+        self.builder.remove(elem)
+        return self.set_element(new_xpath, content, **attrs)
 
     def find_or_create_element(self, xpath, append=False):
         """

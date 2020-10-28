@@ -170,3 +170,11 @@ def test_facho_xml_fragment_relative():
     invoice = xml.fragment('./Invoice')
     invoice.set_element('./Id', 1)
     assert xml.tostring() == '<root><Invoice><Id>1</Id></Invoice></root>'
+
+
+def test_facho_xml_replacement_for():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./child/type')
+    xml.replacement_for('./child/type',
+                        './child/code', 'test')
+    assert xml.tostring() == '<root><child><code>test</code></child></root>'
