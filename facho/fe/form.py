@@ -168,6 +168,12 @@ class Responsability:
     def __iter__(self):
         return iter(self.codes)
 
+    def __post_init__(self):
+        for code in self.responsability_code:
+            if code not in codelist.TipoResponsabilidad:
+                raise ValueError("code %s not found" % (code))
+
+
 @dataclass
 class TaxScheme:
     code: str
@@ -198,10 +204,6 @@ class Party:
     def __post_init__(self):
         if self.organization_code not in codelist.TipoOrganizacion:
             raise ValueError("organization_code not found")
-
-        for code in self.responsability_code:
-            if code not in codelist.TipoResponsabilidad:
-                raise ValueError("responsability_code %s not found" % (code))
         
 @dataclass
 class TaxSubTotal:
