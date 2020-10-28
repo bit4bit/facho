@@ -9,8 +9,8 @@ class DIANInvoiceXML(fe.FeXML):
     lo indicado para la facturacion electronica.
     """
 
-    def __init__(self, invoice):
-        super().__init__('Invoice', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    def __init__(self, invoice, tag_document = 'Invoice'):
+        super().__init__(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
         self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
 
         # ZE02 se requiere existencia para firmar

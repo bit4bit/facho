@@ -11,7 +11,7 @@ class DIANCreditNoteXML(DIANInvoiceXML):
     """
 
     def __init__(self, invoice):
-        super().__init__('CreditNote', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+        super(DIANCreditNoteXML, self).__init__(invoice, 'CreditNote')
 
     def tag_document(fexml):
         return 'CreditNote'

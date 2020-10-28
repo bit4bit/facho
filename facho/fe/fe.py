@@ -26,6 +26,7 @@ POLICY_NAME = u'Política de firma para facturas electrónicas de la República 
 
 
 NAMESPACES = {
+    'facho': 'http://git.disroot.org/Etrivial/facho',
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
     'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
@@ -89,13 +90,13 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
 
     def build(self, fachoxml):
         cufe = self._generate_cufe(self.invoice, fachoxml)
-        fachoxml.set_element('/fe:Invoice/cbc:UUID', cufe,
+        fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName='CUFE-SHA384')
-        fachoxml.set_element('/fe:Invoice/cbc:ProfileID', 'DIAN 2.1')
-        fachoxml.set_element('/fe:Invoice/cbc:ProfileExecutionID', self._tipo_ambiente())
+        fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1')
+        fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente())
         #DIAN 1.7.-2020: FAB36
-        fachoxml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',
+        fachoxml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',
                 'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='+cufe)
 
     def issue_time(self, datetime_):
@@ -164,7 +165,7 @@ class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
         self.id_software = id_software
 
     def build(self, fexml):
-        software_provider = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
+        software_provider = fexml.fragment('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
         provider_id_attrs = SCHEME_AGENCY_ATTRS.copy()
         provider_id_attrs.update({'schemeID': self.dv})
         #DIAN 1.7.-2020: FAB23
@@ -184,7 +185,7 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
         self.invoice_ident = invoice_ident
 
     def build(self, fexml):
-        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode'
+        dian_path = './ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode'
         code = str(self.id_software) + str(self.pin) + str(self.invoice_ident)
         m = hashlib.sha384()
         m.update(code.encode('utf-8'))
@@ -212,7 +213,7 @@ class DianXMLExtensionSigner:
 
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
         #DIAN 1.7.-2020: FAB01
-        extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
+        extcontent = fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
 
         return fachoxml.tostring(xml_declaration=True, encoding='UTF-8')
@@ -276,14 +277,14 @@ class DianXMLExtensionSigner:
 
     def build(self, fachoxml):
         signature = self.sign_xml_element(fachoxml.root)
-        extcontent = fachoxml.builder.xpath(fachoxml.root, '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
+        extcontent = fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
 
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
 
     def build(self, fexml):
-        dian_path = '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
+        dian_path = './ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
         fexml.set_element(dian_path, '800197268')
 
         attrs = {'schemeID': '4', 'schemeName': '31'}
@@ -315,7 +316,7 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
         self.to = to
 
     def build(self, fexml):
-        fexml.set_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode',
+        fexml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode',
                           'CO',
                           #DIAN 1.7.-2020: FAB15
                           listAgencyID="6",
@@ -325,7 +326,7 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
                           listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"
                           )
 
-        invoice_control = fexml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
+        invoice_control = fexml.fragment('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
         invoice_control.set_element('/sts:InvoiceControl/sts:InvoiceAuthorization', self.authorization)
         invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizationPeriod/cbc:StartDate',
                                     self.period_startdate.strftime('%Y-%m-%d'))
