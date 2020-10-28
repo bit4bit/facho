@@ -318,6 +318,7 @@ class Invoice:
         self.invoice_lines = []
         self.invoice_allowance_charge = []
         self.invoice_prepaid_payment = []
+        self.invoice_billing_reference = None
 
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
