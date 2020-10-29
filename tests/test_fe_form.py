@@ -12,7 +12,39 @@ import zipfile
 
 import facho.fe.form as form
 from facho import fe
-from facho.fe.form_xml import DIANInvoiceXML
+from facho.fe.form_xml import DIANInvoiceXML, DIANCreditNoteXML
+
+@pytest.fixture
+def simple_credit_note_without_lines():
+    inv = form.CreditNote(form.InvoiceDocumentReference('1234', 'xx', datetime.now()))
+    inv.set_period(datetime.now(), datetime.now())
+    inv.set_issue(datetime.now())
+    inv.set_ident('ABC123')
+    inv.set_operation_type('10')
+    inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
+    inv.set_supplier(form.Party(
+        name = 'facho-supplier',
+        ident = form.PartyIdentification('123','', '31'),
+        responsability_code = form.Responsability(['O-07']),
+        responsability_regime_code = '48',
+        organization_code = '1',
+        address = form.Address(
+            '', '', form.City('05001', 'Medellín'),
+            form.Country('CO', 'Colombia'),
+            form.CountrySubentity('05', 'Antioquia'))
+    ))
+    inv.set_customer(form.Party(
+        name = 'facho-customer',
+        ident = form.PartyIdentification('321', '', '31'),
+        responsability_code = form.Responsability(['O-07']),
+        responsability_regime_code = '48',
+        organization_code = '1',
+        address = form.Address(
+            '', '', form.City('05001', 'Medellín'),
+            form.Country('CO', 'Colombia'),
+            form.CountrySubentity('05', 'Antioquia'))
+    ))
+    return inv
 
 @pytest.fixture
 def simple_invoice_without_lines():
@@ -207,10 +239,10 @@ def test_invoice_cufe(simple_invoice_without_lines):
 
     cufe_extension = fe.DianXMLExtensionCUFE(
         simple_invoice,
-        tipo_ambiente = fe.DianXMLExtensionCUFE.AMBIENTE_PRODUCCION,
+        tipo_ambiente = fe.AMBIENTE_PRODUCCION,
         clave_tecnica = '693ff6f2a553c3646a063436fd4dd9ded0311471'
     )
-    formatVars = cufe_extension.formatVars(simple_invoice)
+    formatVars = cufe_extension.formatVars()
     #NumFac
     assert formatVars[0] == '323200000129', "NumFac"
     #FecFac
@@ -246,3 +278,37 @@ def test_invoice_cufe(simple_invoice_without_lines):
     cufe = xml_invoice.get_element_text('/fe:Invoice/cbc:UUID')
     # RESOLUCION 004: pagina 689
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
+
+
+def test_credit_note_cude(simple_credit_note_without_lines):
+    simple_invoice = simple_credit_note_without_lines
+    simple_invoice.invoice_ident = '8110007871'
+    simple_invoice.invoice_issue = datetime.strptime('2019-01-12 07:00:00-05:00', '%Y-%m-%d %H:%M:%S%z')
+    simple_invoice.invoice_supplier.ident = form.PartyIdentification('900373076', '5', '31')
+    simple_invoice.invoice_customer.ident = form.PartyIdentification('8355990', '5', '31')
+    simple_invoice.add_invoice_line(form.InvoiceLine(
+        quantity = 1,
+        description = 'producto',
+        item = form.StandardItem('test', 111),
+        price = form.Price(form.Amount(5_000), '01', ''),
+        tax = form.TaxTotal(
+            subtotals = [
+                form.TaxSubTotal(
+                    tax_scheme_ident = '01',
+                    percent = 19.0
+                )])
+    ))
+
+    simple_invoice.calculate()
+    xml_invoice = DIANCreditNoteXML(simple_invoice)
+
+    cude_extension = fe.DianXMLExtensionCUDE(
+        simple_invoice,
+        '12301',
+        tipo_ambiente = fe.AMBIENTE_PRODUCCION,
+    )
+
+    xml_invoice.add_extension(cude_extension)
+    cude = xml_invoice.get_element_text('/fe:CreditNote/cbc:UUID')
+    # pag 612
+    assert cude == '907e4444decc9e59c160a2fb3b6659b33dc5b632a5008922b9a62f83f757b1c448e47f5867f2b50dbdb96f48c7681168'

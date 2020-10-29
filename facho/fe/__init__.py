@@ -3,8 +3,11 @@ from .fe import NAMESPACES
 from .fe import DianXMLExtensionSigner
 from .fe import DianXMLExtensionSoftwareSecurityCode
 from .fe import DianXMLExtensionCUFE
+from .fe import DianXMLExtensionCUDE
 from .fe import DianXMLExtensionInvoiceAuthorization
 from .fe import DianXMLExtensionSoftwareProvider
 from .fe import DianXMLExtensionAuthorizationProvider
 from .fe import DianZIP
+from .fe import AMBIENTE_PRUEBAS
+from .fe import AMBIENTE_PRODUCCION
 from . import form_xml

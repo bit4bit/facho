@@ -14,6 +14,10 @@ from contextlib import contextmanager
 from .data.dian import codelist
 from . import form
 
+AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
+AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
+
+
 SCHEME_AGENCY_ATTRS = {
     'schemeAgencyName': 'CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)',
     'schemeAgencyID': '195'
@@ -76,20 +80,18 @@ class FeXML(FachoXML):
             .replace("xmlns:fe", "xmlns")
 
 
-class DianXMLExtensionCUFE(FachoXMLExtension):
-    AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
-    AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
 
-    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
+class DianXMLExtensionCUDFE(FachoXMLExtension):
+
+    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS):
         self.tipo_ambiente = tipo_ambiente
-        self.clave_tecnica = clave_tecnica
         self.invoice = invoice
 
     def _tipo_ambiente(self):
         return int(self.tipo_ambiente)
 
     def build(self, fachoxml):
-        cufe = self._generate_cufe(self.invoice, fachoxml)
+        cufe = self._generate_cufe(fachoxml)
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName='CUFE-SHA384')
@@ -105,49 +107,38 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
     def issue_date(self, datetime_):
         return datetime_.strftime('%Y-%m-%d')
 
-    def formatVars(self, invoice):
-        NumFac = invoice.invoice_ident
-        FecFac = self.issue_date(invoice.invoice_issue)
-        HoraFac = self.issue_time(invoice.invoice_issue)
+    def buildVars(self):
+        invoice = self.invoice
+        build_vars = {}
+        build_vars['NumFac'] = invoice.invoice_ident
+        build_vars['FecFac'] = self.issue_date(invoice.invoice_issue)
+        build_vars['HoraFac'] = self.issue_time(invoice.invoice_issue)
         # PAG 601
-        ValorBruto = invoice.invoice_legal_monetary_total.line_extension_amount
-        ValorTotalPagar = invoice.invoice_legal_monetary_total.payable_amount
+        build_vars['ValorBruto'] = invoice.invoice_legal_monetary_total.line_extension_amount
+        build_vars['ValorTotalPagar'] = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = {}
-        CodImpuesto1 = 1
-        CodImpuesto2 = 4
-        CodImpuesto3 = 3
+        build_vars['CodImpuesto1'] = 1
+        build_vars['CodImpuesto2'] = 4
+        build_vars['CodImpuesto3'] = 3
         for invoice_line in invoice.invoice_lines:
             for subtotal in invoice_line.tax.subtotals:
                 # TODO cual es la naturaleza de tax_scheme_ident?
                 codigo_impuesto = int(subtotal.tax_scheme_ident)
                 ValorImpuestoPara.setdefault(codigo_impuesto, form.Amount(0.0))
                 ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
+        build_vars['ValorImpuestoPara'] = ValorImpuestoPara
+        build_vars['NitOFE'] = invoice.invoice_supplier.ident
+        build_vars['NumAdq'] = invoice.invoice_customer.ident
+        build_vars['TipoAmb'] = self._tipo_ambiente()
 
-        NitOFE = invoice.invoice_supplier.ident
-        NumAdq = invoice.invoice_customer.ident
-        TipoAmb = self._tipo_ambiente()
-        ClTec = str(self.clave_tecnica)
+        return build_vars
 
-        return [
-            '%s' % NumFac,
-            '%s' % FecFac,
-            '%s' % HoraFac,
-            '%.02f' % round(ValorBruto, 2),
-            '%02d' % CodImpuesto1,
-            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto1, 0.0), 2),
-            '%02d' % CodImpuesto2,
-            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto2, 0.0), 2),
-            '%02d' % CodImpuesto3,
-            '%.02f' % round(ValorImpuestoPara.get(CodImpuesto3, 0.0), 2),
-            '%.02f' % round(ValorTotalPagar, 2),
-            '%s' % NitOFE,
-            '%s' % NumAdq,
-            '%s' % ClTec,
-            '%d' % TipoAmb,
-        ]
 
-    def _generate_cufe(self, invoice, fachoxml):
-        formatVars = self.formatVars(invoice)
+    def formatVars(self, invoice):
+        raise NotImplementedError()
+
+    def _generate_cufe(self, fachoxml):
+        formatVars = self.formatVars()
         cufe = "".join(formatVars)
 
         # crear hash...
@@ -155,6 +146,74 @@ class DianXMLExtensionCUFE(FachoXMLExtension):
         h.update(cufe.encode('utf-8'))
         return h.hexdigest()
 
+
+class DianXMLExtensionCUFE(DianXMLExtensionCUDFE):
+    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
+        self.tipo_ambiente = tipo_ambiente
+        self.clave_tecnica = clave_tecnica
+        self.invoice = invoice
+
+    def buildVars(self):
+        build_vars = super().buildVars()
+        build_vars['ClTec'] = str(self.clave_tecnica)
+        return build_vars
+
+    def formatVars(self):
+        build_vars = self.buildVars()
+        CodImpuesto1 = build_vars['CodImpuesto1']
+        CodImpuesto2 = build_vars['CodImpuesto2']
+        CodImpuesto3 = build_vars['CodImpuesto3']
+        return [
+            '%s' % build_vars['NumFac'],
+            '%s' % build_vars['FecFac'],
+            '%s' % build_vars['HoraFac'],
+            '%.02f' % round(build_vars['ValorBruto'], 2),
+            '%02d' % CodImpuesto1,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto1, 0.0), 2),
+            '%02d' % CodImpuesto2,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto2, 0.0), 2),
+            '%02d' % CodImpuesto3,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto3, 0.0), 2),
+            '%.02f' % round(build_vars['ValorTotalPagar'], 2),
+            '%s' % build_vars['NitOFE'],
+            '%s' % build_vars['NumAdq'],
+            '%s' % build_vars['ClTec'],
+            '%d' % build_vars['TipoAmb'],
+        ]
+
+class DianXMLExtensionCUDE(DianXMLExtensionCUDFE):
+    def __init__(self, invoice, software_pin, tipo_ambiente = AMBIENTE_PRUEBAS):
+        self.tipo_ambiente = tipo_ambiente
+        self.software_pin = software_pin
+        self.invoice = invoice
+
+    def buildVars(self):
+        build_vars = super().buildVars()
+        build_vars['Software-PIN'] = str(self.software_pin)
+        return build_vars
+
+    def formatVars(self):
+        build_vars = self.buildVars()
+        CodImpuesto1 = build_vars['CodImpuesto1']
+        CodImpuesto2 = build_vars['CodImpuesto2']
+        CodImpuesto3 = build_vars['CodImpuesto3']
+        return [
+            '%s' % build_vars['NumFac'],
+            '%s' % build_vars['FecFac'],
+            '%s' % build_vars['HoraFac'],
+            '%.02f' % round(build_vars['ValorBruto'], 2),
+            '%02d' % CodImpuesto1,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto1, 0.0), 2),
+            '%02d' % CodImpuesto2,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto2, 0.0), 2),
+            '%02d' % CodImpuesto3,
+            '%.02f' % round(build_vars['ValorImpuestoPara'].get(CodImpuesto3, 0.0), 2),
+            '%.02f' % round(build_vars['ValorTotalPagar'], 2),
+            '%s' % build_vars['NitOFE'],
+            '%s' % build_vars['NumAdq'],
+            '%s' % build_vars['Software-PIN'],
+            '%d' % build_vars['TipoAmb'],
+        ]
 
 class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 108
@@ -300,7 +359,7 @@ class DianXMLExtensionInvoiceSource(FachoXMLExtension):
                           listAgencyID="6",
                           listAgencyName="United Nations Economic Commission for Europe",
                           listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1")
-        
+
 
 class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
     # RESOLUCION 0004: pagina 106

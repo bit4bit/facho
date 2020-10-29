@@ -470,6 +470,8 @@ class NationalSalesInvoice(Invoice):
 
 class CreditNote(Invoice):
     def __init__(self, invoice_document_reference: BillingReference):
+        super().__init__(CreditNoteDocumentType())
+
         if not isinstance(invoice_document_reference, BillingReference):
             raise TypeError('invoice_document_reference invalid type')
         self.invoice_billing_reference = invoice_document_reference
