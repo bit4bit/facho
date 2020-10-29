@@ -15,9 +15,6 @@ class DIANCreditNoteXML(DIANInvoiceXML):
 
     def tag_document(fexml):
         return 'CreditNote'
-    
+
     def tag_document_concilied(fexml):
         return 'Credited'
-
-    def document_type_code(fexml):
-        return codelist.TipoDocumento.by_name('Nota Crédito')['code']

@@ -16,7 +16,7 @@ from facho.fe.form_xml import DIANInvoiceXML
 
 @pytest.fixture
 def simple_invoice_without_lines():
-    inv = form.Invoice()
+    inv = form.NationalSalesInvoice()
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
@@ -48,7 +48,7 @@ def simple_invoice_without_lines():
 
 @pytest.fixture
 def simple_invoice():
-    inv = form.Invoice()
+    inv = form.NationalSalesInvoice()
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')

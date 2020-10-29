@@ -30,11 +30,11 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ06
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name',
                           invoice.invoice_supplier.name)
-        
+
         #DIAN 1.7.-2020: CAJ07, CAJ08
         #DIAN 1.7.-2020: FAJ07
         fexml.placeholder_for('./cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address')
-        
+
         #DIAN 1.7.-2020: FAJ08
         #DIAN 1.7.-2020: CAJ09
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:ID',
@@ -47,7 +47,7 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: CAJ11
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:CountrySubentity',
                           invoice.invoice_supplier.address.countrysubentity.name)
-        
+
         #DIAN 1.7.-2020: FAJ12
         #DIAN 1.7.-2020: CAJ12
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PhysicalLocation/cac:Address/cbc:CountrySubentityCode',
@@ -384,19 +384,36 @@ class DIANInvoiceXML(fe.FeXML):
                                 invoice.invoice_legal_monetary_total.payable_amount)
 
 
-    def set_billing_reference(fexml, invoice):
-        if invoice.invoice_billing_reference is None:
-            return
+    def _set_invoice_document_reference(fexml, reference):
+        fexml._do_set_billing_reference(reference, 'cac:InvoiceDocumentReference')
 
-        fexml.placeholder_for('./cac:BillingReference')
-        fexml.placeholder_for('./cac:BillingReference/cac:InvoiceDocumentReference')
-        fexml.set_element('./cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID',
-                          invoice.invoice_billing_reference.ident)
+    def _set_credit_note_document_reference(fexml, reference):
+        fexml._do_set_billing_reference(reference, 'cac:CreditNoteDocumentReference')
+
+    def _set_debit_note_document_reference(fexml, reference):
+        fexml._do_set_billing_reference(reference, 'cac:DebitNoteDocumentReference')
+
+    def _do_set_billing_reference(fexml, reference, tag_document):
+        fexml.set_element('./cac:BillingReference/%s/cbc:ID' %(tag_document),
+                          reference.ident)
         fexml.set_element('./cac:BillingReference/cac:InvoiceDocumentReference/cbc:UUID',
-                          invoice.invoice_billing_reference.uuid,
+                          reference.uuid,
                           schemeName='CUFE-SHA384')
         fexml.set_element('./cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate',
-                          invoice.invoice_billing_reference.date)
+                          reference.date)
+
+    def set_billing_reference(fexml, invoice):
+        reference = invoice.invoice_billing_reference
+        if reference is None:
+            return
+
+        if isinstance(reference, DebitNoteDocumentReference):
+            return fexml._set_debit_note_document_reference(reference)
+        if isinstance(reference, CreditNoteDocumentReference):
+            return fexml._set_credit_note_document_reference(reference)
+
+        if isinstance(reference, InvoiceDocumentReference):
+            return fexml._set_invoice_document_reference(reference)
 
     def set_invoice_totals(fexml, invoice):
         tax_amount_for = defaultdict(lambda: defaultdict(lambda: 0.0))
@@ -469,10 +486,6 @@ class DIANInvoiceXML(fe.FeXML):
     def tag_document_concilied(fexml):
         return 'Invoiced'
 
-    # abstract method
-    def document_type_code(fexml):
-        return codelist.TipoDocumento.by_name('Factura de Venta Nacional')['code']
-
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
@@ -519,14 +532,15 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('./cbc:IssueDate', invoice.invoice_issue.strftime('%Y-%m-%d'))
         #DIAN 1.7.-2020: FAD10
         fexml.set_element('./cbc:IssueTime', invoice.invoice_issue.strftime('%H:%M:%S-05:00'))
-        fexml.set_element('./cbc:%sTypeCode' % (fexml.tag_document()), fexml.document_type_code(),
-                          listAgencyID='195',
-                          listAgencyName='No matching global declaration available for the validation root',
-                          listURI='http://www.dian.gov.co')
+        fexml.set_element('./cbc:%sTypeCode' % (fexml.tag_document()),
+                        invoice.invoice_type_code,
+                        listAgencyID='195',
+                        listAgencyName='No matching global declaration available for the validation root',
+                        listURI='http://www.dian.gov.co')
         fexml.set_element('./cbc:LineCountNumeric', len(invoice.invoice_lines))
         fexml.set_element('./cac:%sPeriod/cbc:StartDate' % (fexml.tag_document()),
                           invoice.invoice_period_start.strftime('%Y-%m-%d'))
-        
+
         fexml.set_element('./cac:%sPeriod/cbc:EndDate' % (fexml.tag_document()),
                           invoice.invoice_period_end.strftime('%Y-%m-%d'))
 
@@ -545,10 +559,3 @@ class DIANInvoiceXML(fe.FeXML):
     def customize(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""
-
-
-
-
-        
-        
-

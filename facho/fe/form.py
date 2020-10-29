@@ -271,6 +271,14 @@ class BillingReference:
             self.uuid = uuid
             self.date = date
 
+class CreditNoteDocumentReference(BillingReference):
+    pass
+
+class DebitNoteDocumentReference(BillingReference):
+    pass
+
+class InvoiceDocumentReference(BillingReference):
+    pass
 
 @dataclass
 class InvoiceLine:
@@ -338,9 +346,19 @@ class AllowanceCharge:
         self.charge_indicator = False
 
 
+class NationalSalesInvoiceDocumentType(str):
+    def __str__(self):
+        return '01'
+
+class CreditNoteDocumentType(str):
+    def __str__(self):
+        return '91'
 
 class Invoice:
-    def __init__(self):
+    def __init__(self, type_code: str):
+        if str(type_code) not in codelist.TipoDocumento:
+            raise ValueError("type_code [%s] not found")
+
         self.invoice_period_start = None
         self.invoice_period_end = None
         self.invoice_issue = None
@@ -355,6 +373,8 @@ class Invoice:
         self.invoice_allowance_charge = []
         self.invoice_prepaid_payment = []
         self.invoice_billing_reference = None
+        self.invoice_type_code = str(type_code)
+
 
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
@@ -441,3 +461,15 @@ class Invoice:
         for invline in self.invoice_lines:
             invline.calculate()
         self._calculate_legal_monetary_total()
+
+
+class NationalSalesInvoice(Invoice):
+    def __init__(self):
+        super().__init__(NationalSalesInvoiceDocumentType())
+
+
+class CreditNote(Invoice):
+    def __init__(self, invoice_document_reference: BillingReference):
+        if not isinstance(invoice_document_reference, BillingReference):
+            raise TypeError('invoice_document_reference invalid type')
+        self.invoice_billing_reference = invoice_document_reference
