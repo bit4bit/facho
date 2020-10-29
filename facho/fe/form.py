@@ -111,7 +111,7 @@ class Country:
         if self.code not in codelist.Paises:
             raise ValueError("code [%s] not found" % (self.code))
         self.name = codelist.Paises[self.code]['name']
-        
+
 @dataclass
 class CountrySubentity:
     code: str
@@ -169,7 +169,7 @@ class Responsability:
         return iter(self.codes)
 
     def __post_init__(self):
-        for code in self.responsability_code:
+        for code in self.codes:
             if code not in codelist.TipoResponsabilidad:
                 raise ValueError("code %s not found" % (code))
 
@@ -177,7 +177,7 @@ class Responsability:
 @dataclass
 class TaxScheme:
     code: str
-    name: str = ''   
+    name: str = ''
 
 
     def __post_init__(self):
@@ -204,7 +204,7 @@ class Party:
     def __post_init__(self):
         if self.organization_code not in codelist.TipoOrganizacion:
             raise ValueError("organization_code not found")
-        
+
 @dataclass
 class TaxSubTotal:
     percent: float
@@ -242,7 +242,7 @@ class Price:
         if self.type_code not in codelist.CodigoPrecioReferencia:
             raise ValueError("type_code [%s] not found" % (self.type_code))
 
-        
+
 @dataclass
 class PaymentMean:
     DEBIT = '01'
@@ -251,7 +251,7 @@ class PaymentMean:
     def __init__(self, id: str, code: str, due_at: datetime, payment_id: str):
         if code not in codelist.MediosPago:
             raise ValueError("code not found")
-        
+
         self.id = id
         self.code = code
         self.due_at = due_at
@@ -270,8 +270,8 @@ class BillingReference:
             self.ident = ident
             self.uuid = uuid
             self.date = date
-    
-    
+
+
 @dataclass
 class InvoiceLine:
     # RESOLUCION 0004: pagina 155
@@ -381,7 +381,7 @@ class Invoice:
     def set_operation_type(self, operation):
         if operation not in codelist.TipoOperacionF:
             raise ValueError("operation not found")
-        
+
         self.invoice_operation_type = operation
 
     def add_allownace_charge(self, charge: AllowanceCharge):
@@ -395,7 +395,7 @@ class Invoice:
 
     def set_billing_reference(self, billing_reference: BillingReference):
         self.invoice_billing_reference = billing_reference
-        
+
     def accept(self, visitor):
         visitor.visit_payment_mean(self.invoice_payment_mean)
         visitor.visit_customer(self.invoice_customer)
