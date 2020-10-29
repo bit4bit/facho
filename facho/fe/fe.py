@@ -90,11 +90,17 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
     def _tipo_ambiente(self):
         return int(self.tipo_ambiente)
 
+    def formatVars(self, invoice):
+        raise NotImplementedError()
+
+    def schemeName(self):
+        raise NotImplementedError()
+
     def build(self, fachoxml):
         cufe = self._generate_cufe(fachoxml)
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
-                             schemeName='CUFE-SHA384')
+                             schemeName=self.schemeName())
         fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1')
         fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente())
         #DIAN 1.7.-2020: FAB36
@@ -133,10 +139,6 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
 
         return build_vars
 
-
-    def formatVars(self, invoice):
-        raise NotImplementedError()
-
     def _generate_cufe(self, fachoxml):
         formatVars = self.formatVars()
         cufe = "".join(formatVars)
@@ -152,6 +154,9 @@ class DianXMLExtensionCUFE(DianXMLExtensionCUDFE):
         self.tipo_ambiente = tipo_ambiente
         self.clave_tecnica = clave_tecnica
         self.invoice = invoice
+
+    def schemeName(self):
+        return 'CUFE-SHA384'
 
     def buildVars(self):
         build_vars = super().buildVars()
@@ -186,6 +191,9 @@ class DianXMLExtensionCUDE(DianXMLExtensionCUDFE):
         self.tipo_ambiente = tipo_ambiente
         self.software_pin = software_pin
         self.invoice = invoice
+
+    def schemeName(self):
+        return 'CUDE-SHA384'
 
     def buildVars(self):
         build_vars = super().buildVars()
