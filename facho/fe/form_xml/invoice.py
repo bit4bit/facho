@@ -416,7 +416,7 @@ class DIANInvoiceXML(fe.FeXML):
             return fexml._set_invoice_document_reference(reference)
 
     def set_invoice_totals(fexml, invoice):
-        tax_amount_for = defaultdict(lambda: defaultdict(lambda: 0.0))
+        tax_amount_for = defaultdict(lambda: defaultdict(lambda: Amount(0.0)))
         percent_for = defaultdict(lambda: None)
 
         #requeridos para CUFE

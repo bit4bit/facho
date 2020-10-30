@@ -91,6 +91,7 @@ class Amount:
     def is_same_currency(self, other):
         return self.currency == other.currency
 
+
 @dataclass
 class Item:
     description: str
@@ -348,11 +349,18 @@ class AllowanceCharge:
 
 class NationalSalesInvoiceDocumentType(str):
     def __str__(self):
+        # 6.1.3
         return '01'
 
 class CreditNoteDocumentType(str):
     def __str__(self):
+        # 6.1.3
         return '91'
+
+class DebitNoteDocumentType(str):
+    def __str__(self):
+        # 6.1.3
+        return '92'
 
 class Invoice:
     def __init__(self, type_code: str):
@@ -471,6 +479,15 @@ class NationalSalesInvoice(Invoice):
 class CreditNote(Invoice):
     def __init__(self, invoice_document_reference: BillingReference):
         super().__init__(CreditNoteDocumentType())
+
+        if not isinstance(invoice_document_reference, BillingReference):
+            raise TypeError('invoice_document_reference invalid type')
+        self.invoice_billing_reference = invoice_document_reference
+
+
+class DebitNote(Invoice):
+    def __init__(self, invoice_document_reference: BillingReference):
+        super().__init__(DebitNoteDocumentType())
 
         if not isinstance(invoice_document_reference, BillingReference):
             raise TypeError('invoice_document_reference invalid type')

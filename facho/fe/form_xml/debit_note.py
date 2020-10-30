@@ -17,7 +17,7 @@ class DIANDebitNoteXML(fe.FeXML):
         ublextension = self.fragment('/fe:DebitNote/ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         self.attach_invoice(invoice)
- 
+
     def set_supplier(fexml, invoice):
         fexml.placeholder_for('/fe:DebitNote/cac:AccountingSupplierParty')
         #DIAN 1.7.-2020: DAJ02
@@ -101,7 +101,7 @@ class DIANDebitNoteXML(fe.FeXML):
                           invoice.invoice_customer.tax_scheme.code)
         #DIAN 1.7.-2020: DAJ41
         fexml.set_element('/fe:DebitNote/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:Name',
-                          invoice.invoice_customer.tax_scheme.name)                          
+                          invoice.invoice_customer.tax_scheme.name)
         #DIAN 1.7.-2020: DAJ42
         fexml.placeholder_for('/fe:DebitNote/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity')
         #DIAN 1.7.-2020: DAJ43
@@ -229,7 +229,7 @@ class DIANDebitNoteXML(fe.FeXML):
         #DIAN 1.7.-2020: CAK51, CAK55
         fexml.set_element('/fe:DebitNote/cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail',
                           invoice.invoice_customer.email)
-        
+
 
     def set_payment_mean(fexml, invoice):
         payment_mean = invoice.invoice_payment_mean
@@ -275,10 +275,10 @@ class DIANDebitNoteXML(fe.FeXML):
                                 schemeName='CUFE-SHA384')
         fexml.set_element('/fe:DebitNote/cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate',
                                 invoice.invoice_billing_reference.date)
-        
-        
+
+
     def set_invoice_totals(fexml, invoice):
-        tax_amount_for = defaultdict(lambda: defaultdict(lambda: 0.0))
+        tax_amount_for = defaultdict(lambda: defaultdict(lambda: Amount(0.0)))
         percent_for = defaultdict(lambda: None)
 
         #requeridos para CUDE

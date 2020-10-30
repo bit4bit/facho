@@ -13,6 +13,7 @@ import hashlib
 from contextlib import contextmanager
 from .data.dian import codelist
 from . import form
+from collections import defaultdict
 
 AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
 AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
@@ -97,7 +98,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         raise NotImplementedError()
 
     def build(self, fachoxml):
-        cufe = self._generate_cufe(fachoxml)
+        cufe = self._generate_cufe()
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName=self.schemeName())
@@ -122,7 +123,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         # PAG 601
         build_vars['ValorBruto'] = invoice.invoice_legal_monetary_total.line_extension_amount
         build_vars['ValorTotalPagar'] = invoice.invoice_legal_monetary_total.payable_amount
-        ValorImpuestoPara = {}
+        ValorImpuestoPara = defaultdict(lambda: form.Amount(0.0))
         build_vars['CodImpuesto1'] = 1
         build_vars['CodImpuesto2'] = 4
         build_vars['CodImpuesto3'] = 3
@@ -139,9 +140,8 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
 
         return build_vars
 
-    def _generate_cufe(self, fachoxml):
-        formatVars = self.formatVars()
-        cufe = "".join(formatVars)
+    def _generate_cufe(self):
+        cufe = "".join(self.formatVars())
 
         # crear hash...
         h = hashlib.sha384()

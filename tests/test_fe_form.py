@@ -12,7 +12,39 @@ import zipfile
 
 import facho.fe.form as form
 from facho import fe
-from facho.fe.form_xml import DIANInvoiceXML, DIANCreditNoteXML
+from facho.fe.form_xml import DIANInvoiceXML, DIANCreditNoteXML, DIANDebitNoteXML
+
+@pytest.fixture
+def simple_debit_note_without_lines():
+    inv = form.DebitNote(form.InvoiceDocumentReference('1234', 'xx', datetime.now()))
+    inv.set_period(datetime.now(), datetime.now())
+    inv.set_issue(datetime.now())
+    inv.set_ident('ABC123')
+    inv.set_operation_type('10')
+    inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
+    inv.set_supplier(form.Party(
+        name = 'facho-supplier',
+        ident = form.PartyIdentification('123','', '31'),
+        responsability_code = form.Responsability(['O-07']),
+        responsability_regime_code = '48',
+        organization_code = '1',
+        address = form.Address(
+            '', '', form.City('05001', 'Medellín'),
+            form.Country('CO', 'Colombia'),
+            form.CountrySubentity('05', 'Antioquia'))
+    ))
+    inv.set_customer(form.Party(
+        name = 'facho-customer',
+        ident = form.PartyIdentification('321', '', '31'),
+        responsability_code = form.Responsability(['O-07']),
+        responsability_regime_code = '48',
+        organization_code = '1',
+        address = form.Address(
+            '', '', form.City('05001', 'Medellín'),
+            form.Country('CO', 'Colombia'),
+            form.CountrySubentity('05', 'Antioquia'))
+    ))
+    return inv
 
 @pytest.fixture
 def simple_credit_note_without_lines():
@@ -312,3 +344,54 @@ def test_credit_note_cude(simple_credit_note_without_lines):
     cude = xml_invoice.get_element_text('/fe:CreditNote/cbc:UUID')
     # pag 612
     assert cude == '907e4444decc9e59c160a2fb3b6659b33dc5b632a5008922b9a62f83f757b1c448e47f5867f2b50dbdb96f48c7681168'
+
+
+# pag 614
+def test_debit_note_cude(simple_debit_note_without_lines):
+    simple_invoice = simple_debit_note_without_lines
+    simple_invoice.invoice_ident = 'ND1001'
+    simple_invoice.invoice_issue = datetime.strptime('2019-01-18 10:58:00-05:00', '%Y-%m-%d %H:%M:%S%z')
+    simple_invoice.invoice_supplier.ident = form.PartyIdentification('900197264', '5', '31')
+    simple_invoice.invoice_customer.ident = form.PartyIdentification('10254102', '5', '31')
+    simple_invoice.add_invoice_line(form.InvoiceLine(
+        quantity = 1,
+        description = 'producto',
+        item = form.StandardItem('test', 111),
+        price = form.Price(form.Amount(30_000), '01', ''),
+        tax = form.TaxTotal(
+            subtotals = [
+                form.TaxSubTotal(
+                    tax_scheme_ident = '04',
+                    percent = 8.0
+                )])
+    ))
+
+    simple_invoice.calculate()
+    xml_invoice = DIANDebitNoteXML(simple_invoice)
+
+    cude_extension = fe.DianXMLExtensionCUDE(
+        simple_invoice,
+        '10201',
+        tipo_ambiente = fe.AMBIENTE_PRUEBAS,
+    )
+    build_vars = cude_extension.buildVars()
+    assert build_vars['NumFac'] == 'ND1001'
+    assert build_vars['FecFac'] == '2019-01-18'
+    assert build_vars['HoraFac'] == '10:58:00-05:00'
+    assert build_vars['ValorBruto'] == form.Amount(30_000)
+    assert build_vars['NitOFE'] == '900197264'
+    assert build_vars['NumAdq'] == '10254102'
+    assert build_vars['ValorImpuestoPara'][1] == form.Amount(0)
+    assert build_vars['ValorImpuestoPara'][4] == form.Amount(2400)
+    assert build_vars['ValorImpuestoPara'][3] == form.Amount(0)
+    assert build_vars['ValorTotalPagar'] == form.Amount(32400)
+    assert build_vars['Software-PIN'] == '10201'
+    assert build_vars['TipoAmb'] == 2
+
+
+    cude_composicion =  "".join(cude_extension.formatVars())
+    assert cude_composicion == 'ND10012019-01-1810:58:00-05:0030000.00010.00042400.00030.0032400.0090019726410254102102012'
+
+    xml_invoice.add_extension(cude_extension)
+    cude = xml_invoice.get_element_text('/fe:DebitNote/cbc:UUID')
+    assert cude == 'b9483dc2a17167feedf37b6bd67c4204e7b601933e0e389cffbd545e4d0ec370b403cbb41ff656776cb6cb5d8348ecd4'
