@@ -156,6 +156,10 @@ class PartyIdentification:
     def full(self):
         return "%s%s" % [self.number, self.dv]
 
+    def __post_init__(self):
+        if self.type_fiscal not in codelist.TipoIdFiscal:
+            raise ValueError("type_fiscal [%s] not found" % (self.type_fiscal))
+
 @dataclass
 class Responsability:
     codes: list
