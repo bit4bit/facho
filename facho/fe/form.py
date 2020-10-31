@@ -344,11 +344,23 @@ class LegalMonetaryTotal:
     payable_amount: Amount = Amount(0.0)
     prepaid_amount: Amount = Amount(0.0)
 
+
+@dataclass
+class AllowanceChargeReason:
+    code: str
+    reason: str
+
+    def __post_init__(self):
+        if self.code not in codelist.CodigoDescuento:
+            raise ValueError("code [%s] not found" % (self.code))
+
+
 @dataclass
 class AllowanceCharge:
     #DIAN 1.7.-2020: FAQ03
     charge_indicator: bool = True
     amount: Amount = Amount(0.0)
+    reason: AllowanceChargeReason = None
 
     def isCharge(self):
         return self.charge_indicator == True
@@ -362,6 +374,8 @@ class AllowanceCharge:
     def asDiscount(self):
         self.charge_indicator = False
 
+    def hasReason(self):
+        return self.reason is not None
 
 class NationalSalesInvoiceDocumentType(str):
     def __str__(self):
