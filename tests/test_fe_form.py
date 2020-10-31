@@ -394,4 +394,4 @@ def test_debit_note_cude(simple_debit_note_without_lines):
 
     xml_invoice.add_extension(cude_extension)
     cude = xml_invoice.get_element_text('/fe:DebitNote/cbc:UUID')
-    assert cude == 'b9483dc2a17167feedf37b6bd67c4204e7b601933e0e389cffbd545e4d0ec370b403cbb41ff656776cb6cb5d8348ecd4'
+    assert cude == '3fa73a86d57d9341c536afde1f85c4efd9d4591c2c22bce4dfb0e6b0d2e83b8f047a8bde7098292e9d2493e60d1c31da'
