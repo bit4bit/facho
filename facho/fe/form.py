@@ -5,7 +5,7 @@ import hashlib
 from functools import reduce
 import copy
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 from collections import defaultdict
 import decimal
 from decimal import Decimal
@@ -271,19 +271,31 @@ class PrePaidPayment:
 
 @dataclass
 class BillingReference:
-        def __init__(self, ident: str, uuid: str, date: str):
-            self.ident = ident
-            self.uuid = uuid
-            self.date = date
+    ident: str
+    uuid: str
+    date: date
 
 class CreditNoteDocumentReference(BillingReference):
-    pass
+    """
+    ident: Prefijo + Numero de la factura relacionada
+    uuid: CUFE de la factura electronica
+    date: fecha de emision de la factura relacionada
+    """
+
 
 class DebitNoteDocumentReference(BillingReference):
-    pass
+    """
+    ident: Prefijo + Numero de la factura relacionada
+    uuid: CUFE de la factura electronica
+    date: fecha de emision de la factura relacionada
+    """
 
 class InvoiceDocumentReference(BillingReference):
-    pass
+    """
+    ident: Prefijo + Numero de la nota credito relacionada
+    uuid: CUDE de la nota credito relacionada
+    date: fecha de emision de la nota credito relacionada
+    """
 
 @dataclass
 class InvoiceLine:

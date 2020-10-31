@@ -400,7 +400,7 @@ class DIANInvoiceXML(fe.FeXML):
                           reference.uuid,
                           schemeName='CUFE-SHA384')
         fexml.set_element('./cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate',
-                          reference.date)
+                          reference.date.strftime("%Y-%m-%d"))
 
     def set_billing_reference(fexml, invoice):
         reference = invoice.invoice_billing_reference
