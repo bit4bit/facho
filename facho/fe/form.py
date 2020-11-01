@@ -436,8 +436,11 @@ class Invoice:
     def set_payment_mean(self, payment_mean: PaymentMean):
         self.invoice_payment_mean = payment_mean
 
+    def _get_codelist_tipo_operacion(self):
+        return codelist.TipoOperacionF
+    
     def set_operation_type(self, operation):
-        if operation not in codelist.TipoOperacionF:
+        if operation not in self._get_codelist_tipo_operacion():
             raise ValueError("operation not found")
 
         self.invoice_operation_type = operation
@@ -514,6 +517,9 @@ class CreditNote(Invoice):
             raise TypeError('invoice_document_reference invalid type')
         self.invoice_billing_reference = invoice_document_reference
 
+    def _get_codelist_tipo_operacion(self):
+        return codelist.TipoOperacionNC
+    
 
 class DebitNote(Invoice):
     def __init__(self, invoice_document_reference: BillingReference):
@@ -522,3 +528,6 @@ class DebitNote(Invoice):
         if not isinstance(invoice_document_reference, BillingReference):
             raise TypeError('invoice_document_reference invalid type')
         self.invoice_billing_reference = invoice_document_reference
+
+    def _get_codelist_tipo_operacion(self):
+        return codelist.TipoOperacionND

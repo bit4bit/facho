@@ -20,7 +20,7 @@ def simple_debit_note_without_lines():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
-    inv.set_operation_type('10')
+    inv.set_operation_type('30')
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',
@@ -52,7 +52,7 @@ def simple_credit_note_without_lines():
     inv.set_period(datetime.now(), datetime.now())
     inv.set_issue(datetime.now())
     inv.set_ident('ABC123')
-    inv.set_operation_type('10')
+    inv.set_operation_type('20')
     inv.set_payment_mean(form.PaymentMean(form.PaymentMean.DEBIT, '41', datetime.now(), '1234'))
     inv.set_supplier(form.Party(
         name = 'facho-supplier',

@@ -93,3 +93,42 @@ def test_FAU14():
     wants = form.Amount(119.0 + 19.0 - 50.0)
 
     assert inv.invoice_legal_monetary_total.payable_amount == wants, "got %s want %s" % (inv.invoice_legal_monetary_total.payable_amount, wants)
+
+
+def test_invalid_tipo_operacion_nota_debito():
+    reference = form.InvoiceDocumentReference(
+        ident = '11111',
+        uuid = '21312312',
+        date = '2020-05-05'
+    )
+    inv = form.DebitNote(reference)
+    with pytest.raises(ValueError):
+        inv.set_operation_type(22)
+
+def test_valid_tipo_operacion_nota_debito():
+    reference = form.InvoiceDocumentReference(
+        ident = '11111',
+        uuid = '21312312',
+        date = '2020-05-05'
+    )
+    inv = form.DebitNote(reference)
+    inv.set_operation_type('30')
+
+def test_invalid_tipo_operacion_nota_credito():
+    reference = form.InvoiceDocumentReference(
+        ident = '11111',
+        uuid = '21312312',
+        date = '2020-05-05'
+    )
+    inv = form.DebitNote(reference)
+    with pytest.raises(ValueError):
+        inv.set_operation_type('990')
+
+def test_valid_tipo_operacion_nota_credito():
+    reference = form.InvoiceDocumentReference(
+        ident = '11111',
+        uuid = '21312312',
+        date = '2020-05-05'
+    )
+    inv = form.CreditNote(reference)
+    inv.set_operation_type('20')
