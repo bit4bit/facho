@@ -88,7 +88,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         self.tipo_ambiente = tipo_ambiente
         self.invoice = invoice
 
-    def _tipo_ambiente(self):
+    def _tipo_ambiente_int(self):
         return int(self.tipo_ambiente)
 
     def formatVars(self, invoice):
@@ -97,16 +97,23 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
     def schemeName(self):
         raise NotImplementedError()
 
+    def _get_qrcode(self, cufe):
+        url_for = {
+            AMBIENTE_PRUEBAS: 'https://catalogo-vpfe-hab.dian.gov.co/document/searchqr?documentkey=',
+            AMBIENTE_PRODUCCION: 'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='
+        }
+        return url_for[self.tipo_ambiente] + cufe
+
     def build(self, fachoxml):
         cufe = self._generate_cufe()
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName=self.schemeName())
         fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1')
-        fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente())
+        fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente_int())
         #DIAN 1.7.-2020: FAB36
         fachoxml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',
-                'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='+cufe)
+                self._get_qrcode(cufe))
 
     def issue_time(self, datetime_):
         return datetime_.strftime('%H:%M:%S-05:00')
@@ -136,7 +143,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         build_vars['ValorImpuestoPara'] = ValorImpuestoPara
         build_vars['NitOFE'] = invoice.invoice_supplier.ident
         build_vars['NumAdq'] = invoice.invoice_customer.ident
-        build_vars['TipoAmb'] = self._tipo_ambiente()
+        build_vars['TipoAmb'] = self._tipo_ambiente_int()
 
         return build_vars
 
