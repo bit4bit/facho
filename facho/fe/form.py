@@ -59,7 +59,9 @@ class Amount:
             self.amount = amount.amount
             self.currency = amount.currency
         else:
-            self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION, rounding=decimal.ROUND_HALF_DOWN ))
+            self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION,
+                                                          #DIAN 1.7.-2020: 1.2.1.1
+                                                          rounding=decimal.ROUND_HALF_EVEN ))
             self.currency = currency
 
     def __round__(self, prec):
