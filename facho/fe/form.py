@@ -55,6 +55,10 @@ class AmountCollection(Collection):
 class Amount:
     def __init__(self, amount: int or float or Amount, currency: Currency = Currency('COP')):
 
+        #DIAN 1.7.-2020: 1.2.3.1
+        if amount < 0:
+            raise ValueError('amount must be positive >= 0')
+        
         if isinstance(amount, Amount):
             self.amount = amount.amount
             self.currency = amount.currency

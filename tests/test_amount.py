@@ -10,6 +10,10 @@ import pytest
 import facho.fe.form as form
 
 
+def test_amount_positive():
+    with pytest.raises(ValueError):
+        form.Amount(-1.0)
+
 def test_amount_equals():
     price1 = form.Amount(110.0)
     price2 = form.Amount(100 + 10.0)
