@@ -11,8 +11,12 @@ class DIANInvoiceXML(fe.FeXML):
 
     def __init__(self, invoice, tag_document = 'Invoice'):
         super().__init__(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
-        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
-
+        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
+        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource')
+        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareProvider')
+        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:SoftwareSecurityCode')
+        self.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID')
+        
         # ZE02 se requiere existencia para firmar
         ublextension = self.fragment('./ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')

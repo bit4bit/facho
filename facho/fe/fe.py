@@ -40,7 +40,7 @@ NAMESPACES = {
     'clmIANAMIMEMediaType': 'urn:un:unece:uncefact:codelist:specification:IANAMIMEMediaType:2003',
     'ext': 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
     'qdt': 'urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2',
-    'sts': 'http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures',
+    'sts': 'dian:gov:co:facturaelectronica:Structures-2-1',
     'udt': 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2',
     'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
     'xades': 'http://uri.etsi.org/01903/v1.3.2#',
@@ -358,12 +358,14 @@ class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
 
     def build(self, fexml):
-        dian_path = './ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider/sts:AuthorizationProviderID'
-        fexml.set_element(dian_path, '800197268')
-
         attrs = {'schemeID': '4', 'schemeName': '31'}
         attrs.update(SCHEME_AGENCY_ATTRS)
-        fexml.set_attributes(dian_path, **attrs)
+        
+        authorization_provider = fexml.fragment('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:AuthorizationProvider')
+        authorization_provider.set_element('./sts:AuthorizationProviderID',
+                                           '800197268',
+                                           **attrs)
+
 
 
 class DianXMLExtensionInvoiceSource(FachoXMLExtension):
@@ -390,16 +392,6 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
         self.to = to
 
     def build(self, fexml):
-        fexml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode',
-                          'CO',
-                          #DIAN 1.7.-2020: FAB15
-                          listAgencyID="6",
-                          #DIAN 1.7.-2020: FAB16
-                          listAgencyName="United Nations Economic Commission for Europe",
-                          #DIAN 1.7.-2020: FAB17
-                          listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"
-                          )
-
         invoice_control = fexml.fragment('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceControl')
         invoice_control.set_element('/sts:InvoiceControl/sts:InvoiceAuthorization', self.authorization)
         invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizationPeriod/cbc:StartDate',
@@ -412,6 +404,16 @@ class DianXMLExtensionInvoiceAuthorization(FachoXMLExtension):
                                     self.from_)
         invoice_control.set_element('/sts:InvoiceControl/sts:AuthorizedInvoices/sts:To',
                                     self.to)
+
+        fexml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:InvoiceSource/cbc:IdentificationCode',
+                          'CO',
+                          #DIAN 1.7.-2020: FAB15
+                          listAgencyID="6",
+                          #DIAN 1.7.-2020: FAB16
+                          listAgencyName="United Nations Economic Commission for Europe",
+                          #DIAN 1.7.-2020: FAB17
+                          listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"
+                          )
 
 
 

@@ -164,8 +164,8 @@ class FachoXML:
     def _path_xpath_for(self, xpath):
         return self._normalize_xpath(self._translate_xpath_for(xpath))
 
-    def placeholder_for(self, xpath):
-        return self.find_or_create_element(xpath)
+    def placeholder_for(self, xpath, append=False):
+        return self.find_or_create_element(xpath, append)
 
     def replacement_for(self, xpath, new_xpath, content, **attrs):
         elem = self.get_element(xpath)
