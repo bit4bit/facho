@@ -161,7 +161,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
 
 
 class DianXMLExtensionCUFE(DianXMLExtensionCUDFE):
-    def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS, clave_tecnica = ''):
+    def __init__(self, invoice,  clave_tecnica = '', tipo_ambiente = AMBIENTE_PRUEBAS):
         self.tipo_ambiente = tipo_ambiente
         self.clave_tecnica = clave_tecnica
         self.invoice = invoice
