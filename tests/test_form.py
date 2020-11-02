@@ -18,7 +18,7 @@ def test_invoice_legalmonetary():
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item = form.StandardItem('test', 9999),
+        item = form.StandardItem(9999),
         price = form.Price(
             amount = form.Amount(100.0),
             type_code = '01',
@@ -44,7 +44,7 @@ def test_FAU10():
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item = form.StandardItem('test', 9999),
+        item = form.StandardItem(9999),
         price = form.Price(
             amount = form.Amount(100.0),
             type_code = '01',
@@ -72,7 +72,7 @@ def test_FAU14():
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item = form.StandardItem('test', 9999),
+        item = form.StandardItem(9999),
         price = form.Price(
             amount = form.Amount(100.0),
             type_code = '01',

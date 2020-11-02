@@ -514,8 +514,13 @@ class DIANInvoiceXML(fe.FeXML):
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.tax_scheme_ident)
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.tax_scheme_name)
             line.set_element('./cac:Item/cbc:Description', invoice_line.item.description)
-            # TODO
-            line.set_element('./cac:Item/cac:StandardItemIdentification/cbc:ID', invoice_line.item.id)
+
+            line.set_element('./cac:Item/cac:StandardItemIdentification/cbc:ID',
+                             invoice_line.item.id,
+                             schemeID=invoice_line.item.scheme_id,
+                             schemeName=invoice_line.item.scheme_name,
+                             schemeAgencyID=invoice_line.item.scheme_agency_id)
+
             line.set_element('./cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP")
             #DIAN 1.7.-2020: FBB04
             line.set_element('./cac:Price/cbc:BaseQuantity', invoice_line.price.amount)

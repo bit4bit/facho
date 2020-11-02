@@ -131,7 +131,7 @@ def simple_invoice():
     inv.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto facho',
-        item = form.StandardItem('test', 9999),
+        item = form.StandardItem( 9999),
         price = form.Price(form.Amount(100.0), '01', ''),
         tax = form.TaxTotal(
             tax_amount = form.Amount(0.0),

@@ -91,7 +91,7 @@ def test_invoice_totals(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandardItem('test', 9999),
+        item = form.StandardItem(9999),
         price = form.Price(form.Amount(1_500_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [
@@ -114,7 +114,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandardItem('test', 111),
+        item = form.StandardItem(111),
         price = form.Price(form.Amount(1_500_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [
@@ -179,7 +179,7 @@ def test_credit_note_cude(simple_credit_note_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandardItem('test', 111),
+        item = form.StandardItem(111),
         price = form.Price(form.Amount(5_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [
@@ -214,7 +214,7 @@ def test_debit_note_cude(simple_debit_note_without_lines):
     simple_invoice.add_invoice_line(form.InvoiceLine(
         quantity = 1,
         description = 'producto',
-        item = form.StandardItem('test', 111),
+        item = form.StandardItem(111),
         price = form.Price(form.Amount(30_000), '01', ''),
         tax = form.TaxTotal(
             subtotals = [

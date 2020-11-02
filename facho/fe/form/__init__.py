@@ -100,15 +100,31 @@ class Amount:
 
 @dataclass
 class Item:
+    scheme_name: str
+    scheme_agency_id: str
+    scheme_id: str
     description: str
     id: str
 
 
-@dataclass
 class StandardItem(Item):
-    pass
+    def __init__(self, id_: str, description: str = ''):
+        super().__init__(id=id_,
+                         description=description,
+                         scheme_name='',
+                         scheme_id='999',
+                         scheme_agency_id='')
 
 
+class UNSPSCItem(Item):
+    def __init__(self, id_: str, description: str = ''):
+        super().__init__(id=id_,
+                         description=description,
+                         scheme_name='UNSPSC',
+                         scheme_id='001',
+                         scheme_agency_id='10')        
+
+        
 @dataclass
 class Country:
     code: str
