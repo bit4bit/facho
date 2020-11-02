@@ -11,7 +11,7 @@ import decimal
 from decimal import Decimal
 import typing
 
-from .data.dian import codelist
+from ..data.dian import codelist
 
 DECIMAL_PRECISION = 6
 

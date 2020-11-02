@@ -48,6 +48,10 @@ NAMESPACES = {
     'sig': 'http://www.w3.org/2000/09/xmldsig#',
 }
 
+def fe_from_string(document: str) -> FachoXML:
+    xml = LXMLBuilder.from_string(document)
+    return FachoXML(xml, nsmap=NAMESPACES)
+
 from contextlib import contextmanager
 @contextmanager
 def mock_xades_policy():
