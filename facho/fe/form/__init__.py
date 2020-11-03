@@ -56,23 +56,32 @@ class Amount:
     def __init__(self, amount: int or float or Amount, currency: Currency = Currency('COP')):
 
         #DIAN 1.7.-2020: 1.2.3.1
-        if amount < 0:
-            raise ValueError('amount must be positive >= 0')
-        
         if isinstance(amount, Amount):
+            if amount < Amount(0.0):
+                raise ValueError('amount must be positive >= 0')
+
             self.amount = amount.amount
             self.currency = amount.currency
         else:
+            if amount < 0:
+                raise ValueError('amount must be positive >= 0')
+
             self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION,
                                                           #DIAN 1.7.-2020: 1.2.1.1
                                                           rounding=decimal.ROUND_HALF_EVEN ))
             self.currency = currency
+
 
     def __round__(self, prec):
         return round(self.amount, prec)
 
     def __str__(self):
         return '%.06f' % self.amount
+
+    def __lt__(self, other):
+        if not self.is_same_currency(other):
+            raise AmountCurrencyError()
+        return round(self.amount, DECIMAL_PRECISION) < round(other, 2)
 
     def __eq__(self, other):
         if not self.is_same_currency(other):
@@ -97,6 +106,12 @@ class Amount:
     def is_same_currency(self, other):
         return self.currency == other.currency
 
+    def format(self, formatter):
+        return formatter % self.float()
+
+    def float(self):
+        return round(self.amount, DECIMAL_PRECISION)
+    
 
 class Quantity(Amount):
     pass
