@@ -129,7 +129,7 @@ def simple_invoice():
             form.CountrySubentity('05', 'Antioquia'))
     ))
     inv.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1),
         description = 'producto facho',
         item = form.StandardItem( 9999),
         price = form.Price(form.Amount(100.0), '01', ''),

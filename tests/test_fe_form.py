@@ -89,7 +89,7 @@ def test_invoice_totals(simple_invoice_without_lines):
     simple_invoice.invoice_supplier.ident = '700085371'
     simple_invoice.invoice_customer.ident = '800199436'
     simple_invoice.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1),
         description = 'producto',
         item = form.StandardItem(9999),
         price = form.Price(form.Amount(1_500_000), '01', ''),
@@ -112,7 +112,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '5', '31')
     simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '5', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1),
         description = 'producto',
         item = form.StandardItem(111),
         price = form.Price(form.Amount(1_500_000), '01', ''),
@@ -177,7 +177,7 @@ def test_credit_note_cude(simple_credit_note_without_lines):
     simple_invoice.invoice_supplier.ident = form.PartyIdentification('900373076', '5', '31')
     simple_invoice.invoice_customer.ident = form.PartyIdentification('8355990', '5', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1),
         description = 'producto',
         item = form.StandardItem(111),
         price = form.Price(form.Amount(5_000), '01', ''),
@@ -212,7 +212,7 @@ def test_debit_note_cude(simple_debit_note_without_lines):
     simple_invoice.invoice_supplier.ident = form.PartyIdentification('900197264', '5', '31')
     simple_invoice.invoice_customer.ident = form.PartyIdentification('10254102', '5', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1),
         description = 'producto',
         item = form.StandardItem(111),
         price = form.Price(form.Amount(30_000), '01', ''),

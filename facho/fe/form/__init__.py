@@ -98,6 +98,9 @@ class Amount:
         return self.currency == other.currency
 
 
+class Quantity(Amount):
+    pass
+
 @dataclass
 class Item:
     scheme_name: str
@@ -322,7 +325,7 @@ class InvoiceDocumentReference(BillingReference):
 @dataclass
 class InvoiceLine:
     # RESOLUCION 0004: pagina 155
-    quantity: int
+    quantity: Quantity
     description: str
     item: Item
     price: Price
@@ -334,7 +337,7 @@ class InvoiceLine:
 
     @property
     def total_amount(self):
-        return Amount(self.quantity) * self.price.amount
+        return self.quantity * self.price.amount
 
     @property
     def total_tax_inclusive_amount(self):
@@ -356,8 +359,8 @@ class InvoiceLine:
         self.tax.calculate(self)
 
     def __post_init__(self):
-        if not isinstance(self.quantity, int):
-            raise ValueError("quantity must be integer")
+        if not isinstance(self.quantity, Quantity):
+            raise ValueError("quantity must be Amount")
 
 @dataclass
 class LegalMonetaryTotal:
