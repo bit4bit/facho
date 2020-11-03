@@ -355,6 +355,9 @@ class InvoiceLine:
     def calculate(self):
         self.tax.calculate(self)
 
+    def __post_init__(self):
+        if not isinstance(self.quantity, int):
+            raise ValueError("quantity must be integer")
 
 @dataclass
 class LegalMonetaryTotal:
