@@ -16,7 +16,7 @@ from facho import fe
 def test_invoice_legalmonetary():
     inv = form.NationalSalesInvoice()
     inv.add_invoice_line(form.InvoiceLine(
-        quantity = form.Quantity(1),
+        quantity = form.Quantity(1, '94'),
         description = 'producto facho',
         item = form.StandardItem(9999),
         price = form.Price(
@@ -42,7 +42,7 @@ def test_invoice_legalmonetary():
 def test_FAU10():
     inv = form.NationalSalesInvoice()
     inv.add_invoice_line(form.InvoiceLine(
-        quantity = form.Quantity(1),
+        quantity = form.Quantity(1, '94'),
         description = 'producto facho',
         item = form.StandardItem(9999),
         price = form.Price(
@@ -70,7 +70,7 @@ def test_FAU10():
 def test_FAU14():
     inv = form.NationalSalesInvoice()
     inv.add_invoice_line(form.InvoiceLine(
-        quantity = form.Quantity(1),
+        quantity = form.Quantity(1, '94'),
         description = 'producto facho',
         item = form.StandardItem(9999),
         price = form.Price(

@@ -113,8 +113,30 @@ class Amount:
         return round(self.amount, DECIMAL_PRECISION)
     
 
-class Quantity(Amount):
-    pass
+class Quantity:
+    
+    def __init__(self, val, code):
+        if not isinstance(val, int):
+            raise ValueError('val expected int')
+        if code not in codelist.UnidadesMedida:
+            raise ValueError("code [%s] not found" % (code))
+
+        self.value = val
+        self.code = code
+
+    def __mul__(self, other):
+        if isinstance(other, Amount):
+            return Amount(self.value) * other
+        return self.value * other
+
+    def __lt__(self, other):
+        if isinstance(other, Amount):
+            return Amount(self.value) < other
+        return self.value < other
+
+    def __str__(self):
+        return str(self.value)
+
 
 @dataclass
 class Item:

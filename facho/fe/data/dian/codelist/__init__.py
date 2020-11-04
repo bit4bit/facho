@@ -71,6 +71,7 @@ __all__ = ['TipoOrganizacion',
            'TipoAmbiente',
            'TipoDocumento',
            'TipoImpuesto',
+           'UnidadesMedida',
            'CodigoPrecioReferencia',
            'MediosPago',
            'RegimenFiscal',
@@ -98,3 +99,4 @@ Departamento = CodeList(path_for_codelist('Departamentos-2.1.gc'), 'code', 'name
 Paises = CodeList(path_for_codelist('Paises-2.1.gc'), 'code', 'name')
 TipoIdFiscal = CodeList(path_for_codelist('TipoIdFiscal-2.1.gc'), 'code', 'name')
 CodigoDescuento = CodeList(path_for_codelist('CodigoDescuento-2.1.gc'), 'code', 'name')
+UnidadesMedida = CodeList(path_for_codelist('UnidadesMedida-2.1.gc'), 'code', 'name')

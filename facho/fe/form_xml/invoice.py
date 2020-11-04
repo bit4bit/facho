@@ -523,7 +523,9 @@ class DIANInvoiceXML(fe.FeXML):
 
             line.set_element('./cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP")
             #DIAN 1.7.-2020: FBB04
-            line.set_element('./cac:Price/cbc:BaseQuantity', invoice_line.price.amount)
+            line.set_element('./cac:Price/cbc:BaseQuantity',
+                             invoice_line.quantity,
+                             unitCode=invoice_line.quantity.code)
 
 
     def attach_invoice(fexml, invoice):
