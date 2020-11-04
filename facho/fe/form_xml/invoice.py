@@ -521,7 +521,7 @@ class DIANInvoiceXML(fe.FeXML):
                              schemeName=invoice_line.item.scheme_name,
                              schemeAgencyID=invoice_line.item.scheme_agency_id)
 
-            line.set_element('./cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID="COP")
+            line.set_element('./cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID=invoice_line.price.amount.currency.code)
             #DIAN 1.7.-2020: FBB04
             line.set_element('./cac:Price/cbc:BaseQuantity',
                              invoice_line.quantity,
