@@ -55,7 +55,7 @@ def invoice():
         payment_id = '1'
     ))
     inv.add_invoice_line(form.InvoiceLine(
-        quantity = 1,
+        quantity = form.Quantity(1, '94'),
         description = 'producto facho',
         item = form.StandardItem('test', 9999),
         price = form.Price(
