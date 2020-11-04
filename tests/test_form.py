@@ -132,3 +132,45 @@ def test_valid_tipo_operacion_nota_credito():
     )
     inv = form.CreditNote(reference)
     inv.set_operation_type('20')
+
+
+def test_quantity():
+    quantity1 = form.Quantity(10, '94')
+    assert quantity1 * form.Amount(3) == form.Amount(30)
+
+def test_invoice_line_quantity_without_taxes():
+    line = form.InvoiceLine(
+        quantity = form.Quantity(10, '94'),
+        description = '',
+        item = form.StandardItem('test', 9999),
+        price = form.Price(
+            amount = form.Amount(30.00),
+            type_code = '01',
+            type = 'x'
+        ),
+        tax = form.TaxTotal(subtotals=[]))
+    line.calculate()
+    assert line.total_amount == form.Amount(300)
+    assert line.tax_amount == form.Amount(0)
+
+def test_invoice_legalmonetary_with_taxes():
+    inv = form.NationalSalesInvoice()
+    inv.add_invoice_line(form.InvoiceLine(
+        quantity = form.Quantity(1, '94'),
+        description = 'producto facho',
+        item = form.StandardItem(9999),
+        price = form.Price(
+            amount = form.Amount(100.0),
+            type_code = '01',
+            type = 'x'
+        ),
+        tax = form.TaxTotal(subtotals=[])
+    ))
+    inv.calculate()
+
+    assert inv.invoice_legal_monetary_total.line_extension_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_exclusive_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.tax_inclusive_amount == form.Amount(100.0)
+    assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(0.0)
+    assert inv.invoice_legal_monetary_total.payable_amount == form.Amount(100.0)
+

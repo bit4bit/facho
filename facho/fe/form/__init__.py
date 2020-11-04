@@ -110,7 +110,7 @@ class Amount:
         return formatter % self.float()
 
     def float(self):
-        return round(self.amount, DECIMAL_PRECISION)
+        return float(round(self.amount, DECIMAL_PRECISION))
     
 
 class Quantity:
@@ -279,11 +279,9 @@ class TaxSubTotal:
     tax_scheme_name: str = 'IVA'
 
     tax_amount: Amount = Amount(0.0)
-    taxable_amount: Amount = Amount(0.0)
 
     def calculate(self, invline):
         self.tax_amount = invline.total_amount * Amount(self.percent / 100)
-        self.taxable_amount = invline.total_amount
 
 
 @dataclass
@@ -293,10 +291,11 @@ class TaxTotal:
     taxable_amount: Amount = Amount(0.0)
 
     def calculate(self, invline):
+        self.taxable_amount = invline.total_amount
+
         for subtax in self.subtotals:
             subtax.calculate(invline)
             self.tax_amount += subtax.tax_amount
-            self.taxable_amount += subtax.taxable_amount
 
 
 @dataclass
@@ -408,6 +407,14 @@ class LegalMonetaryTotal:
     allowance_total_amount: Amount = Amount(0.0)
     payable_amount: Amount = Amount(0.0)
     prepaid_amount: Amount = Amount(0.0)
+
+    def calculate(self):
+        #DIAN 1.7.-2020: FAU14
+        self.payable_amount = \
+            self.tax_inclusive_amount \
+            + self.allowance_total_amount \
+            + self.charge_total_amount \
+            - self.prepaid_amount
 
 
 @dataclass
@@ -556,12 +563,7 @@ class Invoice:
             .sum()
 
         #DIAN 1.7.-2020: FAU14
-        self.invoice_legal_monetary_total.payable_amount = \
-            self.invoice_legal_monetary_total.tax_inclusive_amount \
-            + self.invoice_legal_monetary_total.allowance_total_amount \
-            + self.invoice_legal_monetary_total.charge_total_amount \
-            - self.invoice_legal_monetary_total.prepaid_amount
-
+        self.invoice_legal_monetary_total.calculate()
 
     def calculate(self):
         for invline in self.invoice_lines:
