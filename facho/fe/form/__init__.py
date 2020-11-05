@@ -389,7 +389,7 @@ class InvoiceLine:
     # ya que al reportar los totales es sobre
     # la factura y el percent es unico por type_code
     # de subtotal
-    tax: TaxTotal
+    tax: typing.Optional[TaxTotal]
 
     @property
     def total_amount(self):
@@ -418,6 +418,9 @@ class InvoiceLine:
     def __post_init__(self):
         if not isinstance(self.quantity, Quantity):
             raise ValueError("quantity must be Amount")
+
+        if self.tax is None:
+            self.tax = TaxTotalOmit()
 
 @dataclass
 class LegalMonetaryTotal:
