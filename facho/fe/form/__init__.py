@@ -272,16 +272,29 @@ class Party:
         if self.organization_code not in codelist.TipoOrganizacion:
             raise ValueError("organization_code not found")
 
+
+@dataclass
+class TaxScheme:
+    code: str = '01'
+
+    @property
+    def name(self):
+        return codelist.TipoImpuesto[self.code]['name']
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoImpuesto:
+            raise ValueError("code [%s] not found" % (self.code))
+
+
 @dataclass
 class TaxSubTotal:
     percent: float
-    tax_scheme_ident: str = '01'
-    tax_scheme_name: str = 'IVA'
-
+    scheme: typing.Optional[TaxScheme] = None
     tax_amount: Amount = Amount(0.0)
 
     def calculate(self, invline):
-        self.tax_amount = invline.total_amount * Amount(self.percent / 100)
+        if self.percent is not None:
+            self.tax_amount = invline.total_amount * Amount(self.percent / 100)
 
 
 @dataclass
@@ -297,6 +310,13 @@ class TaxTotal:
             subtax.calculate(invline)
             self.tax_amount += subtax.tax_amount
 
+
+class TaxTotalOmit(TaxTotal):
+    def __init__(self):
+        super().__init__([])
+
+    def calculate(self, invline):
+        pass
 
 @dataclass
 class Price:
@@ -377,7 +397,8 @@ class InvoiceLine:
 
     @property
     def total_tax_inclusive_amount(self):
-        return self.tax.taxable_amount + self.tax.tax_amount
+        # FAU06
+        return self.total_amount + self.tax.tax_amount
 
     @property
     def total_tax_exclusive_amount(self):

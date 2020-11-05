@@ -424,8 +424,8 @@ class DIANInvoiceXML(fe.FeXML):
         percent_for = defaultdict(lambda: None)
 
         #requeridos para CUFE
-        tax_amount_for['01']['tax_amount'] = Amount(0.0)
-        tax_amount_for['01']['taxable_amount'] = Amount(0.0)
+        #tax_amount_for['01']['tax_amount'] = Amount(0.0)
+        #tax_amount_for['01']['taxable_amount'] = Amount(0.0)
         #DIAN 1.7.-2020: FAS07 => Se debe construir estrategia para  su manejo
         #tax_amount_for['04']['tax_amount'] = 0.0
         #tax_amount_for['04']['taxable_amount'] = 0.0
@@ -435,13 +435,15 @@ class DIANInvoiceXML(fe.FeXML):
         total_tax_amount = Amount(0.0)
 
         for invoice_line in invoice.invoice_lines:
-
             for subtotal in invoice_line.tax.subtotals:
-                tax_amount_for[subtotal.tax_scheme_ident]['tax_amount'] += subtotal.tax_amount
-                tax_amount_for[subtotal.tax_scheme_ident]['taxable_amount'] += invoice_line.taxable_amount
+                if subtotal.scheme is not None:
+                    tax_amount_for[subtotal.scheme.code]['tax_amount'] += subtotal.tax_amount
+                    tax_amount_for[subtotal.scheme.code]['taxable_amount'] += invoice_line.taxable_amount
+
+                    # MACHETE ojo InvoiceLine.tax pasar a Invoice
+                    percent_for[subtotal.scheme.code] = subtotal.percent
+
                 total_tax_amount += subtotal.tax_amount
-                # MACHETE ojo InvoiceLine.tax pasar a Invoice
-                percent_for[subtotal.tax_scheme_ident] = subtotal.percent
 
         fexml.placeholder_for('./cac:TaxTotal')
         fexml.set_element_amount('./cac:TaxTotal/cbc:TaxAmount',
@@ -491,6 +493,27 @@ class DIANInvoiceXML(fe.FeXML):
     def tag_document_concilied(fexml):
         return 'Invoiced'
 
+    def set_invoice_line_tax(fexml, line, invoice_line):
+        fexml.set_element_amount_for(line,
+                                     './cac:TaxTotal/cbc:TaxAmount',
+                                     invoice_line.tax_amount)
+
+        #DIAN 1.7.-2020: FAX05
+        fexml.set_element_amount_for(line,
+                                     './cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
+                                     invoice_line.taxable_amount)
+
+        for subtotal in invoice_line.tax.subtotals:
+            line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
+
+            if subtotal.percent is not None:
+                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent', '%0.2f' % round(subtotal.percent, 2))
+
+            if subtotal.scheme is not None:
+                #DIAN 1.7.-2020: FAX15
+                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.scheme.code)
+                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.scheme.name)
+
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
@@ -502,20 +525,10 @@ class DIANInvoiceXML(fe.FeXML):
             fexml.set_element_amount_for(line,
                                          './cbc:LineExtensionAmount',
                                          invoice_line.total_amount)
-            fexml.set_element_amount_for(line,
-                                         './cac:TaxTotal/cbc:TaxAmount',
-                                         invoice_line.tax_amount)
 
-            #DIAN 1.7.-2020: FAX05
-            fexml.set_element_amount_for(line,
-                                         './cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
-                                         invoice_line.taxable_amount)
+            if not isinstance(invoice_line.tax, TaxTotalOmit):
+                fexml.set_invoice_line_tax(line, invoice_line)
 
-            for subtotal in invoice_line.tax.subtotals:
-                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
-                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent', subtotal.percent)
-                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.tax_scheme_ident)
-                line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.tax_scheme_name)
             line.set_element('./cac:Item/cbc:Description', invoice_line.item.description)
 
             line.set_element('./cac:Item/cac:StandardItemIdentification/cbc:ID',

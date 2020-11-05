@@ -135,15 +135,17 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         build_vars['ValorBruto'] = invoice.invoice_legal_monetary_total.line_extension_amount
         build_vars['ValorTotalPagar'] = invoice.invoice_legal_monetary_total.payable_amount
         ValorImpuestoPara = defaultdict(lambda: form.Amount(0.0))
-        build_vars['CodImpuesto1'] = 1
-        build_vars['CodImpuesto2'] = 4
-        build_vars['CodImpuesto3'] = 3
+        build_vars['CodImpuesto1'] = '01'
+        build_vars['CodImpuesto2'] = '04'
+        build_vars['CodImpuesto3'] = '03'
         for invoice_line in invoice.invoice_lines:
             for subtotal in invoice_line.tax.subtotals:
-                # TODO cual es la naturaleza de tax_scheme_ident?
-                codigo_impuesto = int(subtotal.tax_scheme_ident)
-                ValorImpuestoPara.setdefault(codigo_impuesto, form.Amount(0.0))
-                ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
+                if subtotal.scheme is not None:
+                    # TODO cual es la naturaleza de tax_scheme_ident?
+                    codigo_impuesto = subtotal.scheme.code
+                    ValorImpuestoPara.setdefault(codigo_impuesto, form.Amount(0.0))
+                    ValorImpuestoPara[codigo_impuesto] += subtotal.tax_amount
+
         build_vars['ValorImpuestoPara'] = ValorImpuestoPara
         build_vars['NitOFE'] = invoice.invoice_supplier.ident
         build_vars['NumAdq'] = invoice.invoice_customer.ident
@@ -184,11 +186,11 @@ class DianXMLExtensionCUFE(DianXMLExtensionCUDFE):
             '%s' % build_vars['FecFac'],
             '%s' % build_vars['HoraFac'],
             form.Amount(build_vars['ValorBruto']).format('%.02f'),
-            '%02d' % CodImpuesto1,
+            CodImpuesto1,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto1, 0.0)).format('%.02f'),
-            '%02d' % CodImpuesto2,
+            CodImpuesto2,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto2, 0.0)).format('%.02f'),
-            '%02d' % CodImpuesto3,
+            CodImpuesto3,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto3, 0.0)).format('%.02f'),
             form.Amount(build_vars['ValorTotalPagar']).format('%.02f'),
             '%s' % build_vars['NitOFE'],
@@ -221,11 +223,11 @@ class DianXMLExtensionCUDE(DianXMLExtensionCUDFE):
             '%s' % build_vars['FecFac'],
             '%s' % build_vars['HoraFac'],
             form.Amount(build_vars['ValorBruto']).format('%.02f'),
-            '%02d' % CodImpuesto1,
+            CodImpuesto1,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto1, 0.0)).format('%.02f'),
-            '%02d' % CodImpuesto2,
+            CodImpuesto2,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto2, 0.0)).format('%.02f'),
-            '%02d' % CodImpuesto3,
+            CodImpuesto3,
             form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto3, 0.0)).format('%.02f'),
             form.Amount(build_vars['ValorTotalPagar']).format('%.02f'),
             '%s' % build_vars['NitOFE'],
