@@ -96,7 +96,7 @@ def test_invoice_totals(simple_invoice_without_lines):
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
-                    tax_scheme_ident = '01',
+                    scheme = form.TaxScheme('01'),
                     percent = 19.0
                 )])
     ))
@@ -119,7 +119,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
-                    tax_scheme_ident = '01',
+                    scheme = form.TaxScheme('01'),
                     percent = 19.0
                 )])
     ))
@@ -184,7 +184,7 @@ def test_credit_note_cude(simple_credit_note_without_lines):
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
-                    tax_scheme_ident = '01',
+                    scheme = form.TaxScheme('01'),
                     percent = 19.0
                 )])
     ))
@@ -219,7 +219,7 @@ def test_debit_note_cude(simple_debit_note_without_lines):
         tax = form.TaxTotal(
             subtotals = [
                 form.TaxSubTotal(
-                    tax_scheme_ident = '04',
+                    scheme = form.TaxScheme('04'),
                     percent = 8.0
                 )])
     ))
@@ -239,9 +239,9 @@ def test_debit_note_cude(simple_debit_note_without_lines):
     assert build_vars['ValorBruto'] == form.Amount(30_000)
     assert build_vars['NitOFE'] == '900197264'
     assert build_vars['NumAdq'] == '10254102'
-    assert build_vars['ValorImpuestoPara'][1] == form.Amount(0)
-    assert build_vars['ValorImpuestoPara'][4] == form.Amount(2400)
-    assert build_vars['ValorImpuestoPara'][3] == form.Amount(0)
+    assert build_vars['ValorImpuestoPara']['01'] == form.Amount(0)
+    assert build_vars['ValorImpuestoPara']['04'] == form.Amount(2400)
+    assert build_vars['ValorImpuestoPara']['03'] == form.Amount(0)
     assert build_vars['ValorTotalPagar'] == form.Amount(32400)
     assert build_vars['Software-PIN'] == '10201'
     assert build_vars['TipoAmb'] == 2
