@@ -438,7 +438,7 @@ class DIANInvoiceXML(fe.FeXML):
 
             for subtotal in invoice_line.tax.subtotals:
                 tax_amount_for[subtotal.tax_scheme_ident]['tax_amount'] += subtotal.tax_amount
-                tax_amount_for[subtotal.tax_scheme_ident]['taxable_amount'] = invoice_line.taxable_amount
+                tax_amount_for[subtotal.tax_scheme_ident]['taxable_amount'] += invoice_line.taxable_amount
                 total_tax_amount += subtotal.tax_amount
                 # MACHETE ojo InvoiceLine.tax pasar a Invoice
                 percent_for[subtotal.tax_scheme_ident] = subtotal.percent
@@ -510,8 +510,8 @@ class DIANInvoiceXML(fe.FeXML):
             fexml.set_element_amount_for(line,
                                          './cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
                                          invoice_line.taxable_amount)
-            for subtotal in invoice_line.tax.subtotals:
 
+            for subtotal in invoice_line.tax.subtotals:
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent', subtotal.percent)
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.tax_scheme_ident)
