@@ -174,3 +174,13 @@ def test_invoice_legalmonetary_with_taxes():
     assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(0.0)
     assert inv.invoice_legal_monetary_total.payable_amount == form.Amount(100.0)
 
+def test_invoice_ident_prefix_automatic():
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('SETP1234567')
+    assert inv.invoice_ident_prefix == 'SETP'
+
+def test_invoice_ident_prefix_manual():
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('SETP1234567')
+    inv.set_ident_prefix('SETA')
+    assert inv.invoice_ident_prefix == 'SETA'

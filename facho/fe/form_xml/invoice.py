@@ -174,7 +174,7 @@ class DIANInvoiceXML(fe.FeXML):
         #DIAN 1.7.-2020: FAJ50
         #DIAN 1.7.-2020: CAJ50
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID',
-                          'SETP')
+                          invoice.invoice_ident_prefix)
 
         #DIAN 1.7.-2020: CAJ67
         fexml.placeholder_for('./cac:AccountingSupplierParty/cac:Party/cac:Contact')

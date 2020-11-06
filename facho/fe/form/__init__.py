@@ -508,7 +508,7 @@ class Invoice:
         self.invoice_prepaid_payment = []
         self.invoice_billing_reference = None
         self.invoice_type_code = str(type_code)
-
+        self.invoice_ident_prefix = None
 
     def set_period(self, startdate, enddate):
         self.invoice_period_start = startdate
@@ -521,7 +521,20 @@ class Invoice:
         self.invoice_issue = dtime
 
     def set_ident(self, ident: str):
+        """
+        identificador de factura; prefijo + consecutivo
+        """
         self.invoice_ident = ident
+        if not self.invoice_ident_prefix:
+            self.invoice_ident_prefix = ident[0:4]
+
+    def set_ident_prefix(self, prefix: str):
+        """
+        prefijo de facturacion: ejemplo SETP
+        """
+        if len(prefix) != 4:
+            raise ValueError('prefix must be 4 length')
+        self.invoice_ident_prefix = prefix
 
     def set_supplier(self, party: Party):
         self.invoice_supplier = party
