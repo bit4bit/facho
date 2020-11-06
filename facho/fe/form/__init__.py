@@ -520,20 +520,36 @@ class Invoice:
 
         self.invoice_issue = dtime
 
+    def _set_ident_prefix_automatic(self):
+        if not self.invoice_ident_prefix:
+            prefix = ''
+            for idx, val in enumerate(self.invoice_ident):
+                if val.isalpha():
+                    prefix += val
+                else:
+                    break
+
+            if len(prefix) <= 4:
+                self.invoice_ident_prefix = prefix
+            else:
+                raise ValueError('ident prefix failed to get, expected 0  to 4 chars')
+
     def set_ident(self, ident: str):
         """
         identificador de factura; prefijo + consecutivo
         """
         self.invoice_ident = ident
-        if not self.invoice_ident_prefix:
-            self.invoice_ident_prefix = ident[0:4]
+        self._set_ident_prefix_automatic()
+
+    def _check_ident_prefix(self, prefix):
+        if len(prefix) != 4:
+            raise ValueError('prefix must be 4 length')
 
     def set_ident_prefix(self, prefix: str):
         """
         prefijo de facturacion: ejemplo SETP
         """
-        if len(prefix) != 4:
-            raise ValueError('prefix must be 4 length')
+        self._check_ident_prefix(prefix)
         self.invoice_ident_prefix = prefix
 
     def set_supplier(self, party: Party):
@@ -624,6 +640,14 @@ class CreditNote(Invoice):
     def _get_codelist_tipo_operacion(self):
         return codelist.TipoOperacionNC
     
+    def _check_ident_prefix(self, prefix):
+        if len(prefix) != 6:
+            raise ValueError('prefix must be 6 length')
+
+    def _set_ident_prefix_automatic(self):
+        if not self.invoice_ident_prefix:
+            self.invoice_ident_prefix = self.invoice_ident[0:6]
+
 
 class DebitNote(Invoice):
     def __init__(self, invoice_document_reference: BillingReference):
@@ -635,3 +659,12 @@ class DebitNote(Invoice):
 
     def _get_codelist_tipo_operacion(self):
         return codelist.TipoOperacionND
+
+    def _check_ident_prefix(self, prefix):
+        if len(prefix) != 6:
+            raise ValueError('prefix must be 6 length')
+
+    def _set_ident_prefix_automatic(self):
+        if not self.invoice_ident_prefix:
+            self.invoice_ident_prefix = self.invoice_ident[0:6]
+

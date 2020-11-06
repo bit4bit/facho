@@ -174,13 +174,36 @@ def test_invoice_legalmonetary_with_taxes():
     assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(0.0)
     assert inv.invoice_legal_monetary_total.payable_amount == form.Amount(100.0)
 
+
+def test_invoice_ident_prefix_automatic_invalid():
+    inv = form.NationalSalesInvoice()
+    with pytest.raises(ValueError):
+        inv.set_ident('SETPQJQJ1234567')
+
 def test_invoice_ident_prefix_automatic():
     inv = form.NationalSalesInvoice()
     inv.set_ident('SETP1234567')
     assert inv.invoice_ident_prefix == 'SETP'
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('SET1234567')
+    assert inv.invoice_ident_prefix == 'SET'
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('SE1234567')
+    assert inv.invoice_ident_prefix == 'SE'
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('S1234567')
+    assert inv.invoice_ident_prefix == 'S'
+    inv = form.NationalSalesInvoice()
+    inv.set_ident('1234567')
+    assert inv.invoice_ident_prefix == ''
 
 def test_invoice_ident_prefix_manual():
     inv = form.NationalSalesInvoice()
     inv.set_ident('SETP1234567')
     inv.set_ident_prefix('SETA')
     assert inv.invoice_ident_prefix == 'SETA'
+
+def test_invoice_ident_prefix_automatic_debit():
+    inv = form.DebitNote(form.BillingReference('','',''))
+    inv.set_ident('ABCDEF1234567')
+    assert inv.invoice_ident_prefix == 'ABCDEF'
