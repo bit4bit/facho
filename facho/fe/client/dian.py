@@ -64,7 +64,7 @@ class GetNumberingRange(SOAPService):
     softwareCode: str
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'GetNumberingRange'
