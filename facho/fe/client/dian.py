@@ -79,7 +79,7 @@ class SendBillAsync(SOAPService):
     contentFile: str
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'SendBillAsync'
@@ -107,7 +107,7 @@ class SendTestSetAsync(SOAPService):
     testSetId: str = ''
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'SendTestSetAsync'
@@ -121,7 +121,7 @@ class SendBillSync(SOAPService):
     contentFile: bytes
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'SendBillSync'
@@ -148,7 +148,7 @@ class GetStatus(SOAPService):
     trackId: bytes
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'GetStatus'
@@ -161,7 +161,7 @@ class GetStatusZip(SOAPService):
     trackId: bytes
 
     def get_wsdl(self):
-        return 'https://colombia-dian-webservices-input-sbx.azurewebsites.net/WcfDianCustomerServices.svc?wsdl'
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     def get_service(self):
         return 'GetStatusZip'
