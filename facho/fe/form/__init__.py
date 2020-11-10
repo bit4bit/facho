@@ -116,12 +116,12 @@ class Amount:
 class Quantity:
     
     def __init__(self, val, code):
-        if not isinstance(val, int):
-            raise ValueError('val expected int')
+        if type(val) not in [float, int]:
+            raise ValueError('val expected int or float')
         if code not in codelist.UnidadesMedida:
             raise ValueError("code [%s] not found" % (code))
 
-        self.value = val
+        self.value = Amount(val)
         self.code = code
 
     def __mul__(self, other):

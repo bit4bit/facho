@@ -112,7 +112,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     simple_invoice.invoice_supplier.ident = form.PartyIdentification('700085371', '5', '31')
     simple_invoice.invoice_customer.ident = form.PartyIdentification('800199436', '5', '31')
     simple_invoice.add_invoice_line(form.InvoiceLine(
-        quantity = form.Quantity(1, '94'),
+        quantity = form.Quantity(1.00, '94'),
         description = 'producto',
         item = form.StandardItem(111),
         price = form.Price(form.Amount(1_500_000), '01', ''),
