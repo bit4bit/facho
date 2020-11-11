@@ -53,7 +53,7 @@ class AmountCollection(Collection):
         return total
 
 class Amount:
-    def __init__(self, amount: int or float or Amount, currency: Currency = Currency('COP')):
+    def __init__(self, amount: int or float or str or Amount, currency: Currency = Currency('COP')):
 
         #DIAN 1.7.-2020: 1.2.3.1
         if isinstance(amount, Amount):
@@ -63,7 +63,7 @@ class Amount:
             self.amount = amount.amount
             self.currency = amount.currency
         else:
-            if amount < 0:
+            if float(amount) < 0:
                 raise ValueError('amount must be positive >= 0')
 
             self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION,
@@ -75,14 +75,13 @@ class Amount:
         return Amount(val, currency=self.currency)
     
     def round(self, prec):
-        #return Amount(self.amount.quantize(Decimal('1.' + '0' * prec), rounding=decimal.ROUND_HALF_EVEN))
-        return Amount(round(self.amount, prec))
+        return Amount(round(self.amount, prec), currency=self.currency)
 
     def __round__(self, prec):
         return round(self.amount, prec)
 
     def __str__(self):
-        return '%.06f' % self.amount
+        return str(self.float())
 
     def __lt__(self, other):
         if not self.is_same_currency(other):
@@ -122,8 +121,9 @@ class Amount:
     def is_same_currency(self, other):
         return self.currency == other.currency
 
-    def format(self, formatter):
-        return formatter % self.float()
+    def truncate_as_string(self, prec):
+        parts = str(self.float()).split('.', 1)
+        return '%s.%s' % (parts[0], parts[1][0:prec].ljust(prec,'0'))
 
     def float(self):
         return float(round(self.amount, DECIMAL_PRECISION))

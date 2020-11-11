@@ -31,3 +31,12 @@ def test_round():
     assert str(form.Amount(1.1560).round(2)) == str(form.Amount(1.15))
     # 5, y el segundo dígito siguiente al dígito menos significativo es impar Incrementar el dígito menos significativo
     assert form.Amount(1.1569).round(2) == form.Amount(1.157)
+
+def test_amount_truncate():
+    assert form.Amount(1.1569).truncate_as_string(2) == '1.15'
+    assert form.Amount(587.0700).truncate_as_string(2) == '587.07'
+    assert form.Amount(14705.8800).truncate_as_string(2) == '14705.88'
+    assert form.Amount(9423.7000).truncate_as_string(2) == '9423.70'
+    assert form.Amount(10084.03).truncate_as_string(2) == '10084.03'
+    assert form.Amount(10000.02245).truncate_as_string(2) == '10000.02'
+    assert form.Amount(10000.02357).truncate_as_string(2) == '10000.02'
