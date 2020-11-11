@@ -540,7 +540,7 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('./cac:Price/cbc:PriceAmount', invoice_line.price.amount, currencyID=invoice_line.price.amount.currency.code)
             #DIAN 1.7.-2020: FBB04
             line.set_element('./cac:Price/cbc:BaseQuantity',
-                             invoice_line.quantity,
+                             invoice_line.price.quantity,
                              unitCode=invoice_line.quantity.code)
 
 

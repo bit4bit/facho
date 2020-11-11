@@ -170,6 +170,7 @@ def test_invoice_cufe(simple_invoice_without_lines):
     assert cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
 
 
+
 def test_credit_note_cude(simple_credit_note_without_lines):
     simple_invoice = simple_credit_note_without_lines
     simple_invoice.invoice_ident = '8110007871'

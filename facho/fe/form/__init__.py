@@ -71,6 +71,12 @@ class Amount:
                                                           rounding=decimal.ROUND_HALF_EVEN ))
             self.currency = currency
 
+    def fromNumber(self, val):
+        return Amount(val, currency=self.currency)
+    
+    def round(self, prec):
+        #return Amount(self.amount.quantize(Decimal('1.' + '0' * prec), rounding=decimal.ROUND_HALF_EVEN))
+        return Amount(round(self.amount, prec))
 
     def __round__(self, prec):
         return round(self.amount, prec)
@@ -88,17 +94,27 @@ class Amount:
             raise AmountCurrencyError()
         return round(self.amount, DECIMAL_PRECISION) == round(other.amount, DECIMAL_PRECISION)
 
-    def __add__(self, other):
+    def _cast(self, val):
+        if type(val) in [int, float]:
+            return self.fromNumber(val)
+        if isinstance(val, Amount):
+            return val
+        raise TypeError("cant cast to amount")
+    
+    def __add__(self, rother):
+        other = self._cast(rother)
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
         return Amount(self.amount + other.amount, self.currency)
 
-    def __sub__(self, other):
+    def __sub__(self, rother):
+        other = self._cast(rother)
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
         return Amount(self.amount - other.amount, self.currency)
 
-    def __mul__(self, other):
+    def __mul__(self, rother):
+        other = self._cast(rother)
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
         return Amount(self.amount * other.amount, self.currency)
@@ -125,18 +141,16 @@ class Quantity:
         self.code = code
 
     def __mul__(self, other):
-        if isinstance(other, Amount):
-            return Amount(self.value) * other
         return self.value * other
 
     def __lt__(self, other):
-        if isinstance(other, Amount):
-            return Amount(self.value) < other
         return self.value < other
 
     def __str__(self):
         return str(self.value)
 
+    def __repr__(self):
+        return str(self)
 
 @dataclass
 class Item:
@@ -323,11 +337,15 @@ class Price:
     amount: Amount
     type_code: str
     type: str
+    quantity: int = 1
 
     def __post_init__(self):
         if self.type_code not in codelist.CodigoPrecioReferencia:
             raise ValueError("type_code [%s] not found" % (self.type_code))
+        if not isinstance(self.quantity, int):
+            raise ValueError("quantity must be int")
 
+        self.amount *= self.quantity
 
 @dataclass
 class PaymentMean:
