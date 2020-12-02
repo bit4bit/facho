@@ -129,6 +129,11 @@ class FachoXML:
         self.xpath_for = {}
         self.extensions = []
 
+    @classmethod
+    def from_string(cls, document: str, namespaces: dict() = []) -> 'FachoXML':
+        xml = LXMLBuilder.from_string(document)
+        return FachoXML(xml, nsmap=namespaces)
+
     def append_element(self, elem, new_elem):
         #elem = self.find_or_create_element(xpath, append=append)
         #self.builder.append(elem, new_elem)

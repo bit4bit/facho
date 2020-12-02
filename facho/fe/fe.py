@@ -49,8 +49,7 @@ NAMESPACES = {
 }
 
 def fe_from_string(document: str) -> FachoXML:
-    xml = LXMLBuilder.from_string(document)
-    return FachoXML(xml, nsmap=NAMESPACES)
+    return FeXML.from_string(document)
 
 from contextlib import contextmanager
 @contextmanager
@@ -69,6 +68,7 @@ def mock_xades_policy():
         mock.return_value = UrllibPolicyMock()
         yield
 
+        
 class FeXML(FachoXML):
 
     def __init__(self, root, namespace):
@@ -79,6 +79,10 @@ class FeXML(FachoXML):
         self._cn = root.rstrip('/')
         #self.find_or_create_element(self._cn)
 
+    @classmethod
+    def from_string(cls, document: str) -> 'FeXML':
+        return super().from_string(document, namespaces=NAMESPACES)
+    
     def tostring(self, **kw):
         return super().tostring(**kw)\
             .replace("fe:", "")\
@@ -360,6 +364,7 @@ class DianXMLExtensionSigner:
         extcontent = fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
         fachoxml.append_element(extcontent, signature)
 
+        
 class DianXMLExtensionAuthorizationProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 176
 

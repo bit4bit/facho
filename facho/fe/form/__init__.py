@@ -491,6 +491,11 @@ class AllowanceCharge:
     def hasReason(self):
         return self.reason is not None
 
+class AllowanceChargeAsDiscount(AllowanceCharge):
+    def __init__(self, amount: Amount = Amount(0.0)):
+        self.charge_indicator = False
+        self.amount = amount
+
 class NationalSalesInvoiceDocumentType(str):
     def __str__(self):
         # 6.1.3

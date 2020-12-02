@@ -38,7 +38,10 @@ def test_invoice_legalmonetary():
     assert inv.invoice_legal_monetary_total.tax_inclusive_amount == form.Amount(119.0)
     assert inv.invoice_legal_monetary_total.charge_total_amount == form.Amount(0.0)
 
-
+def test_allowancecharge_as_discount():
+    discount = form.AllowanceChargeAsDiscount(amount=form.Amount(1000.0))
+    assert discount.isDiscount() == True
+    
 def test_FAU10():
     inv = form.NationalSalesInvoice()
     inv.add_invoice_line(form.InvoiceLine(
