@@ -6,8 +6,12 @@
 """Tests for `facho` package."""
 
 import pytest
+from datetime import datetime
 
+from facho.fe import form
 from facho.fe import form_xml
+
+from fixtures import *
 
 def test_import_DIANInvoiceXML():
     try:
@@ -27,3 +31,29 @@ def test_import_DIANCreditNoteXML():
         form_xml.DIANCreditNoteXML
     except AttributeError:
         pytest.fail("unexpected not found")
+
+def test_FAU10(simple_invoice_without_lines):
+    inv = simple_invoice_without_lines
+    inv.add_invoice_line(form.InvoiceLine(
+        quantity = form.Quantity(1, '94'),
+        description = 'producto facho',
+        item = form.StandardItem(9999),
+        price = form.Price(
+            amount = form.Amount(100.0),
+            type_code = '01',
+            type = 'x'
+        ),
+        tax = form.TaxTotal(
+            subtotals = [
+                form.TaxSubTotal(
+                    percent = 19.0,
+                )
+            ]
+        )
+    ))
+    inv.add_allowance_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
+    
+    xml = form_xml.DIANInvoiceXML(inv)
+    assert xml.get_element_text('./cac:AllowanceCharge/cbc:ID') == '1'
+    assert xml.get_element_text('./cac:AllowanceCharge/cbc:ChargeIndicator') == 'true'
+    assert xml.get_element_text('./cac:AllowanceCharge/cbc:Amount') == '19.0'

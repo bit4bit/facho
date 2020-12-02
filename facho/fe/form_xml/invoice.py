@@ -543,7 +543,23 @@ class DIANInvoiceXML(fe.FeXML):
                              invoice_line.price.quantity,
                              unitCode=invoice_line.quantity.code)
 
+    def set_allowance_charge(fexml, invoice):
+        for idx, charge in enumerate(invoice.invoice_allowance_charge):
+            next_append = idx > 0
+            fexml.append_allowance_charge(fexml, idx + 1, charge, append=next_append)
 
+    def append_allowance_charge(fexml, parent, idx, charge, append=False):
+            line = fexml.fragment('./cac:AllowanceCharge', append=append)
+            #DIAN 1.7.-2020: FAQ02
+            line.set_element('./cbc:ID', idx)
+            #DIAN 1.7.-2020: FAQ03
+            line.set_element('./cbc:ChargeIndicator', str(charge.charge_indicator).lower())
+            if charge.reason:
+                line.set_element('./cbc:AllowanceChargeReasonCode', charge.reason.code)
+                line.set_element('./cbc:allowanceChargeReason', charge.reason.reason)
+            fexml.set_element_amount_for(line, './cbc:Amount', charge.amount)
+
+            
     def attach_invoice(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""
@@ -579,6 +595,7 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_invoice_totals(invoice)
         fexml.set_invoice_lines(invoice)
         fexml.set_payment_mean(invoice)
+        fexml.set_allowance_charge(invoice)
         fexml.set_billing_reference(invoice)
 
         return fexml

@@ -61,7 +61,7 @@ def test_FAU10():
             ]
         )
     ))
-    inv.add_allownace_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
+    inv.add_allowance_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
 
     inv.calculate()
     assert inv.invoice_legal_monetary_total.line_extension_amount == form.Amount(100.0)
@@ -89,7 +89,7 @@ def test_FAU14():
             ]
         )
     ))
-    inv.add_allownace_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
+    inv.add_allowance_charge(form.AllowanceCharge(amount=form.Amount(19.0)))
     inv.add_prepaid_payment(form.PrePaidPayment(paid_amount = form.Amount(50.0)))
     inv.calculate()
 

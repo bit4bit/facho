@@ -397,6 +397,43 @@ class InvoiceDocumentReference(BillingReference):
     """
 
 @dataclass
+class AllowanceChargeReason:
+    code: str
+    reason: str
+
+    def __post_init__(self):
+        if self.code not in codelist.CodigoDescuento:
+            raise ValueError("code [%s] not found" % (self.code))
+
+
+@dataclass
+class AllowanceCharge:
+    #DIAN 1.7.-2020: FAQ03
+    charge_indicator: bool = True
+    amount: Amount = Amount(0.0)
+    reason: AllowanceChargeReason = None
+
+    def isCharge(self):
+        return self.charge_indicator == True
+
+    def isDiscount(self):
+        return self.charge_indicator == False
+
+    def asCharge(self):
+        self.charge_indicator = True
+
+    def asDiscount(self):
+        self.charge_indicator = False
+
+    def hasReason(self):
+        return self.reason is not None
+
+class AllowanceChargeAsDiscount(AllowanceCharge):
+    def __init__(self, amount: Amount = Amount(0.0)):
+        self.charge_indicator = False
+        self.amount = amount
+
+@dataclass
 class InvoiceLine:
     # RESOLUCION 0004: pagina 155
     quantity: Quantity
@@ -408,6 +445,13 @@ class InvoiceLine:
     # la factura y el percent es unico por type_code
     # de subtotal
     tax: typing.Optional[TaxTotal]
+
+    allowance_charge = []
+
+    def add_allowance_charge(charge):
+        if not isinstance(charge, AllowanceCharge):
+            raise TypeError('charge invalid type expected AllowanceCharge')
+        self.allowance_charge.add(charge)
 
     @property
     def total_amount(self):
@@ -459,42 +503,6 @@ class LegalMonetaryTotal:
             - self.prepaid_amount
 
 
-@dataclass
-class AllowanceChargeReason:
-    code: str
-    reason: str
-
-    def __post_init__(self):
-        if self.code not in codelist.CodigoDescuento:
-            raise ValueError("code [%s] not found" % (self.code))
-
-
-@dataclass
-class AllowanceCharge:
-    #DIAN 1.7.-2020: FAQ03
-    charge_indicator: bool = True
-    amount: Amount = Amount(0.0)
-    reason: AllowanceChargeReason = None
-
-    def isCharge(self):
-        return self.charge_indicator == True
-
-    def isDiscount(self):
-        return self.charge_indicator == False
-
-    def asCharge(self):
-        self.charge_indicator = True
-
-    def asDiscount(self):
-        self.charge_indicator = False
-
-    def hasReason(self):
-        return self.reason is not None
-
-class AllowanceChargeAsDiscount(AllowanceCharge):
-    def __init__(self, amount: Amount = Amount(0.0)):
-        self.charge_indicator = False
-        self.amount = amount
 
 class NationalSalesInvoiceDocumentType(str):
     def __str__(self):
@@ -593,7 +601,7 @@ class Invoice:
 
         self.invoice_operation_type = operation
 
-    def add_allownace_charge(self, charge: AllowanceCharge):
+    def add_allowance_charge(self, charge: AllowanceCharge):
         self.invoice_allowance_charge.append(charge)
 
     def add_invoice_line(self, line: InvoiceLine):
