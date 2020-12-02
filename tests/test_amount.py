@@ -40,3 +40,6 @@ def test_amount_truncate():
     assert form.Amount(10084.03).truncate_as_string(2) == '10084.03'
     assert form.Amount(10000.02245).truncate_as_string(2) == '10000.02'
     assert form.Amount(10000.02357).truncate_as_string(2) == '10000.02'
+
+def test_amount_format():
+    assert str(round(form.Amount(1.1569),2)) == '1.16'

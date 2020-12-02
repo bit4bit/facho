@@ -4,6 +4,7 @@
 import hashlib
 from functools import reduce
 import copy
+import dataclasses
 from dataclasses import dataclass
 from datetime import datetime, date
 from collections import defaultdict
@@ -413,6 +414,12 @@ class AllowanceCharge:
     amount: Amount = Amount(0.0)
     reason: AllowanceChargeReason = None
 
+    #Valor Base para calcular el descuento o el cargo
+    base_amount: typing.Optional[Amount] = Amount(0.0)
+    
+    # Porcentaje: Porcentaje que aplicar.
+    multiplier_factor_numeric: Amount = Amount(1.0)
+    
     def isCharge(self):
         return self.charge_indicator == True
 
@@ -427,6 +434,9 @@ class AllowanceCharge:
 
     def hasReason(self):
         return self.reason is not None
+
+    def set_base_amount(self, amount):
+        self.base_amount = amount
 
 class AllowanceChargeAsDiscount(AllowanceCharge):
     def __init__(self, amount: Amount = Amount(0.0)):
@@ -446,16 +456,31 @@ class InvoiceLine:
     # de subtotal
     tax: typing.Optional[TaxTotal]
 
-    allowance_charge = []
+    allowance_charge: typing.List[AllowanceCharge] = dataclasses.field(default_factory=list)
 
-    def add_allowance_charge(charge):
+    def add_allowance_charge(self, charge):
         if not isinstance(charge, AllowanceCharge):
             raise TypeError('charge invalid type expected AllowanceCharge')
+        charge.set_base_amount(self.total_amount_without_charge)
         self.allowance_charge.add(charge)
 
     @property
+    def total_amount_without_charge(self):
+        return (self.quantity * self.price.amount)
+    
+    @property
     def total_amount(self):
-        return self.quantity * self.price.amount
+        charge = AmountCollection(self.allowance_charge)\
+            .filter(lambda charge: charge.isCharge())\
+            .map(lambda charge: charge.amount)\
+            .sum()
+
+        discount = AmountCollection(self.allowance_charge)\
+            .filter(lambda charge: charge.isDiscount())\
+            .map(lambda charge: charge.amount)\
+            .sum()
+
+        return self.total_amount_without_charge + charge - discount
 
     @property
     def total_tax_inclusive_amount(self):
@@ -649,11 +674,22 @@ class Invoice:
         #DIAN 1.7.-2020: FAU14
         self.invoice_legal_monetary_total.calculate()
 
+    def _refresh_charges_base_amount(self):
+        if self.invoice_allowance_charge:
+            for invline in self.invoice_lines:
+                if invline.allowance_charge:
+                    # TODO actualmente solo uno de los cargos es permitido
+                    raise ValueError('allowance charge in invoice exclude invoice line')
+            
+        # cargos a nivel de factura
+        for charge in self.invoice_allowance_charge:
+            charge.set_base_amount(self.invoice_legal_monetary_total.line_extension_amount)
+        
     def calculate(self):
         for invline in self.invoice_lines:
             invline.calculate()
         self._calculate_legal_monetary_total()
-
+        self._refresh_charges_base_amount()
 
 class NationalSalesInvoice(Invoice):
     def __init__(self):
