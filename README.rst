@@ -2,8 +2,6 @@
 facho
 =====
 
-!!INESTABLE NO RECOMENDAMOS USO PARA PRODUCION!!
-
 Libreria para facturacion electronica colombia.
 
 - facho/facho.py: abstracion para manipulacion del XML
