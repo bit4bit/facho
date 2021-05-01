@@ -434,7 +434,7 @@ class DianZIP:
     MAX_FILES = 50
 
     def __init__(self, file_like):
-        self.zipfile = zipfile.ZipFile(file_like, mode='w')
+        self.zipfile = zipfile.ZipFile(file_like, mode='w', compression=zipfile.ZIP_DEFLATED)
         self.num_files = 0
 
     def add_invoice_xml(self, name, xml_data):
