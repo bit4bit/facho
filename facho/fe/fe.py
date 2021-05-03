@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from .data.dian import codelist
 from . import form
 from collections import defaultdict
+from pathlib import Path
 
 AMBIENTE_PRUEBAS = codelist.TipoAmbiente.by_name('Pruebas')['code']
 AMBIENTE_PRODUCCION = codelist.TipoAmbiente.by_name('Producción')['code']
@@ -25,8 +26,9 @@ SCHEME_AGENCY_ATTRS = {
 }
 
 
+pwd = Path(__file__).parent
 # RESOLUCION 0001: pagina 516
-POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
+POLICY_ID = 'file://'+str(pwd)+'/data/dian/politicadefirmav2.pdf'
 POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
 
 
