@@ -138,10 +138,16 @@ class GetStatusResponse:
 
     @classmethod
     def fromdict(cls, data):
+        if data['ErrorMessage']:
+            error_message = data['ErrorMessage']['string']
+        else:
+            error_message = None
+            
         return cls(data['IsValid'],
                    data['StatusDescription'],
                    data['StatusCode'],
-                   data['ErrorMessage']['string'])
+                   error_message)
+                   
 
 @dataclass
 class GetStatus(SOAPService):
