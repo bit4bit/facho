@@ -21,16 +21,24 @@ def test_amount_equals():
     assert price1 == form.Amount(100) + form.Amount(10)
     assert price1 == form.Amount(10) * form.Amount(10) + form.Amount(10)
     assert form.Amount(110) == (form.Amount(1.10) * form.Amount(100))
-    
+
+def test_round_half_even():
+    # https://www.w3.org/TR/xpath-functions-31/#func-round-half-to-even
+    assert form.Amount(0.5).round(0).float() == 0.0
+    assert form.Amount(1.5).round(0).float() == 2.0
+    assert form.Amount(2.5).round(0).float() == 2.0
+    assert form.Amount(3.567812e+3).round(2).float() == 3567.81e0
+    assert form.Amount(4.7564e-3).round(2).float() == 0.0e0
+
 def test_round():
     # Entre 0 y 5 Mantener el dígito menos significativo
     assert form.Amount(1.133).round(2) == form.Amount(1.13)
     # Entre 6 y 9 Incrementar el dígito menos significativo
     assert form.Amount(1.166).round(2) == form.Amount(1.17)
     # 5, y el segundo dígito siguiente al dígito menos significativo es cero o par Mantener el dígito menos significativo
-    assert str(form.Amount(1.1560).round(2)) == str(form.Amount(1.15))
+    assert str(form.Amount(1.1542).round(2)) == str(form.Amount(1.15))
     # 5, y el segundo dígito siguiente al dígito menos significativo es impar Incrementar el dígito menos significativo
-    assert form.Amount(1.1569).round(2) == form.Amount(1.157)
+    assert str(form.Amount(1.1563).round(2)) == str(form.Amount(1.16))
 
 def test_amount_truncate():
     assert form.Amount(1.1569).truncate_as_string(2) == '1.15'
