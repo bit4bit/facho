@@ -55,6 +55,13 @@ def test_invoicesimple_zip(simple_invoice):
     with fe.DianZIP(zipdata) as dianzip:
         name_invoice = dianzip.add_invoice_xml(simple_invoice.invoice_ident, str(xml_invoice))
 
+    # el zip ademas de archivar debe comprimir los archivos
+    # de lo contrario la DIAN lo rechaza
+    with zipfile.ZipFile(zipdata) as dianzip:
+        dianzip.testzip()
+        for zipinfo in dianzip.infolist():
+            assert zipinfo.compress_type == zipfile.ZIP_DEFLATED, "se espera el zip comprimido"
+
     with zipfile.ZipFile(zipdata) as dianzip:
         xml_data = dianzip.open(name_invoice).read().decode('utf-8')
         assert xml_data == str(xml_invoice)
