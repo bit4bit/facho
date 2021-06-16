@@ -110,3 +110,19 @@ def test_xml_sign_dian(monkeypatch):
         helpers.mock_urlopen(m)
         xmlsigned = signer.sign_xml_string(xmlstring)
     assert "Signature" in xmlsigned
+
+def test_xml_sign_dian_using_bytes(monkeypatch):
+    xml = fe.FeXML('Invoice',
+                'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
+    ublextension = xml.fragment('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+    extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
+
+    xmlstring = xml.tostring()
+    p12_data = open('./tests/example.p12', 'rb').read()
+    signer = fe.DianXMLExtensionSigner.from_bytes(p12_data)
+
+    with monkeypatch.context() as m:
+        helpers.mock_urlopen(m)
+        xmlsigned = signer.sign_xml_string(xmlstring)
+    assert "Signature" in xmlsigned

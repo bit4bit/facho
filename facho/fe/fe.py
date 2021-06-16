@@ -283,16 +283,24 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
 class DianXMLExtensionSigner:
 
     def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
-        self._pkcs12_path = pkcs12_path
+        self._pkcs12_data = open(pkcs12_path, 'rb').read()
         self._passphrase = None
         self._mockpolicy = mockpolicy
         if passphrase:
             self._passphrase = passphrase.encode('utf-8')
 
     @classmethod
-    def from_pkcs12(self, filepath, password=None):
-        p12 = OpenSSL.crypto.load_pkcs12(open(filepath, 'rb').read(), password)
-
+    def from_bytes(cls, data, passphrase=None, mockpolicy=False):
+        self = cls.__new__(cls)
+        
+        self._pkcs12_data = data
+        self._passphrase = None
+        self._mockpolicy = mockpolicy
+        if passphrase:
+            self._passphrase = passphrase.encode('utf-8')
+            
+        return self
+    
     def sign_xml_string(self, document):
         xml = LXMLBuilder.from_string(document)
         signature = self.sign_xml_element(xml)
@@ -347,7 +355,7 @@ class DianXMLExtensionSigner:
             POLICY_NAME,
             xmlsig.constants.TransformSha256)
         ctx = xades.XAdESContext(policy)
-        ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(open(self._pkcs12_path, 'rb').read(),
+        ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(self._pkcs12_data,
                                                    self._passphrase))
 
         if self._mockpolicy:
@@ -459,8 +467,8 @@ class DianZIP:
 
 class DianXMLExtensionSignerVerifier:
 
-    def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
-        self._pkcs12_path = pkcs12_path
+    def __init__(self, pkcs12_path_or_bytes, passphrase=None, mockpolicy=False):
+        self._pkcs12_path_or_bytes = pkcs12_path_or_bytes
         self._passphrase = None
         self._mockpolicy = mockpolicy
         if passphrase:
@@ -477,7 +485,12 @@ class DianXMLExtensionSignerVerifier:
         fachoxml.root.append(signature)
 
         ctx = xades.XAdESContext()
-        ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(open(self._pkcs12_path, 'rb').read(),
+
+        pkcs12_data = self._pkcs12_path_or_bytes
+        if isinstance(self._pkcs12_path_or_bytes, str):
+            pkcs12_data = open(self._pkcs12_path_or_bytes, 'rb').read()
+
+        ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(pkcs12_data,
                                                    self._passphrase))
 
         try:
