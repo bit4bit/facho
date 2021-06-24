@@ -103,12 +103,27 @@ def test_field_model():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        id = fields.Model(ID)
+        id = fields.Many2One(ID)
 
     person = Person()
     person.id = ID()
     person.id = 33
     assert "<Person><ID>33</ID></Person>" == person.to_xml()
+
+def test_field_multiple_model():
+    class ID(facho.model.Model):
+        __name__ = 'ID'
+        
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        id = fields.Many2One(ID)
+        id2 = fields.Many2One(ID)
+
+    person = Person()
+    person.id = 33
+    person.id2 = 44
+    assert "<Person><ID>33</ID><ID>44</ID></Person>" == person.to_xml()
 
 def test_field_model_failed_initialization():
     class ID(facho.model.Model):
@@ -117,7 +132,7 @@ def test_field_model_failed_initialization():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        id = fields.Model(ID)
+        id = fields.Many2One(ID)
 
 
     person = Person()
@@ -131,7 +146,7 @@ def test_field_model_with_custom_name():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        id = fields.Model(ID, name='DID')
+        id = fields.Many2One(ID, name='DID')
 
 
     person = Person()
@@ -147,7 +162,7 @@ def test_field_model_default_initialization_with_attributes():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        id = fields.Model(ID)
+        id = fields.Many2One(ID)
 
     person = Person()
     person.id = 33
@@ -189,7 +204,7 @@ def test_field_model_with_namespace():
         __namespace__ = {
             "facho": "http://lib.facho.cyou" 
         }
-        id = fields.Model(ID, namespace="facho")
+        id = fields.Many2One(ID, namespace="facho")
 
 
     person = Person()
@@ -203,7 +218,7 @@ def test_field_hook_before_xml():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        hash = fields.Model(Hash)
+        hash = fields.Many2One(Hash)
 
         def __before_xml__(self):
             self.hash = "calculate"
