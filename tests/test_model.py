@@ -217,13 +217,15 @@ def test_field_function_with_model():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        hash = fields.Function('get_hash', field=fields.Model(Hash))
+        hash = fields.Function('get_hash', field=Hash)
 
         def get_hash(self, name, field):
             field.id = 'calculate'
+            return field
         
     person = Person()
-    assert '<Person><Hash id="calculate"/></Person>'
+    assert person.hash.id == 'calculate'
+    assert '<Person/>'
 
 def test_field_function():
     class Person(facho.model.Model):
