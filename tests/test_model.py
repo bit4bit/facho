@@ -272,3 +272,19 @@ def test_field_function_only_setter():
     person.password = 'calculate'
     assert '<Person hash="calculate+2"/>' == person.to_xml()
     
+
+def test_model_set_default_setter():
+    class Hash(facho.model.Model):
+        __name__ = 'Hash'
+
+        def __default_set__(self, value):
+            return "%s+3" % (value)
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Many2One(Hash)
+
+    person = Person()
+    person.hash = 'hola'
+    assert '<Person><Hash>hola+3</Hash></Person>' == person.to_xml()

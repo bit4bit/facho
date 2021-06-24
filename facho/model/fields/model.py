@@ -14,7 +14,7 @@ class Model(Field):
 
     def __set__(self, inst, value):
         obj = self._create_model(inst)
-        obj._text = str(value)
+        obj._set_content(value)
 
     def _create_model(self, inst):
         try:

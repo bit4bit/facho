@@ -29,7 +29,7 @@ class Many2One(Field):
         if callable(setter):
             setter(inst_model, value)
         else:
-            inst_model._text = str(value)
+            inst_model._set_content(value)
 
 
 

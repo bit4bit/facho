@@ -31,6 +31,12 @@ class ModelBase(object, metaclass=ModelMeta):
     def __before_xml__(self):
         pass
 
+    def __default_set__(self, value):
+        return str(value)
+    
+    def _set_content(self, value):
+        self._text = str(self.__default_set__(value))
+
     def _hook_before_xml(self):
         self.__before_xml__()
         for field in self._fields.values():
