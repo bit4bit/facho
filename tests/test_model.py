@@ -194,6 +194,23 @@ def test_field_function_with_attribute():
     person = Person()
     assert '<Person hash="calculate"/>'
 
+def test_field_function_with_model():
+    class Hash(facho.model.Model):
+        __name__ = 'Hash'
+
+        id = fields.Attribute('id')
+        
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Function('get_hash', field=fields.Model(Hash))
+
+        def get_hash(self, name, field):
+            field.id = 'calculate'
+        
+    person = Person()
+    assert '<Person><Hash id="calculate"/></Person>'
+
 def test_field_function():
     class Person(facho.model.Model):
         __name__ = 'Person'
