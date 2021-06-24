@@ -2,7 +2,7 @@ from .field import Field
 from .model import Model
 
 class Function(Field):
-    def __init__(self, getter, setter=None, field=None):
+    def __init__(self, getter=None, setter=None, field=None):
         self.field = field
         self.getter = getter
         self.setter = setter
@@ -11,6 +11,12 @@ class Function(Field):
         if inst is None:
             return self
         assert self.name is not None
+
+        if self.getter is None and self.field is None:
+            return None
+
+        if self.getter is None and self.field is not None:
+            return Model(self.field)
 
         if self.field is None:
             return self._call(inst, self.getter, self.name)

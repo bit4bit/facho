@@ -257,4 +257,18 @@ def test_field_function_setter():
     person = Person()
     person.password = 'calculate'
     assert '<Person hash="calculate+2"/>' == person.to_xml()
+
+def test_field_function_only_setter():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Attribute('hash')
+        password = fields.Function(setter='set_hash')
+
+        def set_hash(self, name, value):
+            self.hash = "%s+2" % (value)
+
+    person = Person()
+    person.password = 'calculate'
+    assert '<Person hash="calculate+2"/>' == person.to_xml()
     
