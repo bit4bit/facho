@@ -49,7 +49,7 @@ class Invoice(model.Model):
     __name__ = 'Invoice'
 
     id = fields.Many2One(ID)
-    issue = fields.Function(setter='set_issue')
+    issue = fields.Virtual(setter='set_issue')
     issue_date = fields.Many2One(Date, name='IssueDate')
     issue_time = fields.Many2One(Time, name='IssueTime')
     

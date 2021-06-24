@@ -231,7 +231,7 @@ def test_field_function_with_attribute():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        hash = fields.Function('get_hash', field=fields.Attribute('hash'))
+        hash = fields.Function(fields.Attribute('hash'), getter='get_hash')
 
         def get_hash(self, name, field):
             return 'calculate'
@@ -248,39 +248,23 @@ def test_field_function_with_model():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
-        hash = fields.Function('get_hash', field=Hash)
+        hash = fields.Function(fields.Many2One(Hash), getter='get_hash')
 
         def get_hash(self, name, field):
             field.id = 'calculate'
-            return field
+
         
     person = Person()
     assert person.hash.id == 'calculate'
     assert '<Person/>'
-
-def test_field_function():
-    class Person(facho.model.Model):
-        __name__ = 'Person'
-
-        hash = fields.Function('get_hash')
-
-        def get_hash(self, name):
-            return 'calculate'
-        
-    person = Person()
-    assert person.hash == 'calculate'
-    assert "<Person/>" == person.to_xml()
-    
+   
 
 def test_field_function_setter():
     class Person(facho.model.Model):
         __name__ = 'Person'
 
         hash = fields.Attribute('hash')
-        password = fields.Function('get_hash', setter='set_hash')
-
-        def get_hash(self, name):
-            return None
+        password = fields.Virtual(setter='set_hash')
 
         def set_hash(self, name, value):
             self.hash = "%s+2" % (value)
@@ -294,7 +278,7 @@ def test_field_function_only_setter():
         __name__ = 'Person'
 
         hash = fields.Attribute('hash')
-        password = fields.Function(setter='set_hash')
+        password = fields.Virtual(setter='set_hash')
 
         def set_hash(self, name, value):
             self.hash = "%s+2" % (value)
@@ -303,7 +287,6 @@ def test_field_function_only_setter():
     person.password = 'calculate'
     assert '<Person hash="calculate+2"/>' == person.to_xml()
     
-
 def test_model_set_default_setter():
     class Hash(facho.model.Model):
         __name__ = 'Hash'
@@ -319,3 +302,15 @@ def test_model_set_default_setter():
     person = Person()
     person.hash = 'hola'
     assert '<Person><Hash>hola+3</Hash></Person>' == person.to_xml()
+
+
+def test_field_virtual():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        age = fields.Virtual()
+
+    person = Person()
+    person.age = 55
+    assert person.age == 55
+    assert "<Person/>" == person.to_xml()

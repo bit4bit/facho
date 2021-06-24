@@ -2,29 +2,24 @@ from .field import Field
 from .model import Model
 
 class Function(Field):
-    def __init__(self, getter=None, setter=None, field=None):
+    def __init__(self, field, getter=None):
         self.field = field
         self.getter = getter
-        self.setter = setter
 
     def __get__(self, inst, cls):
         if inst is None:
             return self
         assert self.name is not None
 
-        if self.getter is None and self.field is None:
-            return None
+        # si se indica `field` se adiciona
+        # como campo del modelo, esto es
+        # que se serializa a xml
+        inst._fields[self.name] = self.field
 
-        if self.getter is None and self.field is not None:
-            return Model(self.field)
+        if self.getter is not None:
+            value = self._call(inst, self.getter, self.name, self.field)
 
-        if self.field is None:
-            return self._call(inst, self.getter, self.name)
-        else:
-            obj = Model(self.field)
-            return self._call(inst, self.getter, self.name, obj)
+            if value is not None:
+                self.field.__set__(inst, value)
 
-    def __set__(self, inst, value):
-        if self.setter is None:
-            return super().__set__(self.name, value)
-        self._call(inst, self.setter, self.name, value)
+        return self.field
