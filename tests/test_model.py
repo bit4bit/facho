@@ -108,6 +108,20 @@ def test_field_model_failed_initialization():
     person.id = 33
     assert "<Person><ID>33</ID></Person>" == person.to_xml()
 
+def test_field_model_with_custom_name():
+    class ID(facho.model.Model):
+        __name__ = 'ID'
+        
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        id = fields.Model(ID, name='DID')
+
+
+    person = Person()
+    person.id = 33
+    assert "<Person><DID>33</DID></Person>" == person.to_xml()
+
 def test_field_model_default_initialization_with_attributes():
     class ID(facho.model.Model):
         __name__ = 'ID'
