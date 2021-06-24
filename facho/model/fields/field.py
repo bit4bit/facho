@@ -19,3 +19,9 @@ class Field:
         if name not in namespaces:
             raise KeyError("namespace %s not found" % (name))
         inst._namespace_prefix = name
+
+    def _call(self, inst, method, *args):
+        call = getattr(inst, method or '', None)
+
+        if callable(call):
+            return call(*args)

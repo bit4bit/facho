@@ -165,3 +165,63 @@ def test_field_model_with_namespace():
     person = Person()
     person.id = 33
     assert '<Person xmlns:facho="http://lib.facho.cyou"><facho:ID>33</facho:ID></Person>' == person.to_xml()
+
+def test_field_hook_before_xml():
+    class Hash(facho.model.Model):
+        __name__ = 'Hash'
+        
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Model(Hash)
+
+        def __before_xml__(self):
+            self.hash = "calculate"
+            
+    person = Person()
+    assert "<Person><Hash>calculate</Hash></Person>" == person.to_xml()
+
+
+def test_field_function_with_attribute():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Function('get_hash', field=fields.Attribute('hash'))
+
+        def get_hash(self, name, field):
+            return 'calculate'
+        
+    person = Person()
+    assert '<Person hash="calculate"/>'
+
+def test_field_function():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Function('get_hash')
+
+        def get_hash(self, name):
+            return 'calculate'
+        
+    person = Person()
+    assert person.hash == 'calculate'
+    assert "<Person/>" == person.to_xml()
+    
+
+def test_field_function_setter():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Attribute('hash')
+        password = fields.Function('get_hash', setter='set_hash')
+
+        def get_hash(self, name):
+            return None
+
+        def set_hash(self, name, value):
+            self.hash = "%s+2" % (value)
+
+    person = Person()
+    person.password = 'calculate'
+    assert '<Person hash="calculate+2"/>' == person.to_xml()
+    

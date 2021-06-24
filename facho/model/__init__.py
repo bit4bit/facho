@@ -28,7 +28,18 @@ class ModelBase(object, metaclass=ModelMeta):
     def __getitem__(self, key):
         return self._xml_attributes[key]
 
+    def __before_xml__(self):
+        pass
+
+    def _hook_before_xml(self):
+        self.__before_xml__()
+        for field in self._fields.values():
+            if hasattr(field, '__before_xml__'):
+                field.__before_xml__()
+
     def to_xml(self):
+        self._hook_before_xml()
+
         tag = self.__name__
         ns = ''
         if self._namespace_prefix is not None:
