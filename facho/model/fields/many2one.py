@@ -13,15 +13,11 @@ class Many2One(Field):
         if inst is None:
             return self
         assert self.name is not None
-        return inst._fields[self.name]
+        return self._create_model(inst)
         
     def __set__(self, inst, value):
         assert self.name is not None
-        class_model = self.model
-        inst_model = class_model()
-
-        self._set_namespace(inst_model, self.namespace,  inst.__namespace__)
-        inst._fields[self.name] = inst_model
+        inst_model = self._create_model(inst, model=self.model)
 
         # si hay setter manual se ejecuta
         # de lo contrario se asigna como texto del elemento

@@ -10,20 +10,8 @@ class Model(Field):
         if inst is None:
             return self
         assert self.name is not None
-        return self._create_model(inst)
+        return self._create_model(inst, name=self.field_name)
 
     def __set__(self, inst, value):
-        obj = self._create_model(inst)
-        obj._set_content(value)
-
-    def _create_model(self, inst):
-        try:
-            return inst._fields[self.name]
-        except KeyError:
-            obj = self.model()
-            if self.field_name is not None:
-                obj.__name__ = self.field_name
-            self._set_namespace(obj, self.namespace, inst.__namespace__)
-            inst._fields[self.name] = obj
-            return obj
-            
+        obj = self._create_model(inst, name=self.field_name)
+        obj._set_content(value)            

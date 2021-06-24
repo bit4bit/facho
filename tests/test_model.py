@@ -80,6 +80,22 @@ def test_many2one_with_custom_setter():
     party.location = 99
     assert '<Party><PhysicalLocation ID="99"/></Party>' == party.to_xml()
 
+def test_many2one_auto_create():
+    class TaxAmount(facho.model.Model):
+        __name__ = 'TaxAmount'
+
+        currencyID = fields.Attribute('currencyID')
+        
+    class TaxTotal(facho.model.Model):
+        __name__ = 'TaxTotal'
+
+        amount = fields.Many2One(TaxAmount)
+
+    tax_total = TaxTotal()
+    tax_total.amount.currencyID = 'COP'
+    tax_total.amount = 3333
+    assert '<TaxTotal><TaxAmount currencyID="COP">3333</TaxAmount></TaxTotal>' == tax_total.to_xml()
+
 def test_field_model():
     class ID(facho.model.Model):
         __name__ = 'ID'
