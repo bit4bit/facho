@@ -364,3 +364,38 @@ def test_field_inserted_default_nested_many2one():
     person = Person()
     assert '<Person><ID>ole</ID></Person>' == person.to_xml()
 
+def test_model_on_change_field():
+    class Hash(facho.model.Model):
+        __name__ = 'Hash'
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        react = fields.Attribute('react')
+        hash = fields.Many2One(Hash)
+
+        @fields.on_change(['hash'])
+        def on_change_react(self, name, value):
+            assert name == 'hash'
+            self.react = "%s+4" % (value)
+
+    person = Person()
+    person.hash = 'hola'
+    assert '<Person react="hola+4"><Hash>hola</Hash></Person>' == person.to_xml()
+
+def test_model_on_change_field_attribute():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        react = fields.Attribute('react')
+        hash = fields.Attribute('Hash')
+
+        @fields.on_change(['hash'])
+        def on_change_react(self, name, value):
+            assert name == 'hash'
+            self.react = "%s+4" % (value)
+
+    person = Person()
+    person.hash = 'hola'
+    assert '<Person react="hola+4" Hash="hola"/>' == person.to_xml()
+

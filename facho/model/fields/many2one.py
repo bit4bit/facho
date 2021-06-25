@@ -25,6 +25,7 @@ class Many2One(Field):
             setter(inst_model, value)
         else:
             inst_model._set_content(value)
-
+            
+        self._changed_field(inst, self.name, value)
 
 

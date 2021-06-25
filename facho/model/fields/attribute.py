@@ -16,4 +16,6 @@ class Attribute(Field):
     def __set__(self, inst, value):
         assert self.name is not None
         self.value = value
+        
+        self._changed_field(inst, self.name, value)
         inst._set_attribute(self.name, self.attribute, value)

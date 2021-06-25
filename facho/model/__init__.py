@@ -1,4 +1,5 @@
 from .fields import Field
+from collections import defaultdict
 
 class ModelMeta(type):
     def __new__(cls, name, bases, ns):
@@ -20,6 +21,19 @@ class ModelBase(object, metaclass=ModelMeta):
         obj._fields = {}
         obj._text = ""
         obj._namespace_prefix = None
+        obj._on_change_fields = defaultdict(list)
+        
+        def on_change_fields_for_function(function_name):
+            # se recorre arbol buscando el primero
+            for parent_cls in type(obj).__mro__:
+                parent_meth = getattr(parent_cls, function_name, None)
+                if not parent_meth:
+                    continue
+                
+                on_changes = getattr(parent_meth, 'on_changes', None)
+                if on_changes:
+                    return on_changes
+            return []
 
         # forzamos registros de campos al modelo
         # al instanciar
@@ -28,7 +42,12 @@ class ModelBase(object, metaclass=ModelMeta):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
 
-
+                # register callbacks for changes
+                function_name = 'on_change_%s' % (key)
+                on_change_fields = on_change_fields_for_function(function_name)
+                for field in on_change_fields:
+                    obj._on_change_fields[field].append(function_name)
+        
         return obj
 
     def _set_attribute(self, field, name, value):

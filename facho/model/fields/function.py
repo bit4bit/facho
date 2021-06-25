@@ -31,4 +31,5 @@ class Function(Field):
 
     def __set__(self, inst, value):
         inst._set_field(self.name, self.field)
+        self._changed_field(inst, self.name, value)
         self.field.__set__(inst, value)

@@ -39,3 +39,8 @@ class Field:
             self._set_namespace(obj, self.namespace, inst.__namespace__)
             inst._fields[self.name] = obj
             return obj
+
+    def _changed_field(self, inst, name, value):
+        for fun in inst._on_change_fields[name]:
+            getattr(inst, fun)(name, value)
+            
