@@ -1,8 +1,8 @@
 from .field import Field
 
 class Attribute(Field):
-    def __init__(self, tag, default=None):
-        self.tag = tag
+    def __init__(self, name, default=None):
+        self.attribute = name
         self.value = default
         self.default = default
 
@@ -16,4 +16,4 @@ class Attribute(Field):
     def __set__(self, inst, value):
         assert self.name is not None
         self.value = value
-        inst._xml_attributes[self.name] = (self.tag, value)
+        inst._set_attribute(self.name, self.attribute, value)

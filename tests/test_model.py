@@ -326,6 +326,15 @@ def test_field_inserted_default_attribute():
     person = Person()
     assert '<Person hash="calculate"/>' == person.to_xml()
 
+def test_field_function_inserted_default_attribute():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Function(fields.Attribute('hash'), default='calculate')
+
+    person = Person()
+    assert '<Person hash="calculate"/>' == person.to_xml()
+
 def test_field_inserted_default_many2one():
     class ID(facho.model.Model):
         __name__ = 'ID'

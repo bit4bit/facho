@@ -24,12 +24,15 @@ class ModelBase(object, metaclass=ModelMeta):
         # forzamos registros de campos al modelo
         # al instanciar
         for (key, v) in type(obj).__dict__.items():
-            if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One):
+            if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
 
 
         return obj
+
+    def _set_attribute(self, field, name, value):
+        self._xml_attributes[field] = (name, value)
 
     def __setitem__(self, key, val):
         self._xml_attributes[key] = val
@@ -37,12 +40,13 @@ class ModelBase(object, metaclass=ModelMeta):
     def __getitem__(self, key):
         return self._xml_attributes[key]
 
-    def __before_xml__(self):
-        pass
+    def _get_field(self, name):
+        return self._fields[name]
 
-    def __default_set__(self, value):
-        return value
-    
+    def _set_field(self, name, field):
+        field.name = name
+        self._fields[name] = field
+
     def _set_content(self, value):
         default = self.__default_set__(value)
         if default is not None:
@@ -55,6 +59,9 @@ class ModelBase(object, metaclass=ModelMeta):
                 field.__before_xml__()
 
     def to_xml(self):
+        """
+        Genera xml del modelo y sus relaciones
+        """
         self._hook_before_xml()
 
         tag = self.__name__
@@ -85,5 +92,19 @@ class ModelBase(object, metaclass=ModelMeta):
             return "<%s%s%s>%s</%s%s>" % (ns, tag, attributes, content, ns, tag)
 
 class Model(ModelBase):
-    pass
+    def __before_xml__(self):
+        """
+        Ejecuta antes de generar el xml, este
+        metodo sirve para realizar actualizaciones
+        en los campos en el ultimo momento
+        """
+        pass
+
+    def __default_set__(self, value):
+        """
+        Al asignar un valor al modelo atraves de una relacion (person.relation = '33')
+        se puede personalizar como hacer esta asignacion.
+        """
+        return value
+
         

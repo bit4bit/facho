@@ -2,9 +2,14 @@ from .field import Field
 from .model import Model
 
 class Function(Field):
-    def __init__(self, field, getter=None):
+    """
+    Permite modificar el modelo cuando se intenta,
+    obtener el valor de este campo.
+    """
+    def __init__(self, field, getter=None, default=None):
         self.field = field
         self.getter = getter
+        self.default = default
 
     def __get__(self, inst, cls):
         if inst is None:
@@ -14,8 +19,7 @@ class Function(Field):
         # si se indica `field` se adiciona
         # como campo del modelo, esto es
         # que se serializa a xml
-        self.field.name = self.name
-        inst._fields[self.name] = self.field
+        inst._set_field(self.name, self.field)
 
         if self.getter is not None:
             value = self._call(inst, self.getter, self.name, self.field)
@@ -24,3 +28,7 @@ class Function(Field):
                 self.field.__set__(inst, value)
 
         return self.field
+
+    def __set__(self, inst, value):
+        inst._set_field(self.name, self.field)
+        self.field.__set__(inst, value)
