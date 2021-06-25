@@ -1,11 +1,12 @@
 from .field import Field
 
 class Many2One(Field):
-    def __init__(self, model, name=None, setter=None, namespace=None):
+    def __init__(self, model, name=None, setter=None, namespace=None, default=None):
         self.model = model
         self.setter = setter
         self.namespace = namespace
         self.field_name = name
+        self.default = default
 
     def __get__(self, inst, cls):
         if inst is None:

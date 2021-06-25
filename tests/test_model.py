@@ -314,3 +314,44 @@ def test_field_virtual():
     person.age = 55
     assert person.age == 55
     assert "<Person/>" == person.to_xml()
+
+
+def test_field_inserted_default_attribute():
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        hash = fields.Attribute('hash', default='calculate')
+
+
+    person = Person()
+    assert '<Person hash="calculate"/>' == person.to_xml()
+
+def test_field_inserted_default_many2one():
+    class ID(facho.model.Model):
+        __name__ = 'ID'
+
+        key = fields.Attribute('key')
+        
+        def __default_set__(self, value):
+            self.key = value
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        id = fields.Many2One(ID, default="oe")
+
+    person = Person()
+    assert '<Person><ID key="oe"/></Person>' == person.to_xml()
+
+def test_field_inserted_default_nested_many2one():
+    class ID(facho.model.Model):
+        __name__ = 'ID'
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        id = fields.Many2One(ID, default="ole")
+
+    person = Person()
+    assert '<Person><ID>ole</ID></Person>' == person.to_xml()
+

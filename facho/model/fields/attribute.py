@@ -4,6 +4,7 @@ class Attribute(Field):
     def __init__(self, tag, default=None):
         self.tag = tag
         self.value = default
+        self.default = default
 
     def __get__(self, inst, cls):
         if inst is None:

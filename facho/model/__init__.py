@@ -1,3 +1,4 @@
+from .fields import Field
 
 class ModelMeta(type):
     def __new__(cls, name, bases, ns):
@@ -19,7 +20,15 @@ class ModelBase(object, metaclass=ModelMeta):
         obj._fields = {}
         obj._text = ""
         obj._namespace_prefix = None
-        
+
+        # forzamos registros de campos al modelo
+        # al instanciar
+        for (key, v) in type(obj).__dict__.items():
+            if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One):
+                if hasattr(v, 'default') and v.default is not None:
+                    setattr(obj, key, v.default)
+
+
         return obj
 
     def __setitem__(self, key, val):
@@ -32,10 +41,12 @@ class ModelBase(object, metaclass=ModelMeta):
         pass
 
     def __default_set__(self, value):
-        return str(value)
+        return value
     
     def _set_content(self, value):
-        self._text = str(self.__default_set__(value))
+        default = self.__default_set__(value)
+        if default is not None:
+            self._text = str(default)
 
     def _hook_before_xml(self):
         self.__before_xml__()
@@ -63,7 +74,6 @@ class ModelBase(object, metaclass=ModelMeta):
 
         for name, value in self._fields.items():
             if hasattr(value, 'to_xml'):
-                print(self._fields)
                 content += value.to_xml()
             elif isinstance(value, str):
                 content += value

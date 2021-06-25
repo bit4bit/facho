@@ -14,6 +14,7 @@ class Function(Field):
         # si se indica `field` se adiciona
         # como campo del modelo, esto es
         # que se serializa a xml
+        self.field.name = self.name
         inst._fields[self.name] = self.field
 
         if self.getter is not None:
