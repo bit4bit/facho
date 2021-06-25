@@ -399,3 +399,20 @@ def test_model_on_change_field_attribute():
     person.hash = 'hola'
     assert '<Person react="hola+4" Hash="hola"/>' == person.to_xml()
 
+def test_model_one2many():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        quantity = fields.Attribute('quantity')
+        
+    class Invoice(facho.model.Model):
+        __name__ = 'Invoice'
+
+        lines = fields.One2Many(Line)
+
+    invoice = Invoice()
+    line = invoice.lines.create()
+    line.quantity = 3
+    line = invoice.lines.create()
+    line.quantity = 5
+    assert '<Invoice><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()

@@ -1,10 +1,11 @@
 from .attribute import Attribute
 from .many2one import Many2One
+from .one2many import One2Many
 from .function import Function
 from .virtual import Virtual
 from .field import Field
 
-__all__ = [Attribute, Many2One, Virtual, Field]
+__all__ = [Attribute, One2Many, Many2One, Virtual, Field]
 
 def on_change(fields):
     from functools import wraps

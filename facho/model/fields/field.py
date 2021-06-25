@@ -26,7 +26,7 @@ class Field:
         if callable(call):
             return call(*args)
 
-    def _create_model(self, inst, name=None, model=None):
+    def _create_model(self, inst, name=None, model=None, attribute=None):
         try:
             return inst._fields[self.name]
         except KeyError:
@@ -37,7 +37,12 @@ class Field:
             if name is not None:
                 obj.__name__ = name
             self._set_namespace(obj, self.namespace, inst.__namespace__)
-            inst._fields[self.name] = obj
+
+            if attribute:
+                inst._fields[attribute] = obj
+            else:
+                inst._fields[self.name] = obj
+
             return obj
 
     def _changed_field(self, inst, name, value):
