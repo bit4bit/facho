@@ -466,3 +466,26 @@ def test_model_one2many_as_list():
     for line in lines:
         assert isinstance(line, Line)
     assert '<Invoice><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()
+
+
+def test_model_attributes_order():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        quantity = fields.Attribute('quantity')
+        
+    class Invoice(facho.model.Model):
+        __name__ = 'Invoice'
+
+        line1 = fields.Many2One(Line, name='Line1')
+        line2 = fields.Many2One(Line, name='Line2')
+        line3 = fields.Many2One(Line, name='Line3')
+
+
+    invoice = Invoice()
+    invoice.line2.quantity = 2
+    invoice.line3.quantity = 3
+    invoice.line1.quantity = 1
+
+    assert '<Invoice><Line1 quantity="1"/><Line2 quantity="2"/><Line3 quantity="3"/></Invoice>' == invoice.to_xml()
+
