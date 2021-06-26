@@ -416,3 +416,29 @@ def test_model_one2many():
     line = invoice.lines.create()
     line.quantity = 5
     assert '<Invoice><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()
+
+
+def test_model_one2many_with_on_changes():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        quantity = fields.Attribute('quantity')
+        
+    class Invoice(facho.model.Model):
+        __name__ = 'Invoice'
+
+        lines = fields.One2Many(Line)
+        count = fields.Attribute('count', default=0)
+        
+        @fields.on_change(['lines'])
+        def refresh_count(self, name, value):
+            self.count = len(self.lines)
+
+    invoice = Invoice()
+    line = invoice.lines.create()
+    line.quantity = 3
+    line = invoice.lines.create()
+    line.quantity = 5
+
+    assert len(invoice.lines) == 2
+    assert '<Invoice count="2"><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()
