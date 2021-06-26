@@ -41,6 +41,9 @@ class _Relation():
     def __len__(self):
         return len(self.relations)
 
+    def __iter__(self):
+        for relation in self.relations:
+            yield relation
 
 class One2Many(Field):
     def __init__(self, model, name=None, namespace=None, default=None):

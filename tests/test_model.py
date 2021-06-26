@@ -442,3 +442,27 @@ def test_model_one2many_with_on_changes():
 
     assert len(invoice.lines) == 2
     assert '<Invoice count="2"><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()
+
+def test_model_one2many_as_list():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        quantity = fields.Attribute('quantity')
+        
+    class Invoice(facho.model.Model):
+        __name__ = 'Invoice'
+
+        lines = fields.One2Many(Line)
+
+    invoice = Invoice()
+    line = invoice.lines.create()
+    line.quantity = 3
+    line = invoice.lines.create()
+    line.quantity = 5
+
+    lines = list(invoice.lines)
+    assert len(list(invoice.lines)) == 2
+
+    for line in lines:
+        assert isinstance(line, Line)
+    assert '<Invoice><Line quantity="3"/><Line quantity="5"/></Invoice>' == invoice.to_xml()
