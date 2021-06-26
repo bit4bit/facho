@@ -19,7 +19,6 @@ class _RelationProxy():
         # algo burdo, se usa __dict__ para saltarnos el __getattr__ y generar un fallo por recursion
         for fun in self.__dict__['_inst']._on_change_fields[self.__dict__['_attribute']]:
             fun(self.__dict__['_inst'], self.__dict__['_attribute'], value)
-
         return setattr(self._obj, attr, value)
 
 class _Relation():

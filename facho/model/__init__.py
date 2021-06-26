@@ -38,10 +38,11 @@ class ModelBase(object, metaclass=ModelMeta):
         # forzamos registros de campos al modelo
         # al instanciar
         for (key, v) in type(obj).__dict__.items():
+                
             if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
-
+                
                 # register callbacks for changes
                 (fun, on_change_fields) = on_change_fields_for_function()
                 for field in on_change_fields:
@@ -97,7 +98,7 @@ class ModelBase(object, metaclass=ModelMeta):
 
         content = ""
 
-        for name, value in self._fields.items():
+        for value in self._fields.values():
             if hasattr(value, 'to_xml'):
                 content += value.to_xml()
             elif isinstance(value, str):
