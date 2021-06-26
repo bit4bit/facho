@@ -21,10 +21,8 @@ def test_simple_invoice():
 
     line = invoice.lines.create()
     line.quantity = form.Quantity(1, '94')
+    line.price = form.Amount(5_000)
     subtotal = line.taxtotal.subtotals.create()
     subtotal.percent = 19.0
-    # TODO(bit4bit) el orden de los elementos
-    # en el xml lo debe determinar la declaracion en los modelos
-    line.price = form.Amount(5_000)
 
     assert '<Invoice><ID>323200000129</ID><IssueDate>2019-01-16T10:53:10-05:00</IssueDate><IssueTime>10:5310-05:00</IssueTime><AccountingSupplierParty><Party><ID>700085371</ID></Party></AccountingSupplierParty><AccountingCustomerParty><Party><ID>800199436</ID></Party></AccountingCustomerParty><InvoiceLine><InvoiceQuantity unitCode="NAR">1.0</InvoiceQuantity><TaxTotal><TaxSubTotal><TaxCategory><Percent>19.0</Percent><TaxScheme><ID>01</ID><Name>IVA</Name></TaxScheme></TaxCategory></TaxSubTotal></TaxTotal><Price><PriceAmount currencyID="COP">5000.0</PriceAmount></Price></InvoiceLine></Invoice>' == invoice.to_xml()

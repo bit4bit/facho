@@ -22,6 +22,7 @@ class ModelBase(object, metaclass=ModelMeta):
         obj._text = ""
         obj._namespace_prefix = None
         obj._on_change_fields = defaultdict(list)
+        obj._order_fields = []
         
         def on_change_fields_for_function():
             # se recorre arbol buscando el primero
@@ -38,7 +39,9 @@ class ModelBase(object, metaclass=ModelMeta):
         # forzamos registros de campos al modelo
         # al instanciar
         for (key, v) in type(obj).__dict__.items():
-                
+            if isinstance(v, fields.Field):
+                obj._order_fields.append(key)
+
             if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
@@ -98,7 +101,17 @@ class ModelBase(object, metaclass=ModelMeta):
 
         content = ""
 
-        for value in self._fields.values():
+        ordered_fields = {}
+        for name in self._order_fields:
+            if name in self._fields:
+                ordered_fields[name] = True
+            else:
+                for key in self._fields.keys():
+                    if key.startswith(name):
+                        ordered_fields[key] = True
+
+        for name in ordered_fields.keys():
+            value = self._fields[name]
             if hasattr(value, 'to_xml'):
                 content += value.to_xml()
             elif isinstance(value, str):
