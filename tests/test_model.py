@@ -391,7 +391,7 @@ def test_model_on_change_field_attribute():
         hash = fields.Attribute('Hash')
 
         @fields.on_change(['hash'])
-        def on_change_react(self, name, value):
+        def on_react(self, name, value):
             assert name == 'hash'
             self.react = "%s+4" % (value)
 

@@ -47,5 +47,5 @@ class Field:
 
     def _changed_field(self, inst, name, value):
         for fun in inst._on_change_fields[name]:
-            getattr(inst, fun)(name, value)
+            fun(inst, name, value)
             

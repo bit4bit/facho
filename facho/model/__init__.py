@@ -23,17 +23,17 @@ class ModelBase(object, metaclass=ModelMeta):
         obj._namespace_prefix = None
         obj._on_change_fields = defaultdict(list)
         
-        def on_change_fields_for_function(function_name):
+        def on_change_fields_for_function():
             # se recorre arbol buscando el primero
             for parent_cls in type(obj).__mro__:
-                parent_meth = getattr(parent_cls, function_name, None)
-                if not parent_meth:
-                    continue
-                
-                on_changes = getattr(parent_meth, 'on_changes', None)
-                if on_changes:
-                    return on_changes
-            return []
+                for parent_attr in dir(parent_cls):
+                    parent_meth = getattr(parent_cls, parent_attr, None)
+                    if not callable(parent_meth):
+                        continue
+                    on_changes = getattr(parent_meth, 'on_changes', None)
+                    if on_changes:
+                        return (parent_meth, on_changes)
+            return (None, [])
 
         # forzamos registros de campos al modelo
         # al instanciar
@@ -43,10 +43,9 @@ class ModelBase(object, metaclass=ModelMeta):
                     setattr(obj, key, v.default)
 
                 # register callbacks for changes
-                function_name = 'on_change_%s' % (key)
-                on_change_fields = on_change_fields_for_function(function_name)
+                (fun, on_change_fields) = on_change_fields_for_function()
                 for field in on_change_fields:
-                    obj._on_change_fields[field].append(function_name)
+                    obj._on_change_fields[field].append(fun)
         
         return obj
 
