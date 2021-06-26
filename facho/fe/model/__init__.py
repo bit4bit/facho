@@ -44,6 +44,31 @@ class AccountingSupplierParty(model.Model):
     __name__ = 'AccountingSupplierParty'
 
     party = fields.Many2One(Party)
+
+class InvoicedQuantity(model.Model):
+    __name__  = 'InvoiceQuantity'
+
+    code = fields.Attribute('unitCode', default='NAR')
+
+
+class PriceAmount(model.Model):
+    __name__ = 'PriceAmount'
+
+    currency = fields.Attribute('currencyID', default='COP')
+    
+class Price(model.Model):
+    __name__ = 'Price'
+
+    amount = fields.Many2One(PriceAmount)
+
+    def __default_set__(self, value):
+        self.amount = value
+
+class InvoiceLine(model.Model):
+    __name__ = 'InvoiceLine'
+
+    quantity = fields.Many2One(InvoicedQuantity)
+    price = fields.Many2One(Price)
     
 class Invoice(model.Model):
     __name__ = 'Invoice'
@@ -57,7 +82,8 @@ class Invoice(model.Model):
 
     supplier = fields.Many2One(AccountingSupplierParty)
     customer = fields.Many2One(AccountingCustomerParty)
-    
+    lines = fields.One2Many(InvoiceLine)
+
     def set_issue(self, name, value):
         if not isinstance(value, datetime):
             raise ValueError('expected type datetime')
