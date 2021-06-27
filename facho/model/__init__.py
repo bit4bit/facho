@@ -19,7 +19,7 @@ class ModelBase(object, metaclass=ModelMeta):
         obj = super().__new__(cls, *args, **kwargs)
         obj._xml_attributes = {}
         obj._fields = {}
-        obj._text = ""
+        obj._value = None
         obj._namespace_prefix = None
         obj._on_change_fields = defaultdict(list)
         obj._order_fields = []
@@ -72,7 +72,7 @@ class ModelBase(object, metaclass=ModelMeta):
     def _set_content(self, value):
         default = self.__default_set__(value)
         if default is not None:
-            self._text = str(default)
+            self._value = default
 
     def _hook_before_xml(self):
         self.__before_xml__()
@@ -116,7 +116,9 @@ class ModelBase(object, metaclass=ModelMeta):
                 content += value.to_xml()
             elif isinstance(value, str):
                 content += value
-        content += self._text
+
+        if self._value is not None:
+            content += str(self._value)
 
         if content == "":
             return "<%s%s%s/>" % (ns, tag, attributes)

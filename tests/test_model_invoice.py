@@ -20,9 +20,21 @@ def test_simple_invoice():
     invoice.customer.party.id = '800199436'
 
     line = invoice.lines.create()
-    line.quantity = form.Quantity(1, '94')
+    line.quantity = 1
     line.price = form.Amount(5_000)
     subtotal = line.taxtotal.subtotals.create()
     subtotal.percent = 19.0
+    assert '<Invoice><ID>323200000129</ID><IssueDate>2019-01-16T10:53:10-05:00</IssueDate><IssueTime>10:5310-05:00</IssueTime><AccountingSupplierParty><Party><ID>700085371</ID></Party></AccountingSupplierParty><AccountingCustomerParty><Party><ID>800199436</ID></Party></AccountingCustomerParty><InvoiceLine><InvoicedQuantity unitCode="NAR">1</InvoicedQuantity><TaxTotal><TaxSubTotal><TaxCategory><Percent>19.0</Percent><TaxScheme><ID>01</ID><Name>IVA</Name></TaxScheme></TaxCategory></TaxSubTotal></TaxTotal><Price><PriceAmount currencyID="COP">5000.0</PriceAmount>5000.0</Price><LineExtensionAmount currencyID="COP">5000.0</LineExtensionAmount></InvoiceLine><LegalMonetaryTotal><LineExtensionAmount currencyID="COP">35000.0</LineExtensionAmount></LegalMonetaryTotal></Invoice>' == invoice.to_xml()
 
-    assert '<Invoice><ID>323200000129</ID><IssueDate>2019-01-16T10:53:10-05:00</IssueDate><IssueTime>10:5310-05:00</IssueTime><AccountingSupplierParty><Party><ID>700085371</ID></Party></AccountingSupplierParty><AccountingCustomerParty><Party><ID>800199436</ID></Party></AccountingCustomerParty><InvoiceLine><InvoiceQuantity unitCode="NAR">1.0</InvoiceQuantity><TaxTotal><TaxSubTotal><TaxCategory><Percent>19.0</Percent><TaxScheme><ID>01</ID><Name>IVA</Name></TaxScheme></TaxCategory></TaxSubTotal></TaxTotal><Price><PriceAmount currencyID="COP">5000.0</PriceAmount></Price></InvoiceLine></Invoice>' == invoice.to_xml()
+def _test_simple_invoice_cufe():
+    invoice = model.Invoice()
+    invoice.id = '323200000129'
+    invoice.issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
+    invoice.supplier.party.id = '700085371'
+    invoice.customer.party.id = '800199436'
+
+    line = invoice.lines.create()
+    line.quantity = form.Quantity(1, '94')
+    line.price = form.Amount(1_500_000)
+    subtotal = line.taxtotal.subtotals.create()
+    subtotal.percent = 19.0

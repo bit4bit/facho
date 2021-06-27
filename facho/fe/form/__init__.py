@@ -99,7 +99,7 @@ class Amount:
             return self.fromNumber(val)
         if isinstance(val, Amount):
             return val
-        raise TypeError("cant cast to amount")
+        raise TypeError("cant cast %s to amount" % (type(val)))
     
     def __add__(self, rother):
         other = self._cast(rother)
