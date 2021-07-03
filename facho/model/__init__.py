@@ -42,7 +42,7 @@ class ModelBase(object, metaclass=ModelMeta):
             if isinstance(v, fields.Field):
                 obj._order_fields.append(key)
 
-            if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function):
+            if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function) or isinstance(v, fields.Amount):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
                 

@@ -489,3 +489,20 @@ def test_model_attributes_order():
 
     assert '<Invoice><Line1 quantity="1"/><Line2 quantity="2"/><Line3 quantity="3"/></Invoice>' == invoice.to_xml()
 
+
+def test_field_amount():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        amount = fields.Amount(name='Amount', precision=0)
+        amount_as_attribute = fields.Attribute('amount')
+
+        @fields.on_change(['amount'])
+        def on_amount(self, name, value):
+            self.amount_as_attribute = self.amount
+
+    line = Line()
+    line.amount = 33
+
+    assert '<Line amount="33"/>' == line.to_xml()
+        

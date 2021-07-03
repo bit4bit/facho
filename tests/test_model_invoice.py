@@ -34,7 +34,7 @@ def _test_simple_invoice_cufe():
     invoice.customer.party.id = '800199436'
 
     line = invoice.lines.create()
-    line.quantity = form.Quantity(1, '94')
-    line.price = form.Amount(1_500_000)
+    line.quantity = 1
+    line.price = 1_500_000
     subtotal = line.taxtotal.subtotals.create()
     subtotal.percent = 19.0

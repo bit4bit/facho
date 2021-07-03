@@ -4,8 +4,9 @@ from .one2many import One2Many
 from .function import Function
 from .virtual import Virtual
 from .field import Field
+from .amount import Amount
 
-__all__ = [Attribute, One2Many, Many2One, Virtual, Field]
+__all__ = [Attribute, One2Many, Many2One, Virtual, Field, Amount]
 
 def on_change(fields):
     from functools import wraps
