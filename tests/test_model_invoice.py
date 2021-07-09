@@ -36,5 +36,8 @@ def _test_simple_invoice_cufe():
     line = invoice.lines.create()
     line.quantity = 1
     line.price = 1_500_000
-    subtotal = line.taxtotal.subtotals.create()
-    subtotal.percent = 19.0
+    line_subtotal = line.taxtotal.subtotals.create()
+    line_subtotal.percent = 19.0
+    line.subtotal.scheme = '01'
+
+    assert invoice.cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'

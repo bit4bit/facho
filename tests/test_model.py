@@ -506,3 +506,15 @@ def test_field_amount():
 
     assert '<Line amount="33"/>' == line.to_xml()
         
+
+def test_model_setup():
+    class Line(facho.model.Model):
+        __name__ = 'Line'
+
+        amount = fields.Attribute(name='amount')
+
+        def __setup__(self):
+            self.amount = 23
+
+    line = Line()
+    assert '<Line amount="23"/>' == line.to_xml()

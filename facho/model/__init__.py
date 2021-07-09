@@ -50,7 +50,9 @@ class ModelBase(object, metaclass=ModelMeta):
                 (fun, on_change_fields) = on_change_fields_for_function()
                 for field in on_change_fields:
                     obj._on_change_fields[field].append(fun)
-        
+
+
+        obj.__setup__()
         return obj
 
     def _set_attribute(self, field, name, value):
@@ -141,4 +143,8 @@ class Model(ModelBase):
         """
         return value
 
+    def __setup__(self):
+        """
+        Inicializar modelo
+        """
         

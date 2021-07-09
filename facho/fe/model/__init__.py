@@ -111,13 +111,17 @@ class TaxSubTotal(model.Model):
     tax_amount = fields.Many2One(Amount, name='TaxAmount')
     tax_category = fields.Many2One(TaxCategory)
 
-    percent = fields.Virtual(setter='set_percent')
-
-    def set_percent(self, name, value):
-        self.tax_category.percent = value
-        # TODO(bit4bit) hacer variable
-        self.tax_category.tax_scheme.id = '01'
-        self.tax_category.tax_scheme.name = 'IVA'
+    percent = fields.Virtual(setter='set_category')
+    scheme = fields.Virtual(setter='set_category')
+    def set_category(self, name, value):
+        if name == 'percent':
+            self.tax_category.percent = value
+            # TODO(bit4bit) hacer variable
+            self.tax_category.tax_scheme.id = '01'
+            self.tax_category.tax_scheme.name = 'IVA'
+        elif name == 'scheme':
+            self.tax_category.tax_scheme.id = value
+            
     
 class TaxTotal(model.Model):
     __name__ = 'TaxTotal'
@@ -185,6 +189,8 @@ class Invoice(model.Model):
     customer = fields.Many2One(AccountingCustomerParty)
     lines = fields.One2Many(InvoiceLine)
     legal_monetary_total = fields.Many2One(LegalMonetaryTotal)
+
+    cufe = fields.Virtual()
 
     @fields.on_change(['lines'])
     def update_legal_monetary_total(self, name, value):
