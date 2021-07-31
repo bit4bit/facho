@@ -1,22 +1,37 @@
 from .field import Field
+from collections import defaultdict
 
 class Many2One(Field):
-    def __init__(self, model, name=None, setter=None, namespace=None, default=None):
+    def __init__(self, model, name=None, setter=None, namespace=None, default=None, virtual=False):
         self.model = model
         self.setter = setter
         self.namespace = namespace
         self.field_name = name
         self.default = default
-
+        self.virtual = virtual
+        self.relations = defaultdict(dict)
+        
     def __get__(self, inst, cls):
         if inst is None:
             return self
         assert self.name is not None
-        return self._create_model(inst, name=self.field_name)
+
+        if self.name in self.relations:
+            value = self.relations[inst][self.name]
+        else:
+            value = self._create_model(inst, name=self.field_name)
+        self.relations[inst][self.name] = value
+
+        # se puede obtener directamente un valor indicado por el modelo
+        if hasattr(value, '__default_get__'):
+            return value.__default_get__(self.name, value)
+        else:
+            return inst.__default_get__(self.name, value)
         
     def __set__(self, inst, value):
         assert self.name is not None
         inst_model = self._create_model(inst, name=self.field_name, model=self.model)
+        self.relations[inst][self.name] = inst_model
 
         # si hay setter manual se ejecuta
         # de lo contrario se asigna como texto del elemento

@@ -1,8 +1,12 @@
 import facho.model as model
 import facho.model.fields as fields
 import facho.fe.form as form
+from facho import fe
+
 from datetime import date, datetime
+from collections import defaultdict
 from copy import copy
+import hashlib
 
 class Name(model.Model):
     __name__ = 'Name'
@@ -16,6 +20,9 @@ class Date(model.Model):
         if isinstance(value, date):
             return value.isoformat()
 
+    def __str__(self):
+        return str(self._value)
+
 class Time(model.Model):
     __name__ = 'Time'
 
@@ -23,7 +30,10 @@ class Time(model.Model):
         if isinstance(value, str):
             return value
         if isinstance(value, date):
-            return value.strftime('%H:%M%S-05:00')
+            return value.strftime('%H:%M:%S-05:00')
+
+    def __str__(self):
+        return str(self._value)
 
 class InvoicePeriod(model.Model):
     __name__ = 'InvoicePeriod'
@@ -34,6 +44,9 @@ class InvoicePeriod(model.Model):
 
 class ID(model.Model):
     __name__ = 'ID'
+
+    def __str__(self):
+        return str(self._value)
 
 class Party(model.Model):
     __name__ = 'Party'
@@ -63,22 +76,36 @@ class Quantity(model.Model):
     def __mul__(self, other):
         return form.Amount(self.value) * other.value
 
+    def __add__(self, other):
+        return form.Amount(self.value) + other.value
 
 class Amount(model.Model):
     __name__ = 'Amount'
 
     currency = fields.Attribute('currencyID', default='COP')
-    value = fields.Virtual(default=form.Amount(0), update_internal=True)
+    value = fields.Amount(name='amount', default=0.00, precision=2)
 
     def __default_set__(self, value):
         self.value = value
         return value
 
+    def __default__get__(self, value):
+        return value
+
+    def __str__(self):
+        return str(self.value)
+
+    def __add__(self, other):
+        if isinstance(other, form.Amount):
+            return self.value + other
+
+        return self.value + other.value
+
 class Price(model.Model):
     __name__ = 'Price'
 
     amount = fields.Many2One(Amount, name='PriceAmount')
-    value = fields.Virtual(default=form.Amount(0))
+    value = fields.Amount(0.0)
     
     def __default_set__(self, value):
         self.amount = value
@@ -101,32 +128,40 @@ class TaxScheme(model.Model):
 class TaxCategory(model.Model):
     __name__ = 'TaxCategory'
 
-    percent = fields.Many2One(Percent, default='19.0')
+    percent = fields.Many2One(Percent)
     tax_scheme = fields.Many2One(TaxScheme)
     
 class TaxSubTotal(model.Model):
     __name__ = 'TaxSubTotal'
 
-    taxable_amount = fields.Many2One(Amount, name='TaxableAmount')
-    tax_amount = fields.Many2One(Amount, name='TaxAmount')
+    taxable_amount = fields.Many2One(Amount, name='TaxableAmount', default=0.00)
+    tax_amount = fields.Many2One(Amount, name='TaxAmount', default=0.00)
+    tax_percent = fields.Many2One(Percent)
     tax_category = fields.Many2One(TaxCategory)
 
-    percent = fields.Virtual(setter='set_category')
-    scheme = fields.Virtual(setter='set_category')
+    percent = fields.Virtual(setter='set_category', getter='get_category')
+    scheme = fields.Virtual(setter='set_category', getter='get_category')
+
     def set_category(self, name, value):
         if name == 'percent':
             self.tax_category.percent = value
-            # TODO(bit4bit) hacer variable
-            self.tax_category.tax_scheme.id = '01'
-            self.tax_category.tax_scheme.name = 'IVA'
+            # TODO(bit4bit) debe variar en conjunto?
+            self.tax_percent = value
         elif name == 'scheme':
             self.tax_category.tax_scheme.id = value
-            
-    
+
+        return value
+
+    def get_category(self, name, value):
+        if name == 'percent':
+            return value
+        elif name == 'scheme':
+            return self.tax_category.tax_scheme
+
 class TaxTotal(model.Model):
     __name__ = 'TaxTotal'
 
-    tax_amount = fields.Many2One(Amount, name='TaxAmount')
+    tax_amount = fields.Many2One(Amount, name='TaxAmount', default=0.00)
     subtotals = fields.One2Many(TaxSubTotal)
 
 
@@ -142,6 +177,17 @@ class AllowanceCharge(model.Model):
     def isDiscount(self):
         return self.is_discount == True
 
+class TaxScheme:
+    pass
+
+class TaxIva(TaxScheme):
+    def __init__(self, percent):
+        self.scheme = '01'
+        self.percent = percent
+
+    def calculate(self, amount):
+        return form.Amount(amount) * form.Amount(self.percent / 100)
+    
 class InvoiceLine(model.Model):
     __name__ = 'InvoiceLine'
 
@@ -150,6 +196,26 @@ class InvoiceLine(model.Model):
     price = fields.Many2One(Price)
     amount = fields.Many2One(Amount, name='LineExtensionAmount')
     allowance_charge = fields.One2Many(AllowanceCharge)
+    tax_amount = fields.Virtual(getter='get_tax_amount')
+    
+    def __setup__(self):
+        self._taxs = defaultdict(list)
+        self._subtotals = {
+            '01': self.taxtotal.subtotals.create()
+        }
+        self._subtotals['01'].scheme = '01'
+
+    def get_tax_amount(self, name, value):
+        total = form.Amount(0)
+        for (scheme, subtotal) in self._subtotals.items():
+            total += subtotal.tax_amount.value
+        return total
+
+    def add_tax(self, tax):
+        if not isinstance(tax, TaxScheme):
+            raise ValueError('tax expected TaxScheme')
+
+        self._taxs[tax.scheme].append(tax)
 
     @fields.on_change(['price', 'quantity'])
     def update_amount(self, name, value):
@@ -165,19 +231,38 @@ class InvoiceLine(model.Model):
 
         total = self.quantity  * self.price
         self.amount = total + charge - discount
+        for (scheme, subtotal) in self._subtotals.items():
+            subtotal.tax_amount.value = 0
+
+        for (scheme, taxes) in self._taxs.items():
+            for tax in taxes:
+                self._subtotals[scheme].tax_amount += tax.calculate(self.amount.value)
 
 class LegalMonetaryTotal(model.Model):
     __name__ = 'LegalMonetaryTotal'
 
-    line_extension_amount = fields.Many2One(Amount, name='LineExtensionAmount', default=form.Amount(0))
-    tax_exclusive_amount = fields.Many2One(Amount, name='TaxExclusiveAmount')
-    tax_inclusive_amount = fields.Many2One(Amount, name='TaxInclusiveAmount')
-    charge_total_amount = fields.Many2One(Amount, name='ChargeTotalAmount')
-    payable_amount = fields.Many2One(Amount, name='PayableAmount')
+    line_extension_amount = fields.Many2One(Amount, name='LineExtensionAmount', default=0)
+
+    tax_exclusive_amount = fields.Many2One(Amount, name='TaxExclusiveAmount', default=form.Amount(0))
+    tax_inclusive_amount = fields.Many2One(Amount, name='TaxInclusiveAmount', default=form.Amount(0))
+    charge_total_amount = fields.Many2One(Amount, name='ChargeTotalAmount', default=form.Amount(0))
+    payable_amount = fields.Many2One(Amount, name='PayableAmount', default=form.Amount(0))
+
+    @fields.on_change(['tax_inclusive_amount', 'charge_total'])
+    def update_payable_amount(self, name, value):
+        self.payable_amount = self.tax_inclusive_amount.value + self.charge_total_amount.value
     
+class Technical(model.Model):
+    __name__ = 'Technical'
+
+    token = fields.Virtual(default='')
+    environment = fields.Virtual(default=fe.AMBIENTE_PRODUCCION)
+
 class Invoice(model.Model):
     __name__ = 'Invoice'
 
+    technical = fields.Many2One(Technical, virtual=True)
+    
     id = fields.Many2One(ID)
     issue = fields.Virtual(setter='set_issue')
     issue_date = fields.Many2One(Date, name='IssueDate')
@@ -189,16 +274,83 @@ class Invoice(model.Model):
     customer = fields.Many2One(AccountingCustomerParty)
     lines = fields.One2Many(InvoiceLine)
     legal_monetary_total = fields.Many2One(LegalMonetaryTotal)
+    
+    taxtotal_01 = fields.Many2One(TaxTotal)
+    taxtotal_04 = fields.Many2One(TaxTotal)
+    taxtotal_03 = fields.Many2One(TaxTotal)
 
-    cufe = fields.Virtual()
+    cufe = fields.Virtual(getter='calculate_cufe')
+
+    _subtotal_01 = fields.Virtual()
+    _subtotal_04 = fields.Virtual()
+    _subtotal_03 = fields.Virtual()
+
+    def __setup__(self):
+        # Se requieren minimo estos impuestos para
+        # validar el cufe
+        self._subtotal_01 = self.taxtotal_01.subtotals.create()
+        self._subtotal_01.scheme = '01'
+        self._subtotal_01.percent = 19.0
+
+        self._subtotal_04 = self.taxtotal_04.subtotals.create()
+        self._subtotal_04.scheme = '04'
+        
+        self._subtotal_03 = self.taxtotal_03.subtotals.create()
+        self._subtotal_03.scheme = '03'
+
+    def calculate_cufe(self, name, value):
+
+        valor_bruto = self.legal_monetary_total.line_extension_amount.value
+        valor_total_pagar = self.legal_monetary_total.payable_amount.value
+
+        valor_impuesto_01 = form.Amount(0.0)
+        valor_impuesto_04 = form.Amount(0.0)
+        valor_impuesto_03 = form.Amount(0.0)
+
+        for line in self.lines:
+            for subtotal in line.taxtotal.subtotals:
+                scheme_id = subtotal.scheme
+                if str(subtotal.scheme.id) == '01':
+                    valor_impuesto_01 += subtotal.tax_amount.value
+                elif subtotal.scheme.id == '04':
+                    valor_impuesto_04 += subtotal.tax_amount.value
+                elif subtotal.scheme.id == '03':
+                    valor_impuesto_03 += subtotal.tax_amount.value
+
+
+
+        pattern = [
+            '%s' % str(self.id),
+            '%s' % str(self.issue_date),
+            '%s' % str(self.issue_time),
+            valor_bruto.truncate_as_string(2),
+            '01', valor_impuesto_01.truncate_as_string(2),
+            '04', valor_impuesto_04.truncate_as_string(2),
+            '03', valor_impuesto_03.truncate_as_string(2),
+            valor_total_pagar.truncate_as_string(2),
+            str(self.supplier.party.id),
+            str(self.customer.party.id),
+            str(self.technical.token),
+            str(self.technical.environment)
+        ]
+
+        cufe = "".join(pattern)
+        h = hashlib.sha384()
+        h.update(cufe.encode('utf-8'))
+        return h.hexdigest()
 
     @fields.on_change(['lines'])
     def update_legal_monetary_total(self, name, value):
+        self.legal_monetary_total.line_extension_amount.value = 0
+        self.legal_monetary_total.tax_inclusive_amount.value = 0
+
         for line in self.lines:
             self.legal_monetary_total.line_extension_amount.value += line.amount.value
-            
+            self.legal_monetary_total.tax_inclusive_amount += line.amount.value + line.tax_amount
+            print("update legal monetary %s" % (str(line.amount.value)))
+
     def set_issue(self, name, value):
         if not isinstance(value, datetime):
             raise ValueError('expected type datetime')
-        self.issue_date = value
+        self.issue_date = value.date()
         self.issue_time = value

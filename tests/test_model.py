@@ -494,7 +494,7 @@ def test_field_amount():
     class Line(facho.model.Model):
         __name__ = 'Line'
 
-        amount = fields.Amount(name='Amount', precision=0)
+        amount = fields.Amount(name='Amount', precision=1)
         amount_as_attribute = fields.Attribute('amount')
 
         @fields.on_change(['amount'])
@@ -504,7 +504,7 @@ def test_field_amount():
     line = Line()
     line.amount = 33
 
-    assert '<Line amount="33"/>' == line.to_xml()
+    assert '<Line amount="33.0"/>' == line.to_xml()
         
 
 def test_model_setup():

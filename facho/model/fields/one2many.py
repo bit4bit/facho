@@ -1,4 +1,5 @@
 from .field import Field
+from collections import defaultdict
 
 # TODO(bit4bit) lograr que isinstance se aplique
 # al objeto envuelto
@@ -51,7 +52,7 @@ class One2Many(Field):
         self.field_name = name
         self.namespace = namespace
         self.default = default
-        self.relation = None
+        self.relation = {}
         
     def __get__(self, inst, cls):
         assert self.name is not None
@@ -59,8 +60,8 @@ class One2Many(Field):
         def creator(attribute):
             return self._create_model(inst, name=self.field_name, model=self.model, attribute=attribute)
         
-        if self.relation:
-            return self.relation
+        if inst in self.relation:
+            return self.relation[inst]
         else:
-            self.relation = _Relation(creator, inst, self.name)
-            return self.relation
+            self.relation[inst] = _Relation(creator, inst, self.name)
+            return self.relation[inst]

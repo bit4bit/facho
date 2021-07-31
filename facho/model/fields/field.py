@@ -1,6 +1,7 @@
 class Field:
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name, virtual=False):
         self.name = name
+        self.virtual = virtual
 
     def __get__(self, inst, cls):
         if inst is None:

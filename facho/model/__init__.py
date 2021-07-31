@@ -25,7 +25,7 @@ class ModelBase(object, metaclass=ModelMeta):
         obj._order_fields = []
         
         def on_change_fields_for_function():
-            # se recorre arbol buscando el primero
+            # se recorre arbol de herencia buscando attributo on_changes
             for parent_cls in type(obj).__mro__:
                 for parent_attr in dir(parent_cls):
                     parent_meth = getattr(parent_cls, parent_attr, None)
@@ -114,6 +114,10 @@ class ModelBase(object, metaclass=ModelMeta):
 
         for name in ordered_fields.keys():
             value = self._fields[name]
+            # al ser virtual no adicinamos al arbol xml
+            if hasattr(value, 'virtual') and value.virtual:
+                continue
+
             if hasattr(value, 'to_xml'):
                 content += value.to_xml()
             elif isinstance(value, str):
@@ -140,6 +144,12 @@ class Model(ModelBase):
         """
         Al asignar un valor al modelo atraves de una relacion (person.relation = '33')
         se puede personalizar como hacer esta asignacion.
+        """
+        return value
+
+    def __default_get__(self, name, value):
+        """
+        Retorno de valor por defecto
         """
         return value
 

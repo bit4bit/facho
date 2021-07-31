@@ -54,8 +54,8 @@ class AmountCollection(Collection):
         return total
 
 class Amount:
-    def __init__(self, amount: int or float or str or Amount, currency: Currency = Currency('COP')):
-
+    def __init__(self, amount: int or float or str or Amount, currency: Currency = Currency('COP'), precision = DECIMAL_PRECISION):
+        self.precision = precision
         #DIAN 1.7.-2020: 1.2.3.1
         if isinstance(amount, Amount):
             if amount < Amount(0.0):
@@ -67,7 +67,7 @@ class Amount:
             if float(amount) < 0:
                 raise ValueError('amount must be positive >= 0')
 
-            self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION,
+            self.amount = Decimal(amount, decimal.Context(prec=self.precision,
                                                           #DIAN 1.7.-2020: 1.2.1.1
                                                           rounding=decimal.ROUND_HALF_EVEN ))
             self.currency = currency
@@ -87,18 +87,21 @@ class Amount:
     def __lt__(self, other):
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
-        return round(self.amount, DECIMAL_PRECISION) < round(other, 2)
+        return round(self.amount, self.precision) < round(other, 2)
 
     def __eq__(self, other):
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
-        return round(self.amount, DECIMAL_PRECISION) == round(other.amount, DECIMAL_PRECISION)
+        return round(self.amount, self.precision) == round(other.amount, self.precision)
 
     def _cast(self, val):
         if type(val) in [int, float]:
             return self.fromNumber(val)
         if isinstance(val, Amount):
             return val
+        if isinstance(val, Decimal):
+            return self.fromNumber(float(val))
+
         raise TypeError("cant cast %s to amount" % (type(val)))
     
     def __add__(self, rother):
