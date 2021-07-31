@@ -25,8 +25,10 @@ class Many2One(Field):
         # se puede obtener directamente un valor indicado por el modelo
         if hasattr(value, '__default_get__'):
             return value.__default_get__(self.name, value)
-        else:
+        elif hasattr(inst, '__default_get__'):
             return inst.__default_get__(self.name, value)
+        else:
+            return value
         
     def __set__(self, inst, value):
         assert self.name is not None

@@ -52,6 +52,7 @@ class ModelBase(object, metaclass=ModelMeta):
                     obj._on_change_fields[field].append(fun)
 
 
+        # post inicializacion del objeto
         obj.__setup__()
         return obj
 
@@ -76,17 +77,17 @@ class ModelBase(object, metaclass=ModelMeta):
         if default is not None:
             self._value = default
 
-    def _hook_before_xml(self):
-        self.__before_xml__()
-        for field in self._fields.values():
-            if hasattr(field, '__before_xml__'):
-                field.__before_xml__()
-
     def to_xml(self):
         """
         Genera xml del modelo y sus relaciones
         """
-        self._hook_before_xml()
+        def _hook_before_xml():
+            self.__before_xml__()
+            for field in self._fields.values():
+                if hasattr(field, '__before_xml__'):
+                    field.__before_xml__()
+                    
+        _hook_before_xml()
 
         tag = self.__name__
         ns = ''
@@ -149,6 +150,7 @@ class Model(ModelBase):
 
     def __default_get__(self, name, value):
         """
+        Al obtener el valor atraves de una relacion (age = person.age)
         Retorno de valor por defecto
         """
         return value

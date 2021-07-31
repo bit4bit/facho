@@ -13,12 +13,21 @@ class _RelationProxy():
         if (name in self.__dict__):
             return self.__dict__[name]
 
-        return getattr(self.__dict__['_obj'], name)
+        rel = getattr(self.__dict__['_obj'], name)
+        if hasattr(rel, '__default_get__'):
+            return rel.__default_get__(name, rel)
+
+        return rel
 
     def __setattr__(self, attr, value):
         # TODO(bit4bit) hacemos proxy al sistema de notificacion de cambios
-        # algo burdo, se usa __dict__ para saltarnos el __getattr__ y generar un fallo por recursion
-        response = setattr(self._obj, attr, value)
+        # algo burdo, se usa __dict__ para saltarnos el __getattr__ y evitar un fallo por recursion
+        rel = getattr(self.__dict__['_obj'], attr)
+        if hasattr(rel, '__default_set__'):
+            response = setattr(self._obj, attr, rel.__default_set__(value))
+        else:
+            response = setattr(self._obj, attr, value)
+
         for fun in self.__dict__['_inst']._on_change_fields[self.__dict__['_attribute']]:
             fun(self.__dict__['_inst'], self.__dict__['_attribute'], value)
         return response

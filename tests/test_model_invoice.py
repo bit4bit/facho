@@ -29,16 +29,17 @@ def _test_simple_invoice():
 
 
 def test_simple_invoice_cufe():
+    token = '693ff6f2a553c3646a063436fd4dd9ded0311471'
+    environment = fe.AMBIENTE_PRODUCCION
+
     invoice = model.Invoice()
-    invoice.technical.token = '693ff6f2a553c3646a063436fd4dd9ded0311471'
-    invoice.technical.environment = fe.AMBIENTE_PRODUCCION
     invoice.id = '323200000129'
     invoice.issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
     invoice.supplier.party.id = '700085371'
     invoice.customer.party.id = '800199436'
 
     line = invoice.lines.create()
-    line.add_tax(model.TaxIva(19.0))
+    line.add_tax(model.Taxes.Iva(19.0))
 
     # TODO(bit4bit) acoplamiento temporal
     # se debe crear primero el subotatl
@@ -46,4 +47,4 @@ def test_simple_invoice_cufe():
     line.quantity = 1
     line.price = 1_500_000
 
-    assert invoice.cufe == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
+    assert invoice.cufe(token, environment) == '8bb918b19ba22a694f1da11c643b5e9de39adf60311cf179179e9b33381030bcd4c3c3f156c506ed5908f9276f5bd9b4'
