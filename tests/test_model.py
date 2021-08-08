@@ -195,6 +195,58 @@ def test_model_with_xml_namespace_nested():
     person.id = 33
     assert '<Person xmlns:facho="http://lib.facho.cyou"><facho:ID>33</facho:ID></Person>' == person.to_xml()
 
+def test_model_with_xml_namespace_nested_nested():
+    class ID(facho.model.Model):
+        __name__ = 'ID'
+        
+    class Party(facho.model.Model):
+        __name__ = 'Party'
+
+        id = fields.Many2One(ID, namespace='party')
+
+        def __default_set__(self, value):
+            self.id = value
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+        __namespace__ = {
+            'person': 'http://lib.facho.cyou',
+            'party': 'http://lib.facho.cyou'
+        }
+
+        id = fields.Many2One(Party, namespace='person')
+        
+    person = Person()
+    person.id = 33
+    assert '<Person xmlns:person="http://lib.facho.cyou" xmlns:party="http://lib.facho.cyou"><person:Party><party:ID>33</party:ID></person:Party></Person>' == person.to_xml()
+
+def test_model_with_xml_namespace_nested_one_many():
+    class Name(facho.model.Model):
+        __name__ = 'Name'
+
+    class Contact(facho.model.Model):
+        __name__ = 'Contact'
+
+        name = fields.Many2One(Name, namespace='contact')
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+        __namespace__ = {
+            'facho': 'http://lib.facho.cyou',
+            'contact': 'http://lib.facho.cyou'
+        }
+
+        contacts = fields.One2Many(Contact, namespace='facho')
+        
+    person = Person()
+    contact = person.contacts.create()
+    contact.name = 'contact1'
+
+    contact = person.contacts.create()
+    contact.name = 'contact2'
+
+    assert '<Person xmlns:facho="http://lib.facho.cyou" xmlns:contact="http://lib.facho.cyou"><facho:Contact><contact:Name>contact1</contact:Name></facho:Contact><facho:Contact><contact:Name>contact2</contact:Name></facho:Contact></Person>' == person.to_xml()
+
 def test_field_model_with_namespace():
     class ID(facho.model.Model):
         __name__ = 'ID'

@@ -67,7 +67,7 @@ class One2Many(Field):
         assert self.name is not None
 
         def creator(attribute):
-            return self._create_model(inst, name=self.field_name, model=self.model, attribute=attribute)
+            return self._create_model(inst, name=self.field_name, model=self.model, attribute=attribute, namespace=self.namespace)
         
         if inst in self.relation:
             return self.relation[inst]

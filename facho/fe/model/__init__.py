@@ -38,9 +38,9 @@ class Time(model.Model):
 class InvoicePeriod(model.Model):
     __name__ = 'InvoicePeriod'
 
-    start_date = fields.Many2One(Date, name='StartDate')
+    start_date = fields.Many2One(Date, name='StartDate', namespace='cbc')
 
-    end_date = fields.Many2One(Date, name='EndDate')
+    end_date = fields.Many2One(Date, name='EndDate', namespace='cbc')
 
 class ID(model.Model):
     __name__ = 'ID'
@@ -51,15 +51,27 @@ class ID(model.Model):
     def __str__(self):
         return str(self._value)
 
+class PartyTaxScheme(model.Model):
+    __name__ = 'PartyTaxScheme'
+
+    company_id = fields.Many2One(ID, name='CompanyID', namespace='cbc')
+    tax_level_code = fields.Many2One(ID, name='TaxLevelCode', namespace='cbc', default='ZZ')
+    
 class Party(model.Model):
     __name__ = 'Party'
 
-    id = fields.Many2One(ID)
+    id = fields.Virtual(setter='set_id')
+
+    tax_scheme = fields.Many2One(PartyTaxScheme, namespace='cac')
+
+    def set_id(self, name, value):
+        self.tax_scheme.company_id = value
+        return value
 
 class AccountingCustomerParty(model.Model):
     __name__ = 'AccountingCustomerParty'
 
-    party = fields.Many2One(Party)
+    party = fields.Many2One(Party, namespace='cac')
 
 class AccountingSupplierParty(model.Model):
     __name__ = 'AccountingSupplierParty'
@@ -100,7 +112,7 @@ class Amount(model.Model):
 class Price(model.Model):
     __name__ = 'Price'
 
-    amount = fields.Many2One(Amount, name='PriceAmount')
+    amount = fields.Many2One(Amount, name='PriceAmount', namespace='cbc')
     
     def __default_set__(self, value):
         self.amount = value
@@ -115,14 +127,14 @@ class Percent(model.Model):
 class TaxScheme(model.Model):
     __name__ = 'TaxScheme'
 
-    id = fields.Many2One(ID)
-    name= fields.Many2One(Name)
+    id = fields.Many2One(ID, namespace='cbc')
+    name= fields.Many2One(Name, namespace='cbc')
 
 class TaxCategory(model.Model):
     __name__ = 'TaxCategory'
 
-    percent = fields.Many2One(Percent)
-    tax_scheme = fields.Many2One(TaxScheme)
+    percent = fields.Many2One(Percent, namespace='cbc')
+    tax_scheme = fields.Many2One(TaxScheme, namespace='cac')
     
 class TaxSubTotal(model.Model):
     __name__ = 'TaxSubTotal'
@@ -154,14 +166,14 @@ class TaxSubTotal(model.Model):
 class TaxTotal(model.Model):
     __name__ = 'TaxTotal'
 
-    tax_amount = fields.Many2One(Amount, name='TaxAmount', default=0.00)
-    subtotals = fields.One2Many(TaxSubTotal)
+    tax_amount = fields.Many2One(Amount, name='TaxAmount', namespace='cbc', default=0.00)
+    subtotals = fields.One2Many(TaxSubTotal, namespace='cac')
 
 
 class AllowanceCharge(model.Model):
     __name__ = 'AllowanceCharge'
 
-    amount = fields.Many2One(Amount)
+    amount = fields.Many2One(Amount, namespace='cbc')
     is_discount = fields.Virtual(default=False)
     
     def isCharge(self):
@@ -186,11 +198,12 @@ class Taxes:
 class InvoiceLine(model.Model):
     __name__ = 'InvoiceLine'
 
-    quantity = fields.Many2One(Quantity, name='InvoicedQuantity')
-    taxtotal = fields.Many2One(TaxTotal)
-    price = fields.Many2One(Price)
-    amount = fields.Many2One(Amount, name='LineExtensionAmount')
-    allowance_charge = fields.One2Many(AllowanceCharge)
+    id = fields.Many2One(ID, namespace='cbc')
+    quantity = fields.Many2One(Quantity, name='InvoicedQuantity', namespace='cbc')
+    taxtotal = fields.Many2One(TaxTotal, namespace='cac')
+    price = fields.Many2One(Price, namespace='cac')
+    amount = fields.Many2One(Amount, name='LineExtensionAmount', namespace='cbc')
+    allowance_charge = fields.One2Many(AllowanceCharge, 'cac')
     tax_amount = fields.Virtual(getter='get_tax_amount')
     
     def __setup__(self):
@@ -242,12 +255,12 @@ class InvoiceLine(model.Model):
 class LegalMonetaryTotal(model.Model):
     __name__ = 'LegalMonetaryTotal'
 
-    line_extension_amount = fields.Many2One(Amount, name='LineExtensionAmount', default=0)
+    line_extension_amount = fields.Many2One(Amount, name='LineExtensionAmount', namespace='cbc', default=0)
 
-    tax_exclusive_amount = fields.Many2One(Amount, name='TaxExclusiveAmount', default=form.Amount(0))
-    tax_inclusive_amount = fields.Many2One(Amount, name='TaxInclusiveAmount', default=form.Amount(0))
-    charge_total_amount = fields.Many2One(Amount, name='ChargeTotalAmount', default=form.Amount(0))
-    payable_amount = fields.Many2One(Amount, name='PayableAmount', default=form.Amount(0))
+    tax_exclusive_amount = fields.Many2One(Amount, name='TaxExclusiveAmount', namespace='cbc', default=form.Amount(0))
+    tax_inclusive_amount = fields.Many2One(Amount, name='TaxInclusiveAmount', namespace='cbc', default=form.Amount(0))
+    charge_total_amount = fields.Many2One(Amount, name='ChargeTotalAmount', namespace='cbc', default=form.Amount(0))
+    payable_amount = fields.Many2One(Amount, name='PayableAmount', namespace='cbc', default=form.Amount(0))
 
     @fields.on_change(['tax_inclusive_amount', 'charge_total'])
     def update_payable_amount(self, name, value):
@@ -255,18 +268,27 @@ class LegalMonetaryTotal(model.Model):
 
 class Invoice(model.Model):
     __name__ = 'Invoice'
-
-    id = fields.Many2One(ID)
-    issue = fields.Virtual(setter='set_issue')
-    issue_date = fields.Many2One(Date, name='IssueDate')
-    issue_time = fields.Many2One(Time, name='IssueTime')
+    __namespace__ = {
+        'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
+        'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
+        'cdt': 'urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1',
+        'ext': 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
+        'sts': 'http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures',
+        'xades': 'http://uri.etsi.org/01903/v1.3.2#',
+        'ds': 'http://www.w3.org/2000/09/xmldsig#'
+    }
     
-    period = fields.Many2One(InvoicePeriod)
+    id = fields.Many2One(ID, namespace='cbc')
+    issue = fields.Virtual(setter='set_issue')
+    issue_date = fields.Many2One(Date, name='IssueDate', namespace='cbc')
+    issue_time = fields.Many2One(Time, name='IssueTime', namespace='cbc')
+    
+    period = fields.Many2One(InvoicePeriod, namespace='cac')
 
-    supplier = fields.Many2One(AccountingSupplierParty)
-    customer = fields.Many2One(AccountingCustomerParty)
-    lines = fields.One2Many(InvoiceLine)
-    legal_monetary_total = fields.Many2One(LegalMonetaryTotal)
+    supplier = fields.Many2One(AccountingSupplierParty, namespace='cac')
+    customer = fields.Many2One(AccountingCustomerParty, namespace='cac')
+    lines = fields.One2Many(InvoiceLine, namespace='cac')
+    legal_monetary_total = fields.Many2One(LegalMonetaryTotal, namespace='cac')
     
     taxtotal_01 = fields.Many2One(TaxTotal)
     taxtotal_04 = fields.Many2One(TaxTotal)
