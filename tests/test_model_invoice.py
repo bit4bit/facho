@@ -13,8 +13,15 @@ import facho.fe.model as model
 import facho.fe.form as form
 from facho import fe
 
-def _test_simple_invoice():
+def test_simple_invoice():
     invoice = model.Invoice()
+    invoice.dian.software_security_code = '12345'
+    invoice.dian.software_provider.provider_id = 'provider-id'
+    invoice.dian.software_provider.software_id = 'facho'
+    invoice.dian.control.prefix = 'SETP'
+    invoice.dian.control.from_range =  '1000'
+    invoice.dian.control.to_range = '1000'
+
     invoice.id = '323200000129'
     invoice.issue = datetime.strptime('2019-01-16 10:53:10-05:00', '%Y-%m-%d %H:%M:%S%z')
     invoice.supplier.party.id = '700085371'

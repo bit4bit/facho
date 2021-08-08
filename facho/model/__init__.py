@@ -45,7 +45,9 @@ class ModelBase(object, metaclass=ModelMeta):
             if isinstance(v, fields.Attribute) or isinstance(v, fields.Many2One) or isinstance(v, fields.Function) or isinstance(v, fields.Amount):
                 if hasattr(v, 'default') and v.default is not None:
                     setattr(obj, key, v.default)
-                
+                if hasattr(v, 'create') and v.create == True:
+                    setattr(obj, key, '')
+
                 # register callbacks for changes
                 (fun, on_change_fields) = on_change_fields_for_function()
                 for field in on_change_fields:

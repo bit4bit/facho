@@ -2,54 +2,14 @@ import facho.model as model
 import facho.model.fields as fields
 import facho.fe.form as form
 from facho import fe
+from .common import *
+from . import dian
 
 from datetime import date, datetime
 from collections import defaultdict
 from copy import copy
 import hashlib
 
-class Name(model.Model):
-    __name__ = 'Name'
-
-class Date(model.Model):
-    __name__ = 'Date'
-
-    def __default_set__(self, value):
-        if isinstance(value, str):
-            return value
-        if isinstance(value, date):
-            return value.isoformat()
-
-    def __str__(self):
-        return str(self._value)
-
-class Time(model.Model):
-    __name__ = 'Time'
-
-    def __default_set__(self, value):
-        if isinstance(value, str):
-            return value
-        if isinstance(value, date):
-            return value.strftime('%H:%M:%S-05:00')
-
-    def __str__(self):
-        return str(self._value)
-
-class InvoicePeriod(model.Model):
-    __name__ = 'InvoicePeriod'
-
-    start_date = fields.Many2One(Date, name='StartDate', namespace='cbc')
-
-    end_date = fields.Many2One(Date, name='EndDate', namespace='cbc')
-
-class ID(model.Model):
-    __name__ = 'ID'
-
-    def __default_get__(self, name, value):
-        return self._value
-
-    def __str__(self):
-        return str(self._value)
 
 class PartyTaxScheme(model.Model):
     __name__ = 'PartyTaxScheme'
@@ -139,10 +99,10 @@ class TaxCategory(model.Model):
 class TaxSubTotal(model.Model):
     __name__ = 'TaxSubTotal'
 
-    taxable_amount = fields.Many2One(Amount, name='TaxableAmount', default=0.00)
-    tax_amount = fields.Many2One(Amount, name='TaxAmount', default=0.00)
-    tax_percent = fields.Many2One(Percent)
-    tax_category = fields.Many2One(TaxCategory)
+    taxable_amount = fields.Many2One(Amount, name='TaxableAmount', namespace='cbc', default=0.00)
+    tax_amount = fields.Many2One(Amount, name='TaxAmount', namespace='cbc', default=0.00)
+    tax_percent = fields.Many2One(Percent, namespace='cbc')
+    tax_category = fields.Many2One(TaxCategory, namespace='cac')
 
     percent = fields.Virtual(setter='set_category', getter='get_category')
     scheme = fields.Virtual(setter='set_category', getter='get_category')
@@ -266,6 +226,28 @@ class LegalMonetaryTotal(model.Model):
     def update_payable_amount(self, name, value):
         self.payable_amount = self.tax_inclusive_amount + self.charge_total_amount
 
+
+class DIANExtension(model.Model):
+    __name__ = 'UBLExtension'
+
+    _content = fields.Many2One(Element, name='ExtensionContent', namespace='ext')
+
+    dian = fields.Many2One(dian.DianExtensions, name='DianExtensions', namespace='sts')
+
+    def __default_get__(self, name, value):
+        return self.dian
+
+class UBLExtension(model.Model):
+    __name__ = 'UBLExtension'
+
+    content = fields.Many2One(Element, name='ExtensionContent', namespace='ext', default='')
+    
+class UBLExtensions(model.Model):
+    __name__ = 'UBLExtensions'
+
+    dian = fields.Many2One(DIANExtension, namespace='ext', create=True)
+    extension = fields.Many2One(UBLExtension, namespace='ext', create=True)
+
 class Invoice(model.Model):
     __name__ = 'Invoice'
     __namespace__ = {
@@ -277,18 +259,25 @@ class Invoice(model.Model):
         'xades': 'http://uri.etsi.org/01903/v1.3.2#',
         'ds': 'http://www.w3.org/2000/09/xmldsig#'
     }
+
+
+    _ubl_extensions = fields.Many2One(UBLExtensions, namespace='ext')
+    dian = fields.Virtual(getter='get_dian_extension')
+    
+    profile_id = fields.Many2One(Element, name='ProfileID', namespace='cbc', default='DIAN 2.1')
+    profile_execute_id = fields.Many2One(Element, name='ProfileExecuteID', namespace='cbc', default='2')
     
     id = fields.Many2One(ID, namespace='cbc')
     issue = fields.Virtual(setter='set_issue')
     issue_date = fields.Many2One(Date, name='IssueDate', namespace='cbc')
     issue_time = fields.Many2One(Time, name='IssueTime', namespace='cbc')
     
-    period = fields.Many2One(InvoicePeriod, namespace='cac')
+    period = fields.Many2One(Period, name='InvoicePeriod', namespace='cac')
 
     supplier = fields.Many2One(AccountingSupplierParty, namespace='cac')
     customer = fields.Many2One(AccountingCustomerParty, namespace='cac')
-    lines = fields.One2Many(InvoiceLine, namespace='cac')
     legal_monetary_total = fields.Many2One(LegalMonetaryTotal, namespace='cac')
+    lines = fields.One2Many(InvoiceLine, namespace='cac')
     
     taxtotal_01 = fields.Many2One(TaxTotal)
     taxtotal_04 = fields.Many2One(TaxTotal)
@@ -359,3 +348,6 @@ class Invoice(model.Model):
             raise ValueError('expected type datetime')
         self.issue_date = value.date()
         self.issue_time = value
+
+    def get_dian_extension(self, name, _value):
+        return self._ubl_extensions.dian

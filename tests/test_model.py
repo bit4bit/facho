@@ -80,6 +80,35 @@ def test_many2one_with_custom_setter():
     party.location = 99
     assert '<Party><PhysicalLocation ID="99"/></Party>' == party.to_xml()
 
+def test_many2one_always_create():
+    class Name(facho.model.Model):
+        __name__ = 'Name'
+
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        name = fields.Many2One(Name, default='facho')
+
+    person = Person()
+    assert '<Person><Name>facho</Name></Person>' == person.to_xml()
+
+def test_many2one_nested_always_create():
+    class Name(facho.model.Model):
+        __name__ = 'Name'
+
+    class Contact(facho.model.Model):
+        __name__ = 'Contact'
+
+        name = fields.Many2One(Name, default='facho')
+        
+    class Person(facho.model.Model):
+        __name__ = 'Person'
+
+        contact = fields.Many2One(Contact, create=True)
+
+    person = Person()
+    assert '<Person><Contact><Name>facho</Name></Contact></Person>' == person.to_xml()
+
 def test_many2one_auto_create():
     class TaxAmount(facho.model.Model):
         __name__ = 'TaxAmount'

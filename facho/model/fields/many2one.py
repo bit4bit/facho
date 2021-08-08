@@ -2,7 +2,7 @@ from .field import Field
 from collections import defaultdict
 
 class Many2One(Field):
-    def __init__(self, model, name=None, setter=None, namespace=None, default=None, virtual=False):
+    def __init__(self, model, name=None, setter=None, namespace=None, default=None, virtual=False, create=False):
         self.model = model
         self.setter = setter
         self.namespace = namespace
@@ -10,7 +10,8 @@ class Many2One(Field):
         self.default = default
         self.virtual = virtual
         self.relations = defaultdict(dict)
-        
+        self.create = create
+
     def __get__(self, inst, cls):
         if inst is None:
             return self
