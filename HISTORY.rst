@@ -3,4 +3,4 @@ History
 =======
 
 
-* First release on PyPI.
+* 0.2.1 version usada en produccion.
