@@ -1,7 +1,15 @@
 from .field import Field
 
 class Attribute(Field):
+    """
+    Attribute es un atributo del elemento actual.
+    """
+    
     def __init__(self, name, default=None):
+        """
+        :param name: nombre del atribute
+        :param default: valor por defecto del attributo
+        """
         self.attribute = name
         self.value = default
         self.default = default

@@ -4,6 +4,8 @@ class Function(Field):
     """
     Permite modificar el modelo cuando se intenta,
     obtener el valor de este campo.
+
+    DEPRECATED usar Virtual
     """
     def __init__(self, field, getter=None, default=None):
         self.field = field

@@ -3,6 +3,10 @@ from collections import defaultdict
 import facho.fe.form as form
 
 class Amount(Field):
+    """
+    Amount representa un campo moneda usando form.Amount
+    """
+
     def __init__(self, name=None, default=None, precision=6):
         self.field_name = name
         self.values = {}

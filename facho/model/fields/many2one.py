@@ -2,7 +2,19 @@ from .field import Field
 from collections import defaultdict
 
 class Many2One(Field):
+    """
+    Many2One describe una relacion pertenece a.
+    """
+
     def __init__(self, model, name=None, setter=None, namespace=None, default=None, virtual=False, create=False):
+        """
+        :param model: nombre del modelo destino
+        :param name: nombre del elemento xml
+        :param setter: nombre de methodo usado cuando se asigna usa como asignacion ejemplo model.relation = 3
+        :param default: el valor o contenido por defecto
+        :param virtual: se crea la relacion por no se ve reflejada en el xml final
+        :param create: fuerza la creacion del elemento en el xml, ya que los elementos no son creados sino tienen contenido
+        """
         self.model = model
         self.setter = setter
         self.namespace = namespace

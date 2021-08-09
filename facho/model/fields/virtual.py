@@ -4,11 +4,20 @@ from .field import Field
 # no participa del renderizado
 # pero puede interactura con este
 class Virtual(Field):
+    """
+    Virtual es un campo que no es renderizado en el xml final
+    """
     def __init__(self,
                  setter=None,
-                 getter='bob',
+                 getter='',
                  default=None,
                  update_internal=False):
+        """
+        :param setter: nombre de methodo usado cuando se asigna usa como asignacion ejemplo model.relation = 3
+        :param getter: nombre del metodo usando cuando se obtiene, ejemplo: valor = mode.relation
+        :param default: valor por defecto
+        :param update_internal: indica que cuando se asigne algun valor este se almacena localmente
+        """
         self.default = default
         self.setter = setter
         self.getter = getter
