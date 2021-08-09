@@ -11,6 +11,7 @@ class Many2One(Field):
         :param model: nombre del modelo destino
         :param name: nombre del elemento xml
         :param setter: nombre de methodo usado cuando se asigna usa como asignacion ejemplo model.relation = 3
+        :param namespace: sufijo del namespace al que pertenece el elemento
         :param default: el valor o contenido por defecto
         :param virtual: se crea la relacion por no se ve reflejada en el xml final
         :param create: fuerza la creacion del elemento en el xml, ya que los elementos no son creados sino tienen contenido
