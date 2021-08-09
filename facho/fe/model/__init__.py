@@ -11,6 +11,12 @@ from copy import copy
 import hashlib
 
 
+
+class PhysicalLocation(model.Model):
+    __name__ = 'PhysicalLocation'
+
+    address = fields.Many2One(Address, namespace='cac')
+    
 class PartyTaxScheme(model.Model):
     __name__ = 'PartyTaxScheme'
 
@@ -20,11 +26,12 @@ class PartyTaxScheme(model.Model):
 class Party(model.Model):
     __name__ = 'Party'
 
-    id = fields.Virtual(setter='set_id')
+    id = fields.Virtual(setter='_on_set_id')
 
     tax_scheme = fields.Many2One(PartyTaxScheme, namespace='cac')
-
-    def set_id(self, name, value):
+    location = fields.Many2One(PhysicalLocation, namespace='cac')
+    
+    def _on_set_id(self, name, value):
         self.tax_scheme.company_id = value
         return value
 
@@ -256,6 +263,7 @@ class Invoice(model.Model):
     __namespace__ = fe.NAMESPACES
 
     _ubl_extensions = fields.Many2One(UBLExtensions, namespace='ext')
+    # nos interesa el acceso solo los atributos de la DIAN
     dian = fields.Virtual(getter='get_dian_extension')
     
     profile_id = fields.Many2One(Element, name='ProfileID', namespace='cbc', default='DIAN 2.1')
