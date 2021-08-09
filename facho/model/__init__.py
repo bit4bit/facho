@@ -4,6 +4,9 @@ from collections import defaultdict
 class ModelMeta(type):
     def __new__(cls, name, bases, ns):
         new = type.__new__(cls, name, bases, ns)
+
+        # mapeamos asignacion en declaracion de clase
+        # a attributo de objeto
         if '__name__' in ns:
             new.__name__ = ns['__name__']
         if '__namespace__' in ns:
@@ -134,7 +137,15 @@ class ModelBase(object, metaclass=ModelMeta):
         else:
             return "<%s%s%s>%s</%s%s>" % (ns, tag, attributes, content, ns, tag)
 
+    def __str__(self):
+        return self.to_xml()
+
+
 class Model(ModelBase):
+    """
+    Model clase que representa el modelo
+    """
+
     def __before_xml__(self):
         """
         Ejecuta antes de generar el xml, este

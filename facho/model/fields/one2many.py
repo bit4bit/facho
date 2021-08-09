@@ -56,7 +56,17 @@ class _Relation():
             yield relation
 
 class One2Many(Field):
+    """
+    One2Many describe una relacion tiene muchos.
+    """
+
     def __init__(self, model, name=None, namespace=None, default=None):
+        """
+        :param model: nombre del modelo destino
+        :param name: nombre del elemento xml cuando se crea hijo
+        :param namespace: sufijo del namespace al que pertenece el elemento
+        :param default: el valor o contenido por defecto
+        """
         self.model = model
         self.field_name = name
         self.namespace = namespace
