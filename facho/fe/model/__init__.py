@@ -227,15 +227,18 @@ class LegalMonetaryTotal(model.Model):
         self.payable_amount = self.tax_inclusive_amount + self.charge_total_amount
 
 
+class DIANExtensionContent(model.Model):
+    __name__ = 'ExtensionContent'
+    
+    dian = fields.Many2One(dian.DianExtensions, name='DianExtensions', namespace='sts')
+
 class DIANExtension(model.Model):
     __name__ = 'UBLExtension'
 
-    _content = fields.Many2One(Element, name='ExtensionContent', namespace='ext')
-
-    dian = fields.Many2One(dian.DianExtensions, name='DianExtensions', namespace='sts')
+    content = fields.Many2One(DIANExtensionContent, namespace='ext')
 
     def __default_get__(self, name, value):
-        return self.dian
+        return self.content.dian
 
 class UBLExtension(model.Model):
     __name__ = 'UBLExtension'
@@ -250,16 +253,7 @@ class UBLExtensions(model.Model):
 
 class Invoice(model.Model):
     __name__ = 'Invoice'
-    __namespace__ = {
-        'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
-        'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
-        'cdt': 'urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1',
-        'ext': 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
-        'sts': 'http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures',
-        'xades': 'http://uri.etsi.org/01903/v1.3.2#',
-        'ds': 'http://www.w3.org/2000/09/xmldsig#'
-    }
-
+    __namespace__ = fe.NAMESPACES
 
     _ubl_extensions = fields.Many2One(UBLExtensions, namespace='ext')
     dian = fields.Virtual(getter='get_dian_extension')
@@ -284,6 +278,7 @@ class Invoice(model.Model):
     taxtotal_03 = fields.Many2One(TaxTotal)
 
     def __setup__(self):
+        self._namespace_prefix = 'fe'
         # Se requieren minimo estos impuestos para
         # validar el cufe
         self._subtotal_01 = self.taxtotal_01.subtotals.create()
@@ -351,3 +346,10 @@ class Invoice(model.Model):
 
     def get_dian_extension(self, name, _value):
         return self._ubl_extensions.dian
+
+    def to_xml(self, **kw):
+        # al generar documento el namespace
+        # se hace respecto a la raiz
+        return super().to_xml(**kw)\
+            .replace("fe:", "")\
+            .replace("xmlns:fe", "xmlns")

@@ -257,6 +257,9 @@ class FachoXML:
     def get_element_text(self, xpath, format_=str):
         xpath = self.fragment_prefix + self._path_xpath_for(xpath)
         elem = self.builder.xpath(self.root, xpath)
+        if elem is None:
+            raise ValueError('xpath %s invalid' % (xpath))
+
         text = self.builder.get_text(elem)
         return format_(text)
 
