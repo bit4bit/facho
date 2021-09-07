@@ -427,10 +427,10 @@ class DIANInvoiceXML(fe.FeXML):
         #tax_amount_for['01']['tax_amount'] = Amount(0.0)
         #tax_amount_for['01']['taxable_amount'] = Amount(0.0)
         #DIAN 1.7.-2020: FAS07 => Se debe construir estrategia para  su manejo
-        #tax_amount_for['04']['tax_amount'] = 0.0
-        #tax_amount_for['04']['taxable_amount'] = 0.0
-        #tax_amount_for['03']['tax_amount'] = 0.0
-        #tax_amount_for['03']['taxable_amount'] = 0.0
+        #tax_amount_for['04']['tax_amount'] += 0.0
+        #tax_amount_for['04']['taxable_amount'] += 0.0
+        #tax_amount_for['03']['tax_amount'] += 0.0
+        #tax_amount_for['03']['taxable_amount'] += 0.0
 
         total_tax_amount = Amount(0.0)
 
@@ -445,18 +445,18 @@ class DIANInvoiceXML(fe.FeXML):
 
                 total_tax_amount += subtotal.tax_amount
 
-        fexml.placeholder_for('./cac:TaxTotal')
-        fexml.set_element_amount('./cac:TaxTotal/cbc:TaxAmount',
-                                total_tax_amount)
+        if total_tax_amount != Amount(0.0):
+            fexml.placeholder_for('./cac:TaxTotal')
+            fexml.set_element_amount('./cac:TaxTotal/cbc:TaxAmount',
+                    total_tax_amount)
 
-
+        
         for index, item in enumerate(tax_amount_for.items()):
             cod_impuesto, amount_of = item
             next_append = index > 0
 
             #DIAN 1.7.-2020: FAS01
             line = fexml.fragment('./cac:TaxTotal', append=next_append)
-
             #DIAN 1.7.-2020: FAU06
             tax_amount = amount_of['tax_amount']
             fexml.set_element_amount_for(line,
@@ -482,9 +482,12 @@ class DIANInvoiceXML(fe.FeXML):
             if percent_for[cod_impuesto]:
                 line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent',
                                  percent_for[cod_impuesto])
+                
             line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
-                             cod_impuesto)
-
+                    cod_impuesto)
+            line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name',
+                    'IVA')
+  
     # abstract method
     def tag_document(fexml):
         return 'Invoice'
@@ -502,7 +505,6 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element_amount_for(line,
                                      './cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
                                      invoice_line.taxable_amount)
-
         for subtotal in invoice_line.tax.subtotals:
             line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
 
@@ -513,7 +515,7 @@ class DIANInvoiceXML(fe.FeXML):
                 #DIAN 1.7.-2020: FAX15
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.scheme.code)
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.scheme.name)
-
+    
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
