@@ -3,7 +3,7 @@ import facho.model.fields as fields
 
 from datetime import date, datetime
 
-__all__ = ['Element', 'Name', 'Date', 'Time', 'Period', 'ID', 'Address', 'Country']
+__all__ = ['Element', 'PartyName', 'Name', 'Date', 'Time', 'Period', 'ID', 'Address', 'Country', 'Contact']
 
 class Element(model.Model):
     """
@@ -71,3 +71,20 @@ class Address(model.Model):
     #DIAN 1.7.-2020: CAJ10
     city = fields.Many2One(Element, name='CityName', namespace='cbc')
     
+
+class PartyName(model.Model):
+    __name__ = 'PartyName'
+    
+    name = fields.Many2One(Name, namespace='cbc')
+
+    def __default_set__(self, value):
+        self.name = value
+        return value
+
+    def __default_get__(self, name, value):
+        return self.name
+
+class Contact(model.Model):
+    __name__ = 'Contact'
+
+    email = fields.Many2One(Name, name='ElectronicEmail', namespace='cbc')

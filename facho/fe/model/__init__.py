@@ -20,16 +20,20 @@ class PhysicalLocation(model.Model):
 class PartyTaxScheme(model.Model):
     __name__ = 'PartyTaxScheme'
 
+    registration_name = fields.Many2One(Name, name='RegistrationName', namespace='cbc')
     company_id = fields.Many2One(ID, name='CompanyID', namespace='cbc')
     tax_level_code = fields.Many2One(ID, name='TaxLevelCode', namespace='cbc', default='ZZ')
-    
+
+
 class Party(model.Model):
     __name__ = 'Party'
 
     id = fields.Virtual(setter='_on_set_id')
+    name = fields.Many2One(PartyName, namespace='cac')
 
     tax_scheme = fields.Many2One(PartyTaxScheme, namespace='cac')
     location = fields.Many2One(PhysicalLocation, namespace='cac')
+    contact = fields.Many2One(Contact, namespace='cac')
     
     def _on_set_id(self, name, value):
         self.tax_scheme.company_id = value
@@ -43,7 +47,7 @@ class AccountingCustomerParty(model.Model):
 class AccountingSupplierParty(model.Model):
     __name__ = 'AccountingSupplierParty'
 
-    party = fields.Many2One(Party)
+    party = fields.Many2One(Party, namespace='cac')
 
 class Quantity(model.Model):
     __name__  = 'Quantity'
