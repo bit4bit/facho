@@ -8,11 +8,10 @@
 from datetime import datetime
 
 import pytest
-
+from lxml import etree
 import facho.fe.model as model
 import facho.fe.form as form
 from facho import fe
-
 import helpers
 
 def simple_invoice():
@@ -68,3 +67,53 @@ def test_dian_extension_authorization_provider():
     assert provider_id.attrib['schemeAgencyName'] == 'CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)'
     assert provider_id.attrib['schemeAgencyID'] == '195'
     assert provider_id.text == '800197268'
+
+def test_invoicesimple_xml_signed_using_fexml(monkeypatch):
+    invoice = simple_invoice()
+
+    xml = fe.FeXML.from_string(invoice.to_xml())
+
+    signer = fe.DianXMLExtensionSigner('./tests/example.p12')
+
+    print(xml.tostring())
+    with monkeypatch.context() as m:
+        import helpers
+        helpers.mock_urlopen(m)
+        xml.add_extension(signer)
+
+    elem = xml.get_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent/ds:Signature')
+    assert elem.text is not None
+
+def test_invoice_supplier_party():
+    invoice = simple_invoice()
+    invoice.supplier.party.name = 'superfacho'
+    invoice.supplier.party.tax_scheme.registration_name = 'legal-superfacho'
+    invoice.supplier.party.contact.email = 'superfacho@etrivial.net'
+    
+    xml = fe.FeXML.from_string(invoice.to_xml())
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name')
+    assert name.text == 'superfacho'
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName')
+    assert name.text == 'legal-superfacho'
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicEmail')
+    assert name.text == 'superfacho@etrivial.net'
+
+def test_invoice_customer_party():
+    invoice = simple_invoice()
+    invoice.customer.party.name = 'superfacho-customer'
+    invoice.customer.party.tax_scheme.registration_name = 'legal-superfacho-customer'
+    invoice.customer.party.contact.email = 'superfacho@etrivial.net'
+
+    xml = fe.FeXML.from_string(invoice.to_xml())
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name')
+    assert name.text == 'superfacho-customer'
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:RegistrationName')
+    assert name.text == 'legal-superfacho-customer'
+
+    name = xml.get_element('/fe:Invoice/cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicEmail')
+    assert name.text == 'superfacho@etrivial.net'
