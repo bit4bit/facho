@@ -178,3 +178,29 @@ def test_facho_xml_replacement_for():
     xml.replacement_for('./child/type',
                         './child/code', 'test')
     assert xml.tostring() == '<root><child><code>test</code></child></root>'
+
+def test_facho_xml_set_element_content_invalid_validation():
+    xml = facho.FachoXML('root')
+
+    with pytest.raises(facho.FachoValueInvalid) as e:
+        xml.set_element_validator('./Id', lambda text, attrs: text == 'mero')
+        xml.set_element('./Id', 'bad')
+
+def test_facho_xml_set_element_content_valid_validation():
+    xml = facho.FachoXML('root')
+
+    xml.set_element_validator('./Id', lambda text, attrs: text == 'mero')
+    xml.set_element('./Id', 'mero')
+
+def test_facho_xml_set_element_attribute_invalid_validation():
+    xml = facho.FachoXML('root')
+
+    with pytest.raises(facho.FachoValueInvalid) as e:
+        xml.set_element_validator('./Id', lambda text, attrs: attrs['code'] == 'ABC')
+        xml.set_element('./Id', 'mero', code = 'CBA')
+
+def test_facho_xml_set_element_attribute_valid_validation():
+    xml = facho.FachoXML('root')
+
+    xml.set_element_validator('./Id', lambda text, attrs: attrs['code'] == 'ABC')
+    xml.set_element('./Id', 'mero', code = 'ABC')
