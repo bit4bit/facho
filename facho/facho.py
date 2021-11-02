@@ -4,6 +4,12 @@
 from lxml import etree
 from lxml.etree import Element, SubElement, tostring
 import re
+from collections import defaultdict
+from pprint import pprint
+
+class FachoValueInvalid(Exception):
+    def __init__(self, xpath):
+        super().__init__('FachoValueInvalid invalid xpath %s' % (xpath))
 
 
 class FachoXMLExtension:
@@ -128,6 +134,7 @@ class FachoXML:
         self.fragment_prefix = fragment_prefix
         self.xpath_for = {}
         self.extensions = []
+        self._validators = defaultdict(lambda: lambda v, attrs: True)
 
     @classmethod
     def from_string(cls, document: str, namespaces: dict() = []) -> 'FachoXML':
@@ -221,6 +228,20 @@ class FachoXML:
 
         return current_elem
 
+    def set_element_validator(self, xpath, validator = False):
+        """
+        validador al asignar contenido a xpath indicado
+
+        @param xpath ruta tipo XPath
+        @param validator callback(content, attributes)
+        """
+
+        key = self._path_xpath_for(xpath)
+        if not validator:
+            self._validators[key] = lambda v, attrs: True
+        else:
+            self._validators[key] = validator
+        
     def set_element(self, xpath, content, **attrs):
         """
         asigna contenido ubicado por ruta tipo XPATH.
@@ -232,6 +253,11 @@ class FachoXML:
         format_ = attrs.pop('format_', '%s')
         append_ = attrs.pop('append_', False)
         elem = self.find_or_create_element(xpath, append=append_)
+        validator = self._validators[xpath]
+
+        if not validator(content, attrs):
+            raise FachoValueInvalid(xpath)
+
         if content:
             self.builder.set_text(elem, format_ % content)
         for k, v in attrs.items():
