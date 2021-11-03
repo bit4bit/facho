@@ -104,6 +104,9 @@ class LXMLBuilder:
     def get_text(self, elem):
         return elem.text
 
+    def get_attribute(self, elem, key):
+        return elem.attrib[key]
+
     def set_attribute(self,  elem, key, value):
         elem.attrib[key] = value
 
@@ -275,6 +278,10 @@ class FachoXML:
         for k, v in attrs.items():
             self.builder.set_attribute(elem, k, v)
         return self
+
+    def get_element_attribute(self, xpath, attribute):
+        elem = self.get_element(xpath)
+        return self.builder.get_attribute(elem, attribute)
 
     def get_element(self, xpath):
         xpath = self.fragment_prefix + self._path_xpath_for(xpath)

@@ -204,3 +204,8 @@ def test_facho_xml_set_element_attribute_valid_validation():
 
     xml.set_element_validator('./Id', lambda text, attrs: attrs['code'] == 'ABC')
     xml.set_element('./Id', 'mero', code = 'ABC')
+
+def test_facho_xml_get_element_attribute():
+    xml = facho.FachoXML('root')
+    xml.set_element('./Id', 'mero', code = 'ABC')
+    assert xml.get_element_attribute('/root/Id', 'code') == 'ABC'
