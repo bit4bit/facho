@@ -280,3 +280,42 @@ def test_facho_xml_set_attributes_not_set_optional():
     with pytest.raises(KeyError):
         xml.get_element_attribute('/root/A', 'value1')
     assert xml.get_element_attribute('/root/A', 'value2') == '2'
+
+def test_facho_xml_placeholder_with_fragment():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+    xml.placeholder_for('./AA')
+    xml.placeholder_for('./AAA')
+
+    AA = xml.fragment('./AA/Child')
+    AA.find_or_create_element('./B')
+    AA.find_or_create_element('./B', append=True)
+
+    AA = xml.fragment('./AA/Child', append=True)
+    
+    assert xml.tostring() == '<root><A/><AA><Child><B/><B/></Child><Child/></AA><AAA/></root>'
+
+def test_facho_xml_create_on_first_append():
+    xml = facho.FachoXML('root')
+
+    xml.find_or_create_element('./A', append=True)
+    assert xml.tostring() == '<root><A/></root>'
+
+def test_facho_xml_create_on_first_append_multiple_appends():
+    xml = facho.FachoXML('root')
+
+    xml.find_or_create_element('./B', append=True)
+    xml.find_or_create_element('./A', append=True)
+    xml.find_or_create_element('./A', append=True)
+    xml.find_or_create_element('./A', append=True)
+    xml.find_or_create_element('./C', append=True)
+    assert xml.tostring() == '<root><B/><A/><A/><A/><C/></root>'
+
+def test_facho_xml_fragment_create_on_first_append():
+    xml = facho.FachoXML('root')
+
+    A = xml.fragment('./A', append=True)
+    A.find_or_create_element('./B')
+    A = xml.fragment('./A', append=True)
+    A.find_or_create_element('./C')
+    assert xml.tostring() == '<root><A><B/></A><A><C/></A></root>'
