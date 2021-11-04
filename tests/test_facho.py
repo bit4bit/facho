@@ -209,3 +209,13 @@ def test_facho_xml_get_element_attribute():
     xml = facho.FachoXML('root')
     xml.set_element('./Id', 'mero', code = 'ABC')
     assert xml.get_element_attribute('/root/Id', 'code') == 'ABC'
+
+def test_facho_xml_keep_orden_slibing():
+    xml = facho.FachoXML('root')
+    xml.find_or_create_element('./A')
+    xml.find_or_create_element('./B')
+    xml.find_or_create_element('./C')
+    xml.find_or_create_element('./B', append=True)
+    xml.find_or_create_element('./A', append=True)
+
+    assert xml.tostring() == '<root><A/><A/><B/><B/><C/></root>'
