@@ -88,6 +88,9 @@ class LXMLBuilder:
     def append(self, elem, child):
         elem.append(child)
 
+    def append_next(self, elem, slibing):
+        elem.addnext(slibing)
+
     def remove(self, elem):
         elem.getparent().remove(elem)
 
@@ -223,10 +226,18 @@ class FachoXML:
                 self.builder.append(current_elem, node)
                 current_elem = node
 
+
         # se fuerza la adicion como un nuevo elemento
         if append:
-            node = self.builder.build_from_expression(node_paths[-1])
-            self.builder.append(parent, node)
+            node_tag = node_paths[-1]
+            last_slibing = current_elem
+
+            for child in parent.getchildren():
+                if child.tag == node_tag:
+                    last_slibing = child
+
+            node = self.builder.build_from_expression(node_tag)
+            self.builder.append_next(last_slibing, node)
             return node
 
         return current_elem
