@@ -123,8 +123,7 @@ class LXMLBuilder:
 
         for el in elem.getiterator():
             is_optional = el.get('facho_optional', 'False') == 'True'
-            if is_optional and el.getchildren() == []:
-                print(tostring(el))
+            if is_optional and el.getchildren() == [] and el.keys() == ['facho_optional']:
                 el.getparent().remove(el)
 
         return tostring(elem, **attrs).decode('utf-8')
@@ -308,8 +307,12 @@ class FachoXML:
         xpath = self._path_xpath_for(xpath)
         elem = self.get_element(xpath)
 
+        if elem is None:
+            raise ValueError("xpath %s not found" % (xpath))
+
         for k, v in attrs.items():
-            self.builder.set_attribute(elem, k, v)
+            if v is not None or str(v) != 'None':
+                self.builder.set_attribute(elem, k, str(v))
         return self
 
     def get_element_attribute(self, xpath, attribute):
