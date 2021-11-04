@@ -12,3 +12,4 @@ from .fe import DianZIP
 from .fe import AMBIENTE_PRUEBAS
 from .fe import AMBIENTE_PRODUCCION
 from . import form_xml
+from . import nomina

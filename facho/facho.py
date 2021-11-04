@@ -275,6 +275,7 @@ class FachoXML:
         """
         xpath = self._path_xpath_for(xpath)
         elem = self.get_element(xpath)
+
         for k, v in attrs.items():
             self.builder.set_attribute(elem, k, v)
         return self
