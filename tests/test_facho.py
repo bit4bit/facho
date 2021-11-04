@@ -219,3 +219,39 @@ def test_facho_xml_keep_orden_slibing():
     xml.find_or_create_element('./A', append=True)
 
     assert xml.tostring() == '<root><A/><A/><B/><B/><C/></root>'
+
+def test_facho_xml_placeholder_optional():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+    xml.placeholder_for('./B', optional=True)
+    xml.placeholder_for('./C')
+    
+    assert xml.tostring() == '<root><A/><C/></root>'
+
+def test_facho_xml_placeholder_append_to_optional():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+    xml.placeholder_for('./B', optional=True)
+    xml.placeholder_for('./C')
+
+    xml.find_or_create_element('./B')
+    assert xml.tostring() == '<root><A/><B/><C/></root>'
+
+def test_facho_xml_placeholder_set_element_to_optional():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+    xml.placeholder_for('./B', optional=True)
+    xml.placeholder_for('./C')
+
+    xml.set_element('./B', '2')
+    assert xml.tostring() == '<root><A/><B>2</B><C/></root>'
+
+def test_facho_xml_placeholder_set_element_to_optional_with_append():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+    xml.placeholder_for('./B', optional=True)
+    xml.placeholder_for('./C')
+
+    xml.set_element('./B', '2')
+    xml.set_element('./B', '3', append_=True)
+    assert xml.tostring() == '<root><A/><B>2</B><B>3</B><C/></root>'

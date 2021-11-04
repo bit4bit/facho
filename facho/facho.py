@@ -5,6 +5,7 @@ from lxml import etree
 from lxml.etree import Element, SubElement, tostring
 import re
 from collections import defaultdict
+from copy import deepcopy
 from pprint import pprint
 
 class FachoValueInvalid(Exception):
@@ -114,9 +115,18 @@ class LXMLBuilder:
         elem.attrib[key] = value
 
     @classmethod
-    def tostring(self, elem, **attrs):
+    def tostring(self, oelem, **attrs):
+        elem = deepcopy(oelem)
+
         attrs['pretty_print'] = attrs.pop('pretty_print', False)
         attrs['encoding'] = attrs.pop('encoding', 'UTF-8')
+
+        for el in elem.getiterator():
+            is_optional = el.get('facho_optional', 'False') == 'True'
+            if is_optional and el.getchildren() == []:
+                print(tostring(el))
+                el.getparent().remove(el)
+
         return tostring(elem, **attrs).decode('utf-8')
 
 
@@ -182,8 +192,11 @@ class FachoXML:
     def _path_xpath_for(self, xpath):
         return self._normalize_xpath(self._translate_xpath_for(xpath))
 
-    def placeholder_for(self, xpath, append=False):
-        return self.find_or_create_element(xpath, append)
+    def placeholder_for(self, xpath, append=False, optional=False):
+        elem = self.find_or_create_element(xpath, append)
+        if optional:
+            elem.set('facho_optional', 'True')
+        return elem
 
     def replacement_for(self, xpath, new_xpath, content, **attrs):
         elem = self.get_element(xpath)
@@ -217,6 +230,7 @@ class FachoXML:
         for node_path in node_paths:
             node_expr = self.builder.match_expression(node_path)
             node = self.builder.build_from_expression(node_path)
+
             child = self.builder.find_relative(current_elem, node_expr['path'], self.nsmap)
 
             parent = current_elem
@@ -239,6 +253,12 @@ class FachoXML:
             node = self.builder.build_from_expression(node_tag)
             self.builder.append_next(last_slibing, node)
             return node
+
+        try:
+            # TODO(bit4bit) acoplamiento indirecto a placeholder
+            del current_elem.attrib['facho_optional']
+        except KeyError:
+            pass
 
         return current_elem
 
@@ -267,6 +287,7 @@ class FachoXML:
         format_ = attrs.pop('format_', '%s')
         append_ = attrs.pop('append_', False)
         elem = self.find_or_create_element(xpath, append=append_)
+
         validator = self._validators[xpath]
 
         if not validator(content, attrs):
