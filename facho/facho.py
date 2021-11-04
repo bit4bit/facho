@@ -226,6 +226,8 @@ class FachoXML:
         # crea jerarquia segun xpath indicado
         parent = None
         current_elem = self.root
+        node_tag = node_paths.pop(-1)
+
         for node_path in node_paths:
             node_expr = self.builder.match_expression(node_path)
             node = self.builder.build_from_expression(node_path)
@@ -239,12 +241,20 @@ class FachoXML:
                 self.builder.append(current_elem, node)
                 current_elem = node
 
+        node_expr = self.builder.match_expression(node_tag)
+        node = self.builder.build_from_expression(node_tag)
+        child = self.builder.find_relative(current_elem, node_expr['path'], self.nsmap)
+        parent = current_elem
+        if child is not None:
+            current_elem = child
+           
+        if parent == current_elem:
+            self.builder.append(parent, node)
+            return node
 
         # se fuerza la adicion como un nuevo elemento
         if append:
-            node_tag = node_paths[-1]
             last_slibing = current_elem
-
             for child in parent.getchildren():
                 if child.tag == node_tag:
                     last_slibing = child
@@ -258,6 +268,10 @@ class FachoXML:
             del current_elem.attrib['facho_optional']
         except KeyError:
             pass
+
+        if child is None:
+            self.builder.append(current_elem, node)
+            current_elem = node
 
         return current_elem
 
