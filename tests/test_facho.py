@@ -255,3 +255,28 @@ def test_facho_xml_placeholder_set_element_to_optional_with_append():
     xml.set_element('./B', '2')
     xml.set_element('./B', '3', append_=True)
     assert xml.tostring() == '<root><A/><B>2</B><B>3</B><C/></root>'
+
+
+def test_facho_xml_set_attributes():
+    xml = facho.FachoXML('root')
+    xml.find_or_create_element('./A')
+
+    xml.set_attributes('./A',
+                       value1 = '1',
+                       value2 = '2'
+                       )
+    assert xml.get_element_attribute('/root/A', 'value1') == '1'
+    assert xml.get_element_attribute('/root/A', 'value2') == '2'
+
+
+def test_facho_xml_set_attributes_not_set_optional():
+    xml = facho.FachoXML('root')
+    xml.find_or_create_element('./A')
+
+    xml.set_attributes('./A',
+                       value1 = None,
+                       value2 = '2'
+                       )
+    with pytest.raises(KeyError):
+        xml.get_element_attribute('/root/A', 'value1')
+    assert xml.get_element_attribute('/root/A', 'value2') == '2'
