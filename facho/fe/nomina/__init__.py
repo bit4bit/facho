@@ -5,81 +5,16 @@
 # La idea en general es validar comportamiento desde el XML,
 # creando las estructuras minimas necesaras.
 
+from dataclasses import dataclass
 
 from .. import fe
 from .. import form
 
-from dataclasses import dataclass
+from .devengado import *
+from .deduccion import *
 
-class Amount(form.Amount):
-    pass
+from .amount import Amount
 
-
-class Devengado:
-    pass
-
-@dataclass
-class DevengadoBasico(Devengado):
-    dias_trabajados: int
-    sueldo_trabajado: Amount
-
-    def apply(self, fragment):
-        fragment.find_or_create_element('./Basico')
-        
-        fragment.set_attributes('/Basico',
-                                # NIE069
-                                DiasTrabajados = str(self.dias_trabajados),
-                                # NIE070
-                                SueldoTrabajado = str(self.sueldo_trabajado)
-                                )
-
-@dataclass
-class DevengadoTransporte(Devengado):
-    auxilio_transporte: Amount = None
-    viatico_manutencion: Amount = None
-    viatico_manutencion_no_salarial: Amount = None
-
-    def apply(self, fragment):
-        fragment.set_element('./Transporte', None,
-                             append_ = True,
-                             # NIE071
-                             AuxilioTransporte = self.auxilio_transporte,
-                             # NIE072
-                             ViaticoManuAlojS = self.viatico_manutencion,
-                             # NIE073
-                             ViaticoManuAlojNS = self.viatico_manutencion_no_salarial
-                             )
-
-class Deduccion:
-    pass
-
-@dataclass
-class DeduccionSalud(Deduccion):
-    porcentaje: Amount
-    deduccion: Amount
-
-    def apply(self, fragment):
-        fragment.set_element('./Salud', None,
-                             append_ = True,
-                             # NIE161
-                             Porcentaje = self.porcentaje,
-                             #  NIE163
-                             Deduccion = self.deduccion
-                             )
-
-@dataclass
-class DeduccionFondoPension(Deduccion):
-    porcentaje: Amount
-    deduccion: Amount
-
-    def apply(self, fragment):
-        fragment.set_element('./FondoPension', None,
-                             append_ = True,
-                             # NIE164
-                             Porcentaje = self.porcentaje,
-                             #  NIE166
-                             Deduccion = self.deduccion
-                             )
 
 class DIANNominaIndividualError(Exception):
     pass
