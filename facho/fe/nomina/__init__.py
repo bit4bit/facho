@@ -1,3 +1,11 @@
+#
+# Para esta implementacion se usa BDD
+# ver **test_nomina.py**.
+#
+# La idea en general es validar comportamiento desde el XML,
+# creando las estructuras minimas necesaras.
+
+
 from .. import fe
 from .. import form
 
@@ -87,7 +95,7 @@ class DIANNominaIndividual:
 
         self.devengados = self.fexml.fragment('./Devengados')
         self.deducciones = self.fexml.fragment('./Deducciones')
-        
+
     def adicionar_devengado(self, devengado):
         if not isinstance(devengado, Devengado):
             raise ValueError('se espera tipo Devengado')
@@ -106,18 +114,36 @@ class DIANNominaIndividual:
         """
         errors = []
 
-        def add_error(xpath, msg):
+        def check_element(xpath, msg):
             if not self.fexml.exist_element(xpath):
                 errors.append(DIANNominaIndividualError(msg))
 
-        add_error('/fe:NominaIndividual/Devengados/Basico',
-                  'se requiere DevengadoBasico')
+        def check_attribute(xpath, key, msg):
+            err = DIANNominaIndividualError(msg)
+            elem = self.fexml.get_element(xpath)
 
-        add_error('/fe:NominaIndividual/Deducciones/Salud',
-                  'se requiere DeduccionSalud')
+            if elem is None:
+                return errors.append(err)
 
-        add_error('/fe:NominaIndividual/Deducciones/FondoPension',
-                  'se requiere DeduccionFondoPension')
+            if elem.get(key, None) is None:
+                return errors.append(err)
+
+        check_attribute('/fe:NominaIndividual/Periodo', 'FechaIngreso', 'se requiere Periodo')
+        
+        check_element(
+            '/fe:NominaIndividual/Devengados/Basico',
+            'se requiere DevengadoBasico'
+        )
+        
+        check_element(
+            '/fe:NominaIndividual/Deducciones/Salud',
+            'se requiere DeduccionSalud'
+        )
+
+        check_element(
+            '/fe:NominaIndividual/Deducciones/FondoPension',
+            'se requiere DeduccionFondoPension'
+        )
 
         return errors
 
