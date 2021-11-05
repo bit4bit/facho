@@ -351,3 +351,14 @@ def test_facho_xml_placeholder_optional_and_fragment_with_set_element():
 
     assert xml.tostring() == '<root><A><AA prueba="OK"/></A></root>'
     assert xml.get_element_attribute('/root/A/AA', 'prueba') == 'OK'
+
+def test_facho_xml_exist_element():
+    xml = facho.FachoXML('root')
+
+    xml.placeholder_for('./A')
+    assert xml.exist_element('/root/A') == False
+    assert xml.tostring() == '<root><A/></root>'
+    
+    xml.find_or_create_element('./A')
+    assert xml.exist_element('/root/A') == True
+    assert xml.tostring() == '<root><A/></root>'
