@@ -65,6 +65,7 @@ def test_nomina_obligatorios_segun_anexo_tecnico():
 
     errors = nomina.validate()
 
+    assert_error(errors, 'se requiere Periodo')
     assert_error(errors, 'se requiere DevengadoBasico')
     assert_error(errors, 'se requiere DeduccionSalud')
     assert_error(errors, 'se requiere DeduccionFondoPension')
