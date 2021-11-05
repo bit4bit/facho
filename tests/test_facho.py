@@ -319,3 +319,35 @@ def test_facho_xml_fragment_create_on_first_append():
     A = xml.fragment('./A', append=True)
     A.find_or_create_element('./C')
     assert xml.tostring() == '<root><A><B/></A><A><C/></A></root>'
+
+def test_facho_xml_placeholder_optional_and_fragment():
+    xml = facho.FachoXML('root')
+
+    xml.placeholder_for('./A/AA')
+
+    A = xml.fragment('./A', append_not_exists=True)
+    A.find_or_create_element('./AA/B')
+
+    A = xml.fragment('./A', append_not_exists=True)
+    A.find_or_create_element('./AA/C')
+
+    assert xml.tostring() == '<root><A><AA><B/><C/></AA></A></root>'
+
+def test_facho_xml_placeholder_optional_and_set_attributes():
+    xml = facho.FachoXML('root')
+    xml.placeholder_for('./A')
+
+    xml.set_attributes('/root/A', prueba='OK')
+    assert xml.get_element_attribute('/root/A', 'prueba') == 'OK'
+    assert xml.tostring() == '<root><A prueba="OK"/></root>'
+
+def test_facho_xml_placeholder_optional_and_fragment_with_set_element():
+    xml = facho.FachoXML('root')
+
+    xml.placeholder_for('./A/AA')
+
+    A = xml.fragment('./A', append_not_exists=True)
+    A.set_element('./AA', None, append_=True, prueba='OK')
+
+    assert xml.tostring() == '<root><A><AA prueba="OK"/></A></root>'
+    assert xml.get_element_attribute('/root/A/AA', 'prueba') == 'OK'

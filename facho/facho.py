@@ -111,8 +111,18 @@ class LXMLBuilder:
     def get_attribute(self, elem, key):
         return elem.attrib[key]
 
+    def is_attribute(self, elem, key, value):
+        return elem.get(key, False) == value
+
     def set_attribute(self,  elem, key, value):
         elem.attrib[key] = value
+
+    def remove_attributes(self, elem, keys):
+        for key in keys:
+            try:
+                del elem.attrib[key]
+            except KeyError:
+                pass
 
     @classmethod
     def tostring(self, oelem, **attrs):
@@ -122,6 +132,11 @@ class LXMLBuilder:
         attrs['encoding'] = attrs.pop('encoding', 'UTF-8')
 
         for el in elem.getiterator():
+            try:
+                del el.attrib['facho_placeholder']
+            except KeyError:
+                pass
+
             is_optional = el.get('facho_optional', 'False') == 'True'
             if is_optional and el.getchildren() == [] and el.keys() == ['facho_optional']:
                 el.getparent().remove(el)
@@ -195,6 +210,7 @@ class FachoXML:
         elem = self.find_or_create_element(xpath, append)
         if optional:
             elem.set('facho_optional', 'True')
+        elem.set('facho_placeholder', 'True')
         return elem
 
     def replacement_for(self, xpath, new_xpath, content, **attrs):
@@ -254,25 +270,27 @@ class FachoXML:
 
         # se fuerza la adicion como un nuevo elemento
         if append:
-            last_slibing = current_elem
+            last_slibing = None
             for child in parent.getchildren():
                 if child.tag == node_tag:
                     last_slibing = child
 
-            node = self.builder.build_from_expression(node_tag)
+            # si no ahi primos se adiciona como hijo
+            if last_slibing is None:
+                self.builder.append(parent, node)
+                return node
+
+            if self.builder.is_attribute(last_slibing, 'facho_placeholder', 'True'):
+                self._remove_facho_attributes(last_slibing)
+                return last_slibing 
             self.builder.append_next(last_slibing, node)
             return node
 
-        try:
-            # TODO(bit4bit) acoplamiento indirecto a placeholder
-            del current_elem.attrib['facho_optional']
-        except KeyError:
-            pass
-
         if child is None:
             self.builder.append(current_elem, node)
-            current_elem = node
+            return node
 
+        self._remove_facho_attributes(current_elem)
         return current_elem
 
     def set_element_validator(self, xpath, validator = False):
@@ -309,7 +327,9 @@ class FachoXML:
         if content:
             self.builder.set_text(elem, format_ % content)
         for k, v in attrs.items():
-            self.builder.set_attribute(elem, k, v)
+            if v is not None or str(v) != 'None':
+                self.builder.set_attribute(elem, k, str(v))
+
         return elem
 
     def set_attributes(self, xpath, **attrs):
@@ -331,6 +351,7 @@ class FachoXML:
 
     def get_element_attribute(self, xpath, attribute):
         elem = self.get_element(xpath)
+        print(elem.attrib)
         return self.builder.get_attribute(elem, attribute)
 
     def get_element(self, xpath):
@@ -342,6 +363,9 @@ class FachoXML:
         elem = self.builder.xpath(self.root, xpath)
         text = self.builder.get_text(elem)
         return format_(text)
+
+    def _remove_facho_attributes(self, elem):
+        self.builder.remove_attributes(elem, ['facho_optional', 'facho_placeholder'])
 
     def tostring(self, **kw):
         return self.builder.tostring(self.root, **kw)
