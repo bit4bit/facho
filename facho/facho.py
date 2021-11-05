@@ -117,8 +117,12 @@ class LXMLBuilder:
     def set_attribute(self,  elem, key, value):
         elem.attrib[key] = value
 
-    def remove_attributes(self, elem, keys):
+    @classmethod
+    def remove_attributes(cls, elem, keys, exclude = []):
         for key in keys:
+            if key in exclude:
+                continue
+
             try:
                 del elem.attrib[key]
             except KeyError:
@@ -132,10 +136,8 @@ class LXMLBuilder:
         attrs['encoding'] = attrs.pop('encoding', 'UTF-8')
 
         for el in elem.getiterator():
-            try:
-                del el.attrib['facho_placeholder']
-            except KeyError:
-                pass
+            keys = filter(lambda key: key.startswith('facho_'), el.keys())
+            self.remove_attributes(el, keys, exclude=['facho_optional'])
 
             is_optional = el.get('facho_optional', 'False') == 'True'
             if is_optional and el.getchildren() == [] and el.keys() == ['facho_optional']:
@@ -363,6 +365,20 @@ class FachoXML:
         elem = self.builder.xpath(self.root, xpath)
         text = self.builder.get_text(elem)
         return format_(text)
+
+    def exist_element(self, xpath):
+        elem = self.get_element(xpath)
+
+        if elem is None:
+            return False
+
+        if elem.get('facho_placeholder') == 'True':
+            return False
+
+        if elem.get('facho_optional') == 'True':
+            return False
+
+        return True
 
     def _remove_facho_attributes(self, elem):
         self.builder.remove_attributes(elem, ['facho_optional', 'facho_placeholder'])
