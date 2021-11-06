@@ -67,6 +67,7 @@ class InformacionGeneral:
 
     def post_apply(self, fexml, fragment):
         # generar cune
+        # ver 8.1.1.1
         xpaths = [
             '/fe:NominaIndividual/NumeroSecuenciaXML/@Numero',
             '/fe:NominaIndividual/InformacionGeneral/@FechaGen',
