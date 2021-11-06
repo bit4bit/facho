@@ -204,33 +204,66 @@ class DIANNominaIndividual:
         return errors
 
     def toFachoXML(self):
+        self._devengados_total()
+        self._deducciones_total()
+        self._comprobante_total()
+        
         if self.informacion_general is not None:
             #TODO(bit4bit) acoplamiento temporal
             # es importante el orden de ejecucion
-            self._devengados_total()
-            self._deducciones_total()
-            self._comprobante_total()
-        
+
             self.informacion_general.post_apply(self.fexml, self.informacion_general_xml)
 
         return self.fexml
 
     def _comprobante_total(self):
-        # TODO
-        self.fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', '2500000.00')
+        devengados_total = self.fexml.get_element_text_or_attribute('/fe:NominaIndividual/DevengadosTotal', '0.0')
+        deducciones_total = self.fexml.get_element_text_or_attribute('/fe:NominaIndividual/DeduccionesTotal', '0.0')
+
+        comprobante_total = Amount(devengados_total) - Amount(deducciones_total)
+
+        self.fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', str(round(comprobante_total, 2)))
 
     def _deducciones_total(self):
-        # TODO
-        self.fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', '1000000.00')
+        xpaths = [
+            '/fe:NominaIndividual/Deducciones/Salud/@Deduccion',
+            '/fe:NominaIndividual/Deducciones/FondoPension/@Deduccion'
+        ]
+        deducciones = map(lambda valor: Amount(valor),
+                          self._values_of_xpaths(xpaths))
+
+        deducciones_total = Amount(0.0)
+        
+        for deduccion in deducciones:
+            deducciones_total += deduccion
+
+        self.fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', str(round(deducciones_total, 2)))
 
     def _devengados_total(self):
+        xpaths = [
+            '/fe:NominaIndividual/Devengados/Basico/@SueldoTrabajado',
+            '/fe:NominaIndividual/Devengados/Transporte/@AuxilioTransporte',
+            '/fe:NominaIndividual/Devengados/Transporte/@ViaticoManuAlojS',
+            '/fe:NominaIndividual/Devengados/Transporte/@ViaticoManuAlojNS'
+        ]
         devengados = map(lambda valor: Amount(valor),
-                         [
-                             self.fexml.get_element_attribute('/fe:NominaIndividual/Devengados/Basico', 'SueldoTrabajado')
-                         ]
-                         )
+                         self._values_of_xpaths(xpaths))
+        
         devengados_total = Amount(0.0)
         for devengado in devengados:
             devengados_total += devengado
-        self.fexml.set_element('/fe:NominaIndividual/DevengadosTotal', round(devengados_total,2))
+            
+        self.fexml.set_element('/fe:NominaIndividual/DevengadosTotal', str(round(devengados_total,2)))
 
+    def _values_of_xpaths(self, xpaths):
+        xpaths_values_of_values = map(lambda val: self.fexml.get_element_text_or_attribute(val, multiple=True), xpaths)
+        xpaths_values = []
+        # toda esta carreta para hacer un aplano de lista
+        for xpath_values in xpaths_values_of_values:
+            if xpath_values is None:
+                continue
+
+            for xpath_value in xpath_values:
+                xpaths_values.append(xpath_value)
+
+        return filter(lambda val: val is not None, xpaths_values)
