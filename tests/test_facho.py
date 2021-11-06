@@ -362,3 +362,11 @@ def test_facho_xml_exist_element():
     xml.find_or_create_element('./A')
     assert xml.exist_element('/root/A') == True
     assert xml.tostring() == '<root><A/></root>'
+
+def test_facho_xml_query_element_text_or_attribute():
+    xml = facho.FachoXML('root')
+
+    xml.set_element('./A', 'contenido', clave='valor')
+
+    assert xml.get_element_text_or_attribute('/root/A') == 'contenido'
+    assert xml.get_element_text_or_attribute('/root/A/@clave') == 'valor'

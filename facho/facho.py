@@ -368,6 +368,16 @@ class FachoXML:
         text = self.builder.get_text(elem)
         return format_(text)
 
+    def get_element_text_or_attribute(self, xpath):
+        parts = xpath.split('/')
+        is_attribute =  parts[-1].startswith('@')
+        if is_attribute:
+            attribute_name = parts.pop(-1).lstrip('@')
+            element_path = "/".join(parts)
+            return self.get_element_attribute(element_path, attribute_name)
+        else:
+            return self.get_element_text(xpath)
+
     def exist_element(self, xpath):
         elem = self.get_element(xpath)
 
