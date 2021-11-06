@@ -70,6 +70,7 @@ def test_nomina_obligatorios_segun_anexo_tecnico():
     assert_error(errors, 'se requiere DeduccionSalud')
     assert_error(errors, 'se requiere DeduccionFondoPension')
 
+@pytest.mark.skip(reason="es valido el cune en el anexo tecnico?")
 def test_nomina_cune():
     nomina = fe.nomina.DIANNominaIndividual()
 

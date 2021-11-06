@@ -66,22 +66,6 @@ class InformacionGeneral:
                                 )
 
     def post_apply(self, fexml, fragment):
-        devengados = map(lambda valor: Amount(valor),
-                         [
-                             fexml.get_element_attribute('/fe:NominaIndividual/Devengados/Basico', 'SueldoTrabajado')
-                         ]
-                         )
-        devengados_total = Amount(0.0)
-        for devengado in devengados:
-            devengados_total += devengado
-        fexml.set_element('/fe:NominaIndividual/DevengadosTotal', round(devengados_total,2))
-
-        # TODO
-        fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', '1000000.00')
-
-        # TODO
-        fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', '2500000.00')
-
         # generar cune
         campos = [
             fexml.get_element_attribute('/fe:NominaIndividual/NumeroSecuenciaXML', 'Numero'),
@@ -221,6 +205,32 @@ class DIANNominaIndividual:
 
     def toFachoXML(self):
         if self.informacion_general is not None:
+            #TODO(bit4bit) acoplamiento temporal
+            # es importante el orden de ejecucion
+            self._devengados_total()
+            self._deducciones_total()
+            self._comprobante_total()
+        
             self.informacion_general.post_apply(self.fexml, self.informacion_general_xml)
 
         return self.fexml
+
+    def _comprobante_total(self):
+        # TODO
+        self.fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', '2500000.00')
+
+    def _deducciones_total(self):
+        # TODO
+        self.fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', '1000000.00')
+
+    def _devengados_total(self):
+        devengados = map(lambda valor: Amount(valor),
+                         [
+                             self.fexml.get_element_attribute('/fe:NominaIndividual/Devengados/Basico', 'SueldoTrabajado')
+                         ]
+                         )
+        devengados_total = Amount(0.0)
+        for devengado in devengados:
+            devengados_total += devengado
+        self.fexml.set_element('/fe:NominaIndividual/DevengadosTotal', round(devengados_total,2))
+
