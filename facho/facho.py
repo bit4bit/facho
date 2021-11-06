@@ -388,7 +388,7 @@ class FachoXML:
                 return None
             return format_(text)
 
-    def get_element_text_or_attribute(self, xpath, default=None, multiple=False):
+    def get_element_text_or_attribute(self, xpath, default=None, multiple=False, raise_on_fail=False):
         parts = xpath.split('/')
         is_attribute =  parts[-1].startswith('@')
         if is_attribute:
@@ -399,9 +399,13 @@ class FachoXML:
                 if val is None:
                     return default
                 return val
-            except KeyError:
+            except KeyError as e:
+                if raise_on_fail:
+                    raise e
                 return default
-            except ValueError:
+            except ValueError as e:
+                if raise_on_fail:
+                    raise e
                 return default
         else:
             try:
@@ -409,8 +413,24 @@ class FachoXML:
                 if val is None:
                     return default
                 return val
-            except ValueError:
+            except ValueError as e:
+                if raise_on_fail:
+                    raise e
                 return default
+
+    def get_elements_text_or_attributes(self, xpaths, raise_on_fail=True):
+        """
+        returna el contenido o attributos de un conjunto de XPATHS
+        si algun XPATH es una tupla se retorna el primer elemento del mismo.
+        """
+        vals = []
+        for xpath in xpaths:
+            if isinstance(xpath, tuple):
+                val = xpath[0]
+            else:
+                val = self.get_element_text_or_attribute(xpath, raise_on_fail=raise_on_fail)
+            vals.append(val)
+        return vals
 
     def exist_element(self, xpath):
         elem = self.get_element(xpath)
