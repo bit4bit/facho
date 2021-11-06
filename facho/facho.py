@@ -435,12 +435,15 @@ class FachoXML:
     def exist_element(self, xpath):
         elem = self.get_element(xpath)
 
+        # no se encontro elemento
         if elem is None:
             return False
 
+        # el placeholder no ha sido populado
         if elem.get('facho_placeholder') == 'True':
             return False
 
+        # el valor opcional no ha sido populado
         if elem.get('facho_optional') == 'True':
             return False
 
