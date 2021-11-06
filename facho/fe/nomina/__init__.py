@@ -67,19 +67,21 @@ class InformacionGeneral:
 
     def post_apply(self, fexml, fragment):
         # generar cune
-        campos = [
-            fexml.get_element_attribute('/fe:NominaIndividual/NumeroSecuenciaXML', 'Numero'),
-            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'FechaGen'),
-            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'HoraGen'),
-            fexml.get_element_text('/fe:NominaIndividual/DevengadosTotal'),
-            fexml.get_element_text('/fe:NominaIndividual/DeduccionesTotal'),
-            fexml.get_element_text('/fe:NominaIndividual/ComprobanteTotal'),
-            fexml.get_element_attribute('/fe:NominaIndividual/Empleador', 'NIT'),
-            fexml.get_element_attribute('/fe:NominaIndividual/Trabajador', 'NumeroDocumento'),
-            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'TipoXML'),
-            self.software_pin,
-            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'Ambiente')
+        xpaths = [
+            '/fe:NominaIndividual/NumeroSecuenciaXML/@Numero',
+            '/fe:NominaIndividual/InformacionGeneral/@FechaGen',
+            '/fe:NominaIndividual/InformacionGeneral/@HoraGen',
+            '/fe:NominaIndividual/DevengadosTotal',
+            '/fe:NominaIndividual/DeduccionesTotal',
+            '/fe:NominaIndividual/ComprobanteTotal',
+            '/fe:NominaIndividual/Empleador/@NIT',
+            '/fe:NominaIndividual/Trabajador/@NumeroDocumento',
+            '/fe:NominaIndividual/InformacionGeneral/@TipoXML',
+            tuple([self.software_pin]),
+            '/fe:NominaIndividual/InformacionGeneral/@Ambiente'
         ]
+        campos = fexml.get_elements_text_or_attributes(xpaths)
+        
         cune = "".join(campos)
         print(cune)
         h = hashlib.sha384()
