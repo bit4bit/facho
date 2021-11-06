@@ -6,6 +6,7 @@
 # creando las estructuras minimas necesaras.
 
 from dataclasses import dataclass
+import hashlib
 
 from .. import fe
 from .. import form
@@ -14,10 +15,114 @@ from .devengado import *
 from .deduccion import *
 
 from .amount import Amount
+from .exception import *
 
+@dataclass
+class NumeroSecuencia:
+    numero: str
 
-class DIANNominaIndividualError(Exception):
-    pass
+    def apply(self, fragment):
+        fragment.set_attributes('./NumeroSecuenciaXML',
+                                Numero = self.numero)
+        
+@dataclass
+class InformacionGeneral:
+    class TIPO_AMBIENTE:
+        pass
+
+    # TABLA 5.1.1
+    @dataclass
+    class AMBIENTE_PRODUCCION(TIPO_AMBIENTE):
+        valor: str = '1'
+    @dataclass
+    class AMBIENTE_PRUEBAS(TIPO_AMBIENTE):
+        valor: str = '2'
+
+    fecha_generacion: str
+    hora_generacion: str
+    tipo_ambiente: TIPO_AMBIENTE
+    software_pin: str
+
+    def apply(self, fragment):
+        fragment.set_attributes('./InformacionGeneral',
+                                # NIE022
+                                Version = 'V1.0: Documento Soporte de Pago de Nómina ElectrónicaV1.0',
+                                # NIE023
+                                Ambiente = self.tipo_ambiente.valor,
+                                # NIE202
+                                # TABLA 5.5.2
+                                # TODO(bit4bit) solo NominaIndividual
+                                TipoXML = '102',
+                                # NIE024
+                                CUNE = None,
+                                # NIE025
+                                EncripCUNE = 'SHA-384',
+                                # NIE026
+                                FechaGen = self.fecha_generacion,
+                                # NIE027
+                                HoraGen = self.hora_generacion,
+                                # TODO(bit4bit) resto...
+                                # .....
+                                )
+
+    def post_apply(self, fexml, fragment):
+        devengados = map(lambda valor: Amount(valor),
+                         [
+                             fexml.get_element_attribute('/fe:NominaIndividual/Devengados/Basico', 'SueldoTrabajado')
+                         ]
+                         )
+        devengados_total = Amount(0.0)
+        for devengado in devengados:
+            devengados_total += devengado
+        fexml.set_element('/fe:NominaIndividual/DevengadosTotal', round(devengados_total,2))
+
+        # TODO
+        fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', '1000000.00')
+
+        # TODO
+        fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', '2500000.00')
+
+        # generar cune
+        campos = [
+            fexml.get_element_attribute('/fe:NominaIndividual/NumeroSecuenciaXML', 'Numero'),
+            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'FechaGen'),
+            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'HoraGen'),
+            fexml.get_element_text('/fe:NominaIndividual/DevengadosTotal'),
+            fexml.get_element_text('/fe:NominaIndividual/DeduccionesTotal'),
+            fexml.get_element_text('/fe:NominaIndividual/ComprobanteTotal'),
+            fexml.get_element_attribute('/fe:NominaIndividual/Empleador', 'NIT'),
+            fexml.get_element_attribute('/fe:NominaIndividual/Trabajador', 'NumeroDocumento'),
+            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'TipoXML'),
+            self.software_pin,
+            fexml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'Ambiente')
+        ]
+        cune = "".join(campos)
+        print(cune)
+        h = hashlib.sha384()
+        h.update(cune.encode('utf-8'))
+        cune_hash = h.hexdigest()
+    
+        fragment.set_attributes(
+            './InformacionGeneral',
+            # NIE024
+            CUNE = cune_hash
+        )
+
+@dataclass
+class Empleador:
+    nit: str
+
+    def apply(self, fragment):
+        fragment.set_attributes('./Empleador',
+                                NIT = self.nit)
+    
+@dataclass
+class Trabajador:
+    numero_documento: str
+
+    def apply(self, fragment):
+        fragment.set_attributes('./Trabajador',
+                                NumeroDocumento = self.numero_documento)
 
 class DIANNominaIndividual:
     def __init__(self):
@@ -25,12 +130,44 @@ class DIANNominaIndividual:
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
+        self.fexml.placeholder_for('./NumeroSecuenciaXML')
+        self.fexml.placeholder_for('./InformacionGeneral')
+        self.fexml.placeholder_for('./Empleador')
+        self.fexml.placeholder_for('./Trabajador')
         self.fexml.placeholder_for('./Devengados/Basico')
         self.fexml.placeholder_for('./Devengados/Transporte', optional=True)
 
+
+        self.informacion_general_xml = self.fexml.fragment('./InformacionGeneral')
+        self.numero_secuencia_xml = self.fexml.fragment('./NumeroSecuenciaXML')
+        self.empleador = self.fexml.fragment('./Empleador')
+        self.trabajador = self.fexml.fragment('./Trabajador')
         self.devengados = self.fexml.fragment('./Devengados')
         self.deducciones = self.fexml.fragment('./Deducciones')
 
+        self.informacion_general = None
+
+    def asignar_numero_secuencia(self, secuencia):
+        if not isinstance(secuencia, NumeroSecuencia):
+            raise ValueError('se espera tipo NumeroSecuencia')
+        secuencia.apply(self.numero_secuencia_xml)
+
+    def asignar_informacion_general(self, general):
+        if not isinstance(general, InformacionGeneral):
+            raise ValueError('se espera tipo InformacionGeneral')
+        self.informacion_general = general
+        self.informacion_general.apply(self.informacion_general_xml)
+
+    def asignar_empleador(self, empleador):
+        if not isinstance(empleador, Empleador):
+            raise ValueError('se espera tipo Empleador')
+        empleador.apply(self.empleador)
+
+    def asignar_trabajador(self, trabajador):
+        if not isinstance(trabajador, Trabajador):
+            raise ValueError('se espera tipo Trabajador')
+        trabajador.apply(self.trabajador)
+        
     def adicionar_devengado(self, devengado):
         if not isinstance(devengado, Devengado):
             raise ValueError('se espera tipo Devengado')
@@ -83,4 +220,7 @@ class DIANNominaIndividual:
         return errors
 
     def toFachoXML(self):
+        if self.informacion_general is not None:
+            self.informacion_general.post_apply(self.fexml, self.informacion_general_xml)
+
         return self.fexml
