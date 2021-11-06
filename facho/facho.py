@@ -353,7 +353,9 @@ class FachoXML:
 
     def get_element_attribute(self, xpath, attribute):
         elem = self.get_element(xpath)
-        print(elem.attrib)
+        if elem is None:
+            raise ValueError("xpath %s not found" % (xpath))
+
         return self.builder.get_attribute(elem, attribute)
 
     def get_element(self, xpath):

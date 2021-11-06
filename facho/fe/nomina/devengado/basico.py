@@ -16,5 +16,5 @@ class DevengadoBasico(Devengado):
                                 # NIE069
                                 DiasTrabajados = str(self.dias_trabajados),
                                 # NIE070
-                                SueldoTrabajado = str(self.sueldo_trabajado)
+                                SueldoTrabajado = round(self.sueldo_trabajado, 2)
                                 )
