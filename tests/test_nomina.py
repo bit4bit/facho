@@ -32,6 +32,41 @@ def test_adicionar_devengado_transporte():
 
     assert xml.get_element_attribute('/fe:NominaIndividual/Devengados/Transporte', 'AuxilioTransporte') == '2000000.0'
 
+def test_adicionar_devengado_comprobante_total():
+    nomina = fe.nomina.DIANNominaIndividual()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
+        dias_trabajados = 60,
+        sueldo_trabajado = fe.nomina.Amount(2_000_000)
+    ))
+
+    nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
+        porcentaje = fe.nomina.Amount(19),
+        deduccion = fe.nomina.Amount(1_000_000)
+    ))
+
+
+    xml = nomina.toFachoXML()
+
+    assert xml.get_element_text('/fe:NominaIndividual/ComprobanteTotal') == '1000000.00'
+
+def test_adicionar_devengado_comprobante_total_cero():
+    nomina = fe.nomina.DIANNominaIndividual()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
+        dias_trabajados = 60,
+        sueldo_trabajado = fe.nomina.Amount(1_000_000)
+    ))
+
+    nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
+        porcentaje = fe.nomina.Amount(19),
+        deduccion = fe.nomina.Amount(1_000_000)
+    ))
+
+    xml = nomina.toFachoXML()
+
+    assert xml.get_element_text('/fe:NominaIndividual/ComprobanteTotal') == '0.00'
+
 def test_adicionar_devengado_transporte_muchos():
     nomina = fe.nomina.DIANNominaIndividual()
 
@@ -45,11 +80,15 @@ def test_adicionar_devengado_transporte_muchos():
 
     xml = nomina.toFachoXML()
     print(xml)
-    assert str(xml) == """<NominaIndividual xmlns:facho="http://git.disroot.org/Etrivial/facho" xmlns="http://www.dian.gov.co/contratos/facturaelectronica/v1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cdt="urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1" xmlns:clm54217="urn:un:unece:uncefact:codelist:specification:54217:2001" xmlns:clmIANAMIMEMediaType="urn:un:unece:uncefact:codelist:specification:IANAMIMEMediaType:2003" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sts="dian:gov:co:facturaelectronica:Structures-2-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sig="http://www.w3.org/2000/09/xmldsig#"><NumeroSecuenciaXML/><InformacionGeneral/><Empleador/><Trabajador/><Devengados><Basico/><Transporte AuxilioTransporte="2000000.0"/><Transporte AuxilioTransporte="3000000.0"/></Devengados><Deducciones/></NominaIndividual>"""
-
+    assert xml.get_element_text('/fe:NominaIndividual/DevengadosTotal') == '5000000.00'
 
 def test_adicionar_deduccion_salud():
     nomina = fe.nomina.DIANNominaIndividual()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
+        dias_trabajados = 60,
+        sueldo_trabajado = fe.nomina.Amount(1000)
+    ))
 
     nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
         porcentaje = fe.nomina.Amount(19),
@@ -58,7 +97,7 @@ def test_adicionar_deduccion_salud():
 
     xml = nomina.toFachoXML()
     print(xml)
-    assert str(xml) == """<NominaIndividual xmlns:facho="http://git.disroot.org/Etrivial/facho" xmlns="http://www.dian.gov.co/contratos/facturaelectronica/v1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cdt="urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1" xmlns:clm54217="urn:un:unece:uncefact:codelist:specification:54217:2001" xmlns:clmIANAMIMEMediaType="urn:un:unece:uncefact:codelist:specification:IANAMIMEMediaType:2003" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sts="dian:gov:co:facturaelectronica:Structures-2-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sig="http://www.w3.org/2000/09/xmldsig#"><NumeroSecuenciaXML/><InformacionGeneral/><Empleador/><Trabajador/><Devengados><Basico/></Devengados><Deducciones><Salud Porcentaje="19.0" Deduccion="1000.0"/></Deducciones></NominaIndividual>"""
+    assert xml.get_element_text('/fe:NominaIndividual/DeduccionesTotal') == '1000.00'
 
 def test_nomina_obligatorios_segun_anexo_tecnico():
     nomina = fe.nomina.DIANNominaIndividual()
@@ -96,6 +135,11 @@ def test_nomina_cune():
     nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
         dias_trabajados = 60,
         sueldo_trabajado = fe.nomina.Amount(3_500_000)
+    ))
+
+    nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
+        porcentaje = fe.nomina.Amount(19),
+        deduccion = fe.nomina.Amount(1_000_000)
     ))
 
     xml = nomina.toFachoXML()

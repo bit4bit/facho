@@ -98,10 +98,13 @@ class LXMLBuilder:
     def set_text(self, elem, text):
         elem.text = text
 
-    def xpath(self, elem, xpath):
+    def xpath(self, elem, xpath, multiple=False):
         elems = elem.xpath(xpath, namespaces=self.nsmap)
         if elems:
-            return elems[0]
+            if multiple:
+                return elems
+            else:
+                return elems[0]
 
         return None
 
@@ -351,32 +354,63 @@ class FachoXML:
                 self.builder.set_attribute(elem, k, str(v))
         return self
 
-    def get_element_attribute(self, xpath, attribute):
-        elem = self.get_element(xpath)
+    def get_element_attribute(self, xpath, attribute, multiple=False):
+        elem = self.get_element(xpath, multiple=multiple)
+
         if elem is None:
             raise ValueError("xpath %s not found" % (xpath))
 
-        return self.builder.get_attribute(elem, attribute)
+        if multiple:
+            vals = []
+            for e in elem:
+                vals.append(self.builder.get_attribute(e, attribute))
+            return vals
+        else:
+            return self.builder.get_attribute(elem, attribute)
 
-    def get_element(self, xpath):
+    def get_element(self, xpath, multiple=False):
         xpath = self.fragment_prefix + self._path_xpath_for(xpath)
-        return self.builder.xpath(self.root, xpath)
+        return self.builder.xpath(self.root, xpath, multiple=multiple)
 
-    def get_element_text(self, xpath, format_=str):
+    def get_element_text(self, xpath, format_=str, multiple=False):
         xpath = self.fragment_prefix + self._path_xpath_for(xpath)
-        elem = self.builder.xpath(self.root, xpath)
-        text = self.builder.get_text(elem)
-        return format_(text)
+        elem = self.builder.xpath(self.root, xpath, multiple=multiple)
+        if multiple:
+            vals = []
+            for e in elem:
+                text = self.builder.get_text(e)
+                if text is not None:
+                    vals.append(format_(text))
+            return vals
+        else:
+            text = self.builder.get_text(elem)
+            if text is None:
+                return None
+            return format_(text)
 
-    def get_element_text_or_attribute(self, xpath):
+    def get_element_text_or_attribute(self, xpath, default=None, multiple=False):
         parts = xpath.split('/')
         is_attribute =  parts[-1].startswith('@')
         if is_attribute:
             attribute_name = parts.pop(-1).lstrip('@')
             element_path = "/".join(parts)
-            return self.get_element_attribute(element_path, attribute_name)
+            try:
+                val = self.get_element_attribute(element_path, attribute_name, multiple=multiple)
+                if val is None:
+                    return default
+                return val
+            except KeyError:
+                return default
+            except ValueError:
+                return default
         else:
-            return self.get_element_text(xpath)
+            try:
+                val = self.get_element_text(xpath, multiple=multiple)
+                if val is None:
+                    return default
+                return val
+            except ValueError:
+                return default
 
     def exist_element(self, xpath):
         elem = self.get_element(xpath)
