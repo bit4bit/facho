@@ -125,6 +125,10 @@ def test_nomina_cune():
 
     nomina.asignar_empleador(fe.nomina.Empleador(
         nit = '700085371',
+        dv = '1',
+        pais = fe.nomina.Pais(
+            code = 'CO'
+        )
     ))
 
     nomina.asignar_trabajador(fe.nomina.Trabajador(
