@@ -185,3 +185,10 @@ def assert_error(errors, msg):
 
     raise "wants error: %s" % (msg)
 
+
+def test_asignar_pago():
+    nomina = fe.nomina.DIANNominaIndividual()
+    nomina.asignar_pago(fe.nomina.Pago(
+        forma = fe.nomina.FormaPago(code='1'),
+        metodo = fe.nomina.MetodoPago(code='1')
+    ))

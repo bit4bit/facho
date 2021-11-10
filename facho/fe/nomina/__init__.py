@@ -240,6 +240,40 @@ class Trabajador:
                                 CodigoTrabajador = self.codigo_trabajador
                                 )
 
+
+
+@dataclass
+class FormaPago:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.FormasPago:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.FormasPago[self.code]['name']
+
+@dataclass
+class MetodoPago:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.MediosPago:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.MediosPago[self.code]['name']
+
+@dataclass
+class Pago:
+    forma: FormaPago
+    metodo: MetodoPago
+
+    def apply(self, fragment):
+        fragment.set_attributes('./Pago',
+                                # NIE064
+                                Forma = self.forma.code,
+                                # NIE065
+                                Metodo = self.metodo.code)
+                                
 class DIANNominaXML:
     def __init__(self, tag_document):
         self.tag_document = tag_document
@@ -251,6 +285,7 @@ class DIANNominaXML:
         self.fexml.placeholder_for('./InformacionGeneral')
         self.fexml.placeholder_for('./Empleador')
         self.fexml.placeholder_for('./Trabajador')
+        self.fexml.placeholder_for('./Pago')
         self.fexml.placeholder_for('./Devengados/Basico')
         self.fexml.placeholder_for('./Devengados/Transporte', optional=True)
 
@@ -259,6 +294,7 @@ class DIANNominaXML:
         self.numero_secuencia_xml = self.fexml.fragment('./NumeroSecuenciaXML')
         self.empleador = self.fexml.fragment('./Empleador')
         self.trabajador = self.fexml.fragment('./Trabajador')
+        self.pago_xml = self.fexml.fragment('./Pago')
         self.devengados = self.fexml.fragment('./Devengados')
         self.deducciones = self.fexml.fragment('./Deducciones')
 
@@ -274,6 +310,11 @@ class DIANNominaXML:
             raise ValueError('se espera tipo InformacionGeneral')
         self.informacion_general = general
         self.informacion_general.apply(self.informacion_general_xml)
+
+    def asignar_pago(self, pago):
+        if not isinstance(pago, Pago):
+            raise ValueError('se espera tipo Pago')
+        pago.apply(self.pago_xml)
 
     def asignar_empleador(self, empleador):
         if not isinstance(empleador, Empleador):
@@ -321,7 +362,12 @@ class DIANNominaXML:
             self.fexml.xpath_from_root('/Periodo'),
             'FechaIngreso',
             'se requiere Periodo')
-        
+
+        check_element(
+            self.fexml.xpath_from_root('/Pago'),
+            'se requiere Pago'
+        )
+
         check_element(
             self.fexml.xpath_from_root('/Devengados/Basico'),
             'se requiere DevengadoBasico'
