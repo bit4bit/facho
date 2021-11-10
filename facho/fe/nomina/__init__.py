@@ -98,11 +98,20 @@ class InformacionGeneral:
 class Pais(form.Country):
     pass
 
+class Departamento(form.CountrySubentity):
+    pass
+
+class Municipio(form.City):
+    pass
+
 @dataclass
 class Empleador:
     nit: str
     dv: str
     pais: Pais
+    departamento: Departamento
+    municipio: Municipio
+    direccion: str
 
     def apply(self, fragment):
         fragment.set_attributes('./Empleador',
@@ -111,7 +120,13 @@ class Empleador:
                                 # NIE034
                                 DV = self.dv,
                                 # NIE035
-                                Pais = self.pais.code
+                                Pais = self.pais.code,
+                                # NIE036
+                                DepartamentoEstado = self.departamento.code,
+                                # NIE037
+                                MunicipioCiudad = self.municipio.code,
+                                # NIE038
+                                Direccion = self.direccion
                                 )
     
 @dataclass

@@ -128,7 +128,14 @@ def test_nomina_cune():
         dv = '1',
         pais = fe.nomina.Pais(
             code = 'CO'
-        )
+        ),
+        departamento = fe.nomina.Departamento(
+            code = '05'
+        ),
+        municipio = fe.nomina.Municipio(
+            code = '05001'
+        ),
+        direccion = 'calle etrivial'
     ))
 
     nomina.asignar_trabajador(fe.nomina.Trabajador(
