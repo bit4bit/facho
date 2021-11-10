@@ -14,6 +14,13 @@ from ..data.dian import codelist
 
 from .devengado import *
 from .deduccion import *
+from .trabajador import *
+from .empleador import *
+from .pago import *
+
+from .pais import Pais
+from .departamento import Departamento
+from .municipio import Municipio
 
 from .amount import Amount
 from .exception import *
@@ -96,184 +103,7 @@ class InformacionGeneral:
             CUNE = cune_hash
         )
 
-class Pais(form.Country):
-    pass
 
-class Departamento(form.CountrySubentity):
-    pass
-
-class Municipio(form.City):
-    pass
-
-@dataclass
-class Empleador:
-    nit: str
-    dv: str
-    pais: Pais
-    departamento: Departamento
-    municipio: Municipio
-    direccion: str
-
-    def apply(self, fragment):
-        fragment.set_attributes('./Empleador',
-                                # NIE033
-                                NIT = self.nit,
-                                # NIE034
-                                DV = self.dv,
-                                # NIE035
-                                Pais = self.pais.code,
-                                # NIE036
-                                DepartamentoEstado = self.departamento.code,
-                                # NIE037
-                                MunicipioCiudad = self.municipio.code,
-                                # NIE038
-                                Direccion = self.direccion
-                                )
-
-
-@dataclass
-class TipoTrabajador:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.TipoTrabajador:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.TipoTrabajador[self.code]['name']
-
-@dataclass
-class SubTipoTrabajador:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.SubTipoTrabajador:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.SubTipoTrabajador[self.code]['name']
-
-@dataclass
-class TipoDocumento:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.TipoIdFiscal:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.TipoIdFiscal[self.code]['name']
-
-@dataclass
-class TipoContrato:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.TipoContrato:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.TipoContrato[self.code]['name']
-
-@dataclass
-class LugarTrabajo:
-    pais: Pais
-    departamento: Departamento
-    municipio: Municipio
-    direccion: str
-
-@dataclass
-class Trabajador:
-    tipo_contrato: TipoContrato
-    tipo_documento: TipoDocumento
-    numero_documento: str
-
-    primer_apellido: str
-    segundo_apellido: str
-    primer_nombre: str
-
-    lugar_trabajo: LugarTrabajo
-    alto_riesgo: bool
-    salario_integral: bool
-    sueldo: Amount
-
-    tipo: TipoTrabajador
-
-    codigo_trabajador: str = None
-    otros_nombres: str = None
-    sub_tipo: SubTipoTrabajador = SubTipoTrabajador(code='00')
-
-    def apply(self, fragment):
-        fragment.set_attributes('./Trabajador',
-                                # NIE041
-                                TipoTrabajador = self.tipo.code,
-                                # NIE042
-                                SubTipoTrabajador = self.sub_tipo.code,
-                                # NIE043
-                                AltoRiesgoPension = str(self.alto_riesgo).lower(),
-                                # NIE044
-                                TipoDocumento = self.tipo_documento.code,
-                                # NIE045
-                                NumeroDocumento = self.numero_documento,
-                                # NIE046
-                                PrimerApellido = self.primer_apellido,
-                                # NIE047
-                                SegundoApellido = self.segundo_apellido,
-                                # NIE048
-                                PrimerNombre = self.primer_nombre,
-                                # NIE049
-                                OtrosNombres = self.otros_nombres,
-                                # NIE050
-                                LugarTrabajoPais = self.lugar_trabajo.pais.code,
-
-                                # NIE051
-                                LugarTrabajoDepartamentoEstadoEstado = self.lugar_trabajo.departamento.code,
-
-                                # NIE052
-                                LugarTrabajoMunicipioCiudad = self.lugar_trabajo.municipio.code,
-
-                                # NIE053
-                                LugarTrabajoDireccion = self.lugar_trabajo.direccion,
-                                # NIE056
-                                SalarioIntegral = str(self.salario_integral).lower(),
-                                # NIE061
-                                TipoContrato = self.tipo_contrato.code,
-                                # NIE062
-                                Sueldo = str(self.sueldo),
-                                # NIE063
-                                CodigoTrabajador = self.codigo_trabajador
-                                )
-
-
-
-@dataclass
-class FormaPago:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.FormasPago:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.FormasPago[self.code]['name']
-
-@dataclass
-class MetodoPago:
-    code: str
-    name: str = ''
-
-    def __post_init__(self):
-        if self.code not in codelist.MediosPago:
-            raise ValueError("code [%s] not found" % (self.code))
-        self.name = codelist.MediosPago[self.code]['name']
-
-@dataclass
-class Pago:
-    forma: FormaPago
-    metodo: MetodoPago
-
-    def apply(self, fragment):
-        fragment.set_attributes('./Pago',
-                                # NIE064
-                                Forma = self.forma.code,
-                                # NIE065
-                                Metodo = self.metodo.code)
-                                
 class DIANNominaXML:
     def __init__(self, tag_document):
         self.tag_document = tag_document
