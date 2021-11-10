@@ -95,13 +95,24 @@ class InformacionGeneral:
             CUNE = cune_hash
         )
 
+class Pais(form.Country):
+    pass
+
 @dataclass
 class Empleador:
     nit: str
+    dv: str
+    pais: Pais
 
     def apply(self, fragment):
         fragment.set_attributes('./Empleador',
-                                NIT = self.nit)
+                                # NIE033
+                                NIT = self.nit,
+                                # NIE034
+                                DV = self.dv,
+                                # NIE035
+                                Pais = self.pais.code
+                                )
     
 @dataclass
 class Trabajador:
