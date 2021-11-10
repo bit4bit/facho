@@ -99,3 +99,5 @@ UnidadesMedida = CodeList(path_for_codelist('UnidadesMedida-2.1.gc'), 'code', 'n
 TipoTrabajador = CodeList(path_for_codelist('TipoTrabajador-2.1.gc'), 'code', 'name')
 SubTipoTrabajador = CodeList(path_for_codelist('SubTipoTrabajador-2.1.gc'), 'code', 'name')
 TipoContrato = CodeList(path_for_codelist('TipoContrato-2.1.gc'), 'code', 'name')
+PeriodoNomina = CodeList(path_for_codelist('PeriodoNomina-2.1.gc'), 'code', 'name')
+TipoMoneda = CodeList(path_for_codelist('TipoMoneda-2.1.gc'), 'code', 'name')
