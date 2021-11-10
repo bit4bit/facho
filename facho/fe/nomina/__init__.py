@@ -69,17 +69,17 @@ class InformacionGeneral:
         # generar cune
         # ver 8.1.1.1
         xpaths = [
-            '/fe:NominaIndividual/NumeroSecuenciaXML/@Numero',
-            '/fe:NominaIndividual/InformacionGeneral/@FechaGen',
-            '/fe:NominaIndividual/InformacionGeneral/@HoraGen',
-            '/fe:NominaIndividual/DevengadosTotal',
-            '/fe:NominaIndividual/DeduccionesTotal',
-            '/fe:NominaIndividual/ComprobanteTotal',
-            '/fe:NominaIndividual/Empleador/@NIT',
-            '/fe:NominaIndividual/Trabajador/@NumeroDocumento',
-            '/fe:NominaIndividual/InformacionGeneral/@TipoXML',
+            fexml.xpath_from_root('/NumeroSecuenciaXML/@Numero'),
+            fexml.xpath_from_root('/InformacionGeneral/@FechaGen'),
+            fexml.xpath_from_root('/InformacionGeneral/@HoraGen'),
+            fexml.xpath_from_root('/DevengadosTotal'),
+            fexml.xpath_from_root('/DeduccionesTotal'),
+            fexml.xpath_from_root('/ComprobanteTotal'),
+            fexml.xpath_from_root('/Empleador/@NIT'),
+            fexml.xpath_from_root('/Trabajador/@NumeroDocumento'),
+            fexml.xpath_from_root('/InformacionGeneral/@TipoXML'),
             tuple([self.software_pin]),
-            '/fe:NominaIndividual/InformacionGeneral/@Ambiente'
+            fexml.xpath_from_root('/InformacionGeneral/@Ambiente')
         ]
         campos = fexml.get_elements_text_or_attributes(xpaths)
         
@@ -111,9 +111,10 @@ class Trabajador:
         fragment.set_attributes('./Trabajador',
                                 NumeroDocumento = self.numero_documento)
 
-class DIANNominaIndividual:
-    def __init__(self):
-        self.fexml = fe.FeXML('NominaIndividual', 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+class DIANNominaXML:
+    def __init__(self, tag_document):
+        self.tag_document = tag_document
+        self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
@@ -187,20 +188,23 @@ class DIANNominaIndividual:
             if elem.get(key, None) is None:
                 return errors.append(err)
 
-        check_attribute('/fe:NominaIndividual/Periodo', 'FechaIngreso', 'se requiere Periodo')
+        check_attribute(
+            self.fexml.xpath_from_root('/Periodo'),
+            'FechaIngreso',
+            'se requiere Periodo')
         
         check_element(
-            '/fe:NominaIndividual/Devengados/Basico',
+            self.fexml.xpath_from_root('/Devengados/Basico'),
             'se requiere DevengadoBasico'
         )
         
         check_element(
-            '/fe:NominaIndividual/Deducciones/Salud',
+            self.fexml.xpath_from_root('/Deducciones/Salud'),
             'se requiere DeduccionSalud'
         )
 
         check_element(
-            '/fe:NominaIndividual/Deducciones/FondoPension',
+            self.fexml.xpath_from_root('/Deducciones/FondoPension'),
             'se requiere DeduccionFondoPension'
         )
 
@@ -220,17 +224,17 @@ class DIANNominaIndividual:
         return self.fexml
 
     def _comprobante_total(self):
-        devengados_total = self.fexml.get_element_text_or_attribute('/fe:NominaIndividual/DevengadosTotal', '0.0')
-        deducciones_total = self.fexml.get_element_text_or_attribute('/fe:NominaIndividual/DeduccionesTotal', '0.0')
+        devengados_total = self.fexml.get_element_text_or_attribute(self.fexml.xpath_from_root('/DevengadosTotal'), '0.0')
+        deducciones_total = self.fexml.get_element_text_or_attribute(self.fexml.xpath_from_root('/DeduccionesTotal'), '0.0')
 
         comprobante_total = Amount(devengados_total) - Amount(deducciones_total)
 
-        self.fexml.set_element('/fe:NominaIndividual/ComprobanteTotal', str(round(comprobante_total, 2)))
+        self.fexml.set_element(self.fexml.xpath_from_root('/ComprobanteTotal'), str(round(comprobante_total, 2)))
 
     def _deducciones_total(self):
         xpaths = [
-            '/fe:NominaIndividual/Deducciones/Salud/@Deduccion',
-            '/fe:NominaIndividual/Deducciones/FondoPension/@Deduccion'
+            self.fexml.xpath_from_root('/Deducciones/Salud/@Deduccion'),
+            self.fexml.xpath_from_root('/Deducciones/FondoPension/@Deduccion')
         ]
         deducciones = map(lambda valor: Amount(valor),
                           self._values_of_xpaths(xpaths))
@@ -240,14 +244,14 @@ class DIANNominaIndividual:
         for deduccion in deducciones:
             deducciones_total += deduccion
 
-        self.fexml.set_element('/fe:NominaIndividual/DeduccionesTotal', str(round(deducciones_total, 2)))
+        self.fexml.set_element(f'/fe:{self.tag_document}/DeduccionesTotal', str(round(deducciones_total, 2)))
 
     def _devengados_total(self):
         xpaths = [
-            '/fe:NominaIndividual/Devengados/Basico/@SueldoTrabajado',
-            '/fe:NominaIndividual/Devengados/Transporte/@AuxilioTransporte',
-            '/fe:NominaIndividual/Devengados/Transporte/@ViaticoManuAlojS',
-            '/fe:NominaIndividual/Devengados/Transporte/@ViaticoManuAlojNS'
+            self.fexml.xpath_from_root('/Devengados/Basico/@SueldoTrabajado'),
+            self.fexml.xpath_from_root('/Devengados/Transporte/@AuxilioTransporte'),
+            self.fexml.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojS'),
+            self.fexml.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojNS')
         ]
         devengados = map(lambda valor: Amount(valor),
                          self._values_of_xpaths(xpaths))
@@ -256,7 +260,7 @@ class DIANNominaIndividual:
         for devengado in devengados:
             devengados_total += devengado
             
-        self.fexml.set_element('/fe:NominaIndividual/DevengadosTotal', str(round(devengados_total,2)))
+        self.fexml.set_element(self.fexml.xpath_from_root('/DevengadosTotal'), str(round(devengados_total,2)))
 
     def _values_of_xpaths(self, xpaths):
         xpaths_values_of_values = map(lambda val: self.fexml.get_element_text_or_attribute(val, multiple=True), xpaths)
@@ -270,3 +274,15 @@ class DIANNominaIndividual:
                 xpaths_values.append(xpath_value)
 
         return filter(lambda val: val is not None, xpaths_values)
+
+class DIANNominaIndividual(DIANNominaXML):
+
+    def __init__(self):
+        super().__init__('NominaIndividual')
+
+        
+# TODO(bit4bit) confirmar que no tienen en comun con NominaIndividual
+class DIANNominaIndividualDeAjuste(DIANNominaXML):
+
+    def __init__(self):
+        super().__init__('NominaIndividualDeAjuste')

@@ -370,3 +370,17 @@ def test_facho_xml_query_element_text_or_attribute():
 
     assert xml.get_element_text_or_attribute('/root/A') == 'contenido'
     assert xml.get_element_text_or_attribute('/root/A/@clave') == 'valor'
+
+def test_facho_xml_build_xml_absolute():
+    xml = facho.FachoXML('root')
+
+    xpath = xml.xpath_from_root('/A')
+    assert xpath == '/root/A'
+
+
+def test_facho_xml_build_xml_absolute_namespace():
+    xml = facho.FachoXML('{%s}root' % ('http://www.dian.gov.co/contratos/facturaelectronica/v1'),
+                         nsmap={'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1'})
+
+    xpath = xml.xpath_from_root('/A')
+    assert xpath == '/fe:root/A'

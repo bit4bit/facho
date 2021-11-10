@@ -455,5 +455,16 @@ class FachoXML:
     def tostring(self, **kw):
         return self.builder.tostring(self.root, **kw)
 
+    def xpath_from_root(self, xpath):
+        nsmap = {}
+        ns = ''
+        
+        if isinstance(self.nsmap, dict):
+            nsmap = dict(map(reversed, self.nsmap.items()))
+            ns = nsmap[etree.QName(self.root).namespace] + ':'
+
+        new_xpath = '/' + ns + etree.QName(self.root).localname + '/' + xpath.lstrip('/')
+        return new_xpath
+
     def __str__(self):
         return self.tostring()
