@@ -33,6 +33,27 @@ class NumeroSecuencia:
         fragment.set_attributes('./NumeroSecuenciaXML',
                                 Numero = self.numero)
         
+
+@dataclass
+class PeriodoNomina:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.PeriodoNomina:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.PeriodoNomina[self.code]['name']
+
+@dataclass
+class TipoMoneda:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoMoneda:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.TipoMoneda[self.code]['name']
+
 @dataclass
 class InformacionGeneral:
     class TIPO_AMBIENTE:
@@ -48,6 +69,8 @@ class InformacionGeneral:
 
     fecha_generacion: str
     hora_generacion: str
+    periodo_nomina: PeriodoNomina
+    tipo_moneda: TipoMoneda
     tipo_ambiente: TIPO_AMBIENTE
     software_pin: str
 
@@ -69,6 +92,10 @@ class InformacionGeneral:
                                 FechaGen = self.fecha_generacion,
                                 # NIE027
                                 HoraGen = self.hora_generacion,
+                                # NIE029
+                                PeriodoNomina = self.periodo_nomina.code,
+                                # NIE030
+                                TipoMoneda = self.tipo_moneda.code
                                 # TODO(bit4bit) resto...
                                 # .....
                                 )

@@ -120,7 +120,9 @@ def test_nomina_cune():
         fecha_generacion = '2020-01-16',
         hora_generacion = '1053:10-05:00',
         tipo_ambiente = fe.nomina.InformacionGeneral.AMBIENTE_PRODUCCION,
-        software_pin = '693'
+        software_pin = '693',
+        periodo_nomina = fe.nomina.PeriodoNomina(code='1'),
+        tipo_moneda = fe.nomina.TipoMoneda(code='COP')
     ))
 
     nomina.asignar_empleador(fe.nomina.Empleador(
