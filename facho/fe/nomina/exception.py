@@ -1,0 +1,2 @@
+class DIANNominaIndividualError(Exception):
+    pass
