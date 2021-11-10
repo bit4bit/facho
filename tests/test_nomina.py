@@ -139,7 +139,28 @@ def test_nomina_cune():
     ))
 
     nomina.asignar_trabajador(fe.nomina.Trabajador(
-        numero_documento = '800199436'
+        tipo_contrato = fe.nomina.TipoContrato(
+            code = '1'
+        ),
+        alto_riesgo = False,
+        tipo_documento = fe.nomina.TipoDocumento(
+            code = '11'
+        ),
+        primer_apellido = 'gnu',
+        segundo_apellido = 'emacs',
+        primer_nombre = 'facho',
+        lugar_trabajo = fe.nomina.LugarTrabajo(
+            pais = fe.nomina.Pais(code='CO'),
+            departamento = fe.nomina.Departamento(code='05'),
+            municipio = fe.nomina.Municipio(code='05001'),
+            direccion = 'calle facho'
+        ),
+        numero_documento = '800199436',
+        tipo = fe.nomina.TipoTrabajador(
+            code = '01'
+        ),
+        salario_integral = True,
+        sueldo = fe.nomina.Amount(1_500_000)
     ))
 
     nomina.adicionar_devengado(fe.nomina.DevengadoBasico(

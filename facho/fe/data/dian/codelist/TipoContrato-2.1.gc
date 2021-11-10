@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     creado por facho, la dian tiene oficial?
+     poblar usando anexo tecnico 5.5.2
+-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+	<Identification>
+		<ShortName>TipoContrato</ShortName>
+		<LongName xml:lang="es">Tipos de contratos</LongName>
+		<Version>1</Version>
+	</Identification>
+	<ColumnSet>
+		<Column Id="code" Use="required">
+			<ShortName>Code</ShortName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Column Id="name" Use="required">
+			<ShortName>Nombre</ShortName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Key Id="codeKey">
+			<ShortName>CodeKey</ShortName>
+			<ColumnRef Ref="code"/>
+		</Key>
+	</ColumnSet>
+	<SimpleCodeList>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>1</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Termino Fijo</SimpleValue>
+			</Value>
+		</Row>
+        </SimpleCodeList>
+</gc:CodeList>

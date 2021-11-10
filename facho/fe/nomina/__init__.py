@@ -10,6 +10,7 @@ import hashlib
 
 from .. import fe
 from .. import form
+from ..data.dian import codelist
 
 from .devengado import *
 from .deduccion import *
@@ -128,14 +129,116 @@ class Empleador:
                                 # NIE038
                                 Direccion = self.direccion
                                 )
-    
+
+
+@dataclass
+class TipoTrabajador:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoTrabajador:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.TipoTrabajador[self.code]['name']
+
+@dataclass
+class SubTipoTrabajador:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.SubTipoTrabajador:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.SubTipoTrabajador[self.code]['name']
+
+@dataclass
+class TipoDocumento:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoIdFiscal:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.TipoIdFiscal[self.code]['name']
+
+@dataclass
+class TipoContrato:
+    code: str
+    name: str = ''
+
+    def __post_init__(self):
+        if self.code not in codelist.TipoContrato:
+            raise ValueError("code [%s] not found" % (self.code))
+        self.name = codelist.TipoContrato[self.code]['name']
+
+@dataclass
+class LugarTrabajo:
+    pais: Pais
+    departamento: Departamento
+    municipio: Municipio
+    direccion: str
+
 @dataclass
 class Trabajador:
+    tipo_contrato: TipoContrato
+    tipo_documento: TipoDocumento
     numero_documento: str
+
+    primer_apellido: str
+    segundo_apellido: str
+    primer_nombre: str
+
+    lugar_trabajo: LugarTrabajo
+    alto_riesgo: bool
+    salario_integral: bool
+    sueldo: Amount
+
+    tipo: TipoTrabajador
+
+    codigo_trabajador: str = None
+    otros_nombres: str = None
+    sub_tipo: SubTipoTrabajador = SubTipoTrabajador(code='00')
 
     def apply(self, fragment):
         fragment.set_attributes('./Trabajador',
-                                NumeroDocumento = self.numero_documento)
+                                # NIE041
+                                TipoTrabajador = self.tipo.code,
+                                # NIE042
+                                SubTipoTrabajador = self.sub_tipo.code,
+                                # NIE043
+                                AltoRiesgoPension = str(self.alto_riesgo).lower(),
+                                # NIE044
+                                TipoDocumento = self.tipo_documento.code,
+                                # NIE045
+                                NumeroDocumento = self.numero_documento,
+                                # NIE046
+                                PrimerApellido = self.primer_apellido,
+                                # NIE047
+                                SegundoApellido = self.segundo_apellido,
+                                # NIE048
+                                PrimerNombre = self.primer_nombre,
+                                # NIE049
+                                OtrosNombres = self.otros_nombres,
+                                # NIE050
+                                LugarTrabajoPais = self.lugar_trabajo.pais.code,
+
+                                # NIE051
+                                LugarTrabajoDepartamentoEstadoEstado = self.lugar_trabajo.departamento.code,
+
+                                # NIE052
+                                LugarTrabajoMunicipioCiudad = self.lugar_trabajo.municipio.code,
+
+                                # NIE053
+                                LugarTrabajoDireccion = self.lugar_trabajo.direccion,
+                                # NIE056
+                                SalarioIntegral = str(self.salario_integral).lower(),
+                                # NIE061
+                                TipoContrato = self.tipo_contrato.code,
+                                # NIE062
+                                Sueldo = str(self.sueldo),
+                                # NIE063
+                                CodigoTrabajador = self.codigo_trabajador
+                                )
 
 class DIANNominaXML:
     def __init__(self, tag_document):

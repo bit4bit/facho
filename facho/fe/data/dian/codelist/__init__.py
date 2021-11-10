@@ -12,9 +12,6 @@ class CodeList:
         self.short_name = ''
         self.long_name = ''
         self.version = 1
-        self.canonical_uri = ''
-        self.canonical_version_uri = ''
-        self.location_uri = ''
 
         self.name_column = name_column
         self.rows = {}
@@ -27,9 +24,6 @@ class CodeList:
         self.short_name = tree.find('./Identification/ShortName').text
         self.long_name = tree.find('./Identification/LongName').text
         self.version = tree.find('./Identification/Version').text
-        self.canonical_uri = tree.find('./Identification/CanonicalUri').text
-        self.canonical_version_uri = tree.find('./Identification/CanonicalVersionUri').text
-        self.location_uri = tree.find('./Identification/LocationUri').text
 
         #obtener registros...
         for row in tree.findall('./SimpleCodeList/Row'):
@@ -101,3 +95,6 @@ Paises = CodeList(path_for_codelist('Paises-2.1.gc'), 'code', 'name')
 TipoIdFiscal = CodeList(path_for_codelist('TipoIdFiscal-2.1.gc'), 'code', 'name')
 CodigoDescuento = CodeList(path_for_codelist('CodigoDescuento-2.1.gc'), 'code', 'name')
 UnidadesMedida = CodeList(path_for_codelist('UnidadesMedida-2.1.gc'), 'code', 'name')
+TipoTrabajador = CodeList(path_for_codelist('TipoTrabajador-2.1.gc'), 'code', 'name')
+SubTipoTrabajador = CodeList(path_for_codelist('SubTipoTrabajador-2.1.gc'), 'code', 'name')
+TipoContrato = CodeList(path_for_codelist('TipoContrato-2.1.gc'), 'code', 'name')
