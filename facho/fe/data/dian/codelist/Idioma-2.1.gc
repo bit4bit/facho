@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     creado por facho, la dian tiene oficial?
+     poblar usando anexo tecnico 5.3.1
+-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+	<Identification>
+		<ShortName>Idioma</ShortName>
+		<LongName xml:lang="es">Idioma</LongName>
+		<Version>1</Version>
+	</Identification>
+	<ColumnSet>
+		<Column Id="iso-639-1" Use="required">
+			<ShortName>ISO 639 1</ShortName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Column Id="name" Use="required">
+			<ShortName>Nombre</ShortName>
+			<Data Type="normalizedString"/>
+		</Column>
+		<Key Id="codeKey">
+			<ShortName>CodeKey</ShortName>
+			<ColumnRef Ref="code"/>
+		</Key>
+	</ColumnSet>
+	<SimpleCodeList>
+		<Row>
+			<Value ColumnRef="iso-639-1">
+				<SimpleValue>es</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Español, castellano</SimpleValue>
+			</Value>
+		</Row>
+        </SimpleCodeList>
+</gc:CodeList>
