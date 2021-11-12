@@ -101,3 +101,4 @@ SubTipoTrabajador = CodeList(path_for_codelist('SubTipoTrabajador-2.1.gc'), 'cod
 TipoContrato = CodeList(path_for_codelist('TipoContrato-2.1.gc'), 'code', 'name')
 PeriodoNomina = CodeList(path_for_codelist('PeriodoNomina-2.1.gc'), 'code', 'name')
 TipoMoneda = CodeList(path_for_codelist('TipoMoneda-2.1.gc'), 'code', 'name')
+IdiomaISO6391 = CodeList(path_for_codelist('Idioma-2.1.gc'), 'iso-639-1', 'name')

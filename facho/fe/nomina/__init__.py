@@ -17,23 +17,65 @@ from .deduccion import *
 from .trabajador import *
 from .empleador import *
 from .pago import *
-
-from .pais import Pais
-from .departamento import Departamento
-from .municipio import Municipio
+from .lugar import Lugar
 
 from .amount import Amount
 from .exception import *
 
 @dataclass
 class NumeroSecuencia:
+    consecutivo: int
     numero: str
 
     def apply(self, fragment):
         fragment.set_attributes('./NumeroSecuenciaXML',
+                                # NIE011
+                                Consecutivo=self.consecutivo,
+                                # NIE012
                                 Numero = self.numero)
-        
 
+
+@dataclass
+class Proveedor:
+    nit: str
+    dv: int
+    software_id: str
+    software_sc: str
+
+    def apply(self, fragment):
+        fragment.set_attributes('./ProveedorXML',
+                                # NIE017
+                                NIT=self.nit,
+                                # NIE018
+                                DV=self.dv,
+                                # NIE019
+                                SoftwareID=self.software_id,
+                                # NIE020
+                                SoftwareSC=self.software_sc,
+                                )
+
+    def post_apply(self, fexml, fragment):
+        cune_xpath = fexml.xpath_from_root('/InformacionGeneral')
+        cune = fexml.get_element_attribute(cune_xpath, 'CUNE')
+        codigo_qr = f"https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
+        fragment.set_attributes('./ProveedorXML',
+                                CodigoQR=codigo_qr)
+        
+@dataclass
+class Metadata:
+    secuencia: NumeroSecuencia
+    # NIE013, NIE014, NIE015, NIE016
+    lugar_generacion: Lugar
+    proveedor: Proveedor
+
+    def apply(self, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+        self.secuencia.apply(numero_secuencia_xml)
+        self.lugar_generacion.apply(lugar_generacion_xml, './LugarGeneracionXML')
+        self.proveedor.apply(proveedor_xml)
+
+    def post_apply(self, fexml, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+        self.proveedor.post_apply(fexml, proveedor_xml)
+        
 @dataclass
 class PeriodoNomina:
     code: str
@@ -138,7 +180,12 @@ class DIANNominaXML:
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
+        self.fexml.placeholder_for('./UBLExtensions')
+        self.fexml.placeholder_for('./Novedad', optional=True)
+        self.fexml.placeholder_for('./Periodo')
         self.fexml.placeholder_for('./NumeroSecuenciaXML')
+        self.fexml.placeholder_for('./LugarGeneracionXML')
+        self.fexml.placeholder_for('./ProveedorXML')
         self.fexml.placeholder_for('./InformacionGeneral')
         self.fexml.placeholder_for('./Empleador')
         self.fexml.placeholder_for('./Trabajador')
@@ -149,6 +196,8 @@ class DIANNominaXML:
 
         self.informacion_general_xml = self.fexml.fragment('./InformacionGeneral')
         self.numero_secuencia_xml = self.fexml.fragment('./NumeroSecuenciaXML')
+        self.lugar_generacion_xml = self.fexml.fragment('./LugarGeneracionXML')
+        self.proveedor_xml = self.fexml.fragment('./ProveedorXML')
         self.empleador = self.fexml.fragment('./Empleador')
         self.trabajador = self.fexml.fragment('./Trabajador')
         self.pago_xml = self.fexml.fragment('./Pago')
@@ -156,12 +205,14 @@ class DIANNominaXML:
         self.deducciones = self.fexml.fragment('./Deducciones')
 
         self.informacion_general = None
+        self.metadata = None
 
-    def asignar_numero_secuencia(self, secuencia):
-        if not isinstance(secuencia, NumeroSecuencia):
-            raise ValueError('se espera tipo NumeroSecuencia')
-        secuencia.apply(self.numero_secuencia_xml)
-
+    def asignar_metadata(self, metadata):
+        if not isinstance(metadata, Metadata):
+            raise ValueError('se espera tipo Metadata')
+        self.metadata = metadata
+        self.metadata.apply(self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
+        
     def asignar_informacion_general(self, general):
         if not isinstance(general, InformacionGeneral):
             raise ValueError('se espera tipo InformacionGeneral')
@@ -246,12 +297,15 @@ class DIANNominaXML:
         self._devengados_total()
         self._deducciones_total()
         self._comprobante_total()
-        
+
         if self.informacion_general is not None:
             #TODO(bit4bit) acoplamiento temporal
             # es importante el orden de ejecucion
 
             self.informacion_general.post_apply(self.fexml, self.informacion_general_xml)
+
+        if self.metadata is not None:
+            self.metadata.post_apply(self.fexml, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
 
         return self.fexml
 

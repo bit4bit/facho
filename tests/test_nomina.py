@@ -109,12 +109,32 @@ def test_nomina_obligatorios_segun_anexo_tecnico():
     assert_error(errors, 'se requiere DeduccionSalud')
     assert_error(errors, 'se requiere DeduccionFondoPension')
 
-def test_nomina_cune():
+def test_nomina_xml():
     nomina = fe.nomina.DIANNominaIndividual()
 
-    nomina.asignar_numero_secuencia(fe.nomina.NumeroSecuencia(
-        numero = 'N00001'
-        ))
+    nomina.asignar_metadata(fe.nomina.Metadata(
+        secuencia=fe.nomina.NumeroSecuencia(
+            numero = 'N00001',
+            consecutivo=232
+        ),
+        lugar_generacion=fe.nomina.Lugar(
+            pais = fe.nomina.Pais(
+                code = 'CO'
+            ),
+            departamento = fe.nomina.Departamento(
+                code = '05'
+            ),
+            municipio = fe.nomina.Municipio(
+                code = '05001'
+            ),
+        ),
+        proveedor=fe.nomina.Proveedor(
+            nit='999999',
+            dv=2,
+            software_id='xx',
+            software_sc='yy'
+        )
+    ))
 
     nomina.asignar_informacion_general(fe.nomina.InformacionGeneral(
         fecha_generacion = '2020-01-16',
@@ -179,6 +199,16 @@ def test_nomina_cune():
     # TODO(bit4bit) no logro generar cune igual al del anexo tecnico
     #assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == '16560dc8956122e84ffb743c817fe7d494e058a44d9ca3fa4c234c268b4f766003253fbee7ea4af9682dd57210f3bac2'
     assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == 'b8f9b6c24de07ffd92ea5467433a3b69357cfaffa7c19722db94b2e0eca41d057085a54f484b5da15ff585e773b0b0ab'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Numero') == 'N00001'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Consecutivo') == '232'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@Pais') == 'CO'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@DepartamentoEstado') == '05'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@MunicipioCiudad') == '05001'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@NIT') == '999999'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@DV') == '2'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareID') == 'xx'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') == 'yy'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@CodigoQR') != None
 
 def assert_error(errors, msg):
     for error in errors:
