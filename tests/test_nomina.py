@@ -9,6 +9,15 @@ import pytest
 
 from facho import fe
 
+import helpers
+
+def assert_error(errors, msg):
+    for error in errors:
+        if str(error) == msg:
+            return True
+
+    raise "wants error: %s" % (msg)
+
 def test_adicionar_devengado_Basico():
     nomina = fe.nomina.DIANNominaIndividual()
 
@@ -210,13 +219,6 @@ def test_nomina_xml():
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') == 'yy'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@CodigoQR') != None
 
-def assert_error(errors, msg):
-    for error in errors:
-        if str(error) == msg:
-            return True
-
-    raise "wants error: %s" % (msg)
-
 
 def test_asignar_pago():
     nomina = fe.nomina.DIANNominaIndividual()
@@ -224,3 +226,16 @@ def test_asignar_pago():
         forma = fe.nomina.FormaPago(code='1'),
         metodo = fe.nomina.MetodoPago(code='1')
     ))
+
+def test_nomina_xmlsign(monkeypatch):
+    nomina = fe.nomina.DIANNominaIndividual()
+    xml = nomina.toFachoXML()
+
+    signer = fe.nomina.DianXMLExtensionSigner('./tests/example.p12')
+    with monkeypatch.context() as m:
+        helpers.mock_urlopen(m)
+        xml.add_extension(signer)
+
+    print(xml.tostring())
+    elem = xml.get_element('/fe:NominaIndividual/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
+    assert elem is not None

@@ -172,6 +172,16 @@ class InformacionGeneral:
             CUNE = cune_hash
         )
 
+class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
+
+    def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
+        super().__init__(pkcs12_path, passphrase=passphrase, mockpolicy=mockpolicy)
+
+    def build(self, fachoxml):
+        signature = self.sign_xml_element(fachoxml.root)
+        xpath = fachoxml.xpath_from_root('/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
+        extcontent = fachoxml.get_element(xpath)
+        fachoxml.append_element(extcontent, signature)
 
 class DIANNominaXML:
     def __init__(self, tag_document):
@@ -180,7 +190,7 @@ class DIANNominaXML:
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
-        self.fexml.placeholder_for('./UBLExtensions')
+        self.fexml.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
         self.fexml.placeholder_for('./Novedad', optional=True)
         self.fexml.placeholder_for('./Periodo')
         self.fexml.placeholder_for('./NumeroSecuenciaXML')
