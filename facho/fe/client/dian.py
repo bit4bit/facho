@@ -175,7 +175,21 @@ class GetStatusZip(SOAPService):
     def build_response(self, as_dict):
         return GetStatusResponse.fromdict(as_dict[0])
 
+@dataclass
+class SendNominaSync(SOAPService):
+    fileName: str
+    contentFile: bytes
 
+    def get_wsdl(self):
+        return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
+
+    def get_service(self):
+        return 'SendNominaSync'
+
+    def build_response(self, as_dict):
+        return as_dict
+
+    
 class Habilitacion:
     WSDL = 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
@@ -203,6 +217,9 @@ class Habilitacion:
         def get_wsdl(self):
             return Habilitacion.WSDL
 
+    class SendNominaSync(SendNominaSync):
+        def get_wsdl(self):
+            return Habilitacion.WSDL
 
 class DianGateway:
 
