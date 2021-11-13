@@ -313,6 +313,26 @@ def generate_nomina(private_key, passphrase, scriptname, ssl=True, sign=False, u
         DIANWrite(xml, output)
 
 @click.command()
+@click.option('--private-key', required=True)
+@click.option('--public-key', required=True)
+@click.option('--habilitacion/--produccion', default=False)
+@click.option('--password')
+@click.argument('filename', required=True)
+@click.argument('zipfile', type=click.Path(exists=True))
+def soap_send_nomina_sync(private_key, public_key, habilitacion, password, filename, zipfile):
+    from facho.fe.client import dian
+
+    client = dian.DianSignatureClient(private_key, public_key, password=password)
+    req = dian.SendNominaSync
+    if habilitacion:
+        req = dian.Habilitacion.SendNominaSync
+    resp = client.request(req(
+        filename,
+        open(zipfile, 'rb').read()
+    ))
+    print(resp)
+
+@click.command()
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
@@ -347,7 +367,8 @@ main.add_command(soap_get_status)
 main.add_command(soap_get_status_zip)
 main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)
-main.add_command(generate_nomina)
 main.add_command(validate_invoice)
 main.add_command(sign_xml)
 main.add_command(sign_verify_xml)
+main.add_command(generate_nomina)
+main.add_command(soap_send_nomina_sync)
