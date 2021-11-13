@@ -271,6 +271,46 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
         else:
             DIANWrite(xml, output)
 
+@click.command()
+@click.option('--private-key', type=click.Path(exists=True))
+@click.option('--passphrase')
+@click.option('--ssl/--no-ssl', default=False)
+@click.option('--sign/--no-sign', default=False)
+@click.option('--use-cache-policy/--no-use-cache-policy', default=False)
+@click.argument('scriptname', type=click.Path(exists=True), required=True)
+@click.argument('output', required=True)
+def generate_nomina(private_key, passphrase, scriptname, ssl=True, sign=False, use_cache_policy=False, output=None):
+    """
+    imprime xml en pantalla.
+    SCRIPTNAME espera
+     def nomina() -> fe.nomina.NominaIndividual
+     def extensions(fe.nomina.NominaIndividual): -> List[facho.FachoXMLExtension]
+    """
+
+    if not ssl:
+        disable_ssl()
+
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location('nomina', scriptname)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    from facho.fe.form_xml import DIANWriteSigned, DIANWrite
+    import facho.fe
+
+    nomina = module.nomina()
+
+    xml = nomina.toFachoXML()
+
+    extensions = module.extensions(nomina)
+    for extension in extensions:
+        xml.add_extension(extension)
+
+    if sign:
+        DIANWriteSigned(xml, output, private_key, passphrase, use_cache_policy, dian_signer=facho.fe.nomina.DianXMLExtensionSigner)
+    else:
+        DIANWrite(xml, output)
 
 @click.command()
 @click.option('--private-key', type=click.Path(exists=True))
@@ -307,6 +347,7 @@ main.add_command(soap_get_status)
 main.add_command(soap_get_status_zip)
 main.add_command(soap_get_numbering_range)
 main.add_command(generate_invoice)
+main.add_command(generate_nomina)
 main.add_command(validate_invoice)
 main.add_command(sign_xml)
 main.add_command(sign_verify_xml)

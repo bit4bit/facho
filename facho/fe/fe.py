@@ -301,14 +301,17 @@ class DianXMLExtensionSigner:
             self._passphrase = passphrase.encode('utf-8')
             
         return self
-    
+
+    def _element_extension_content(self, fachoxml):
+        return fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
+
     def sign_xml_string(self, document):
         xml = LXMLBuilder.from_string(document)
         signature = self.sign_xml_element(xml)
 
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
         #DIAN 1.7.-2020: FAB01
-        extcontent = fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
+        extcontent = self._element_extension_content(fachoxml)
         fachoxml.append_element(extcontent, signature)
 
         return fachoxml.tostring(xml_declaration=True, encoding='UTF-8')
@@ -372,7 +375,7 @@ class DianXMLExtensionSigner:
 
     def build(self, fachoxml):
         signature = self.sign_xml_element(fachoxml.root)
-        extcontent = fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent')
+        extcontent = self._element_extension_content(fachoxml)
         fachoxml.append_element(extcontent, signature)
 
         
