@@ -6,14 +6,19 @@
 # luego se pueden ejecutar las pruebas:
 #  * make -f Makefile.dev test
 
-.PHONY: dev-setup
+.PHONY: dev-setup dev-shell py-develop test tox
+
 dev-setup:
 	docker build -t facho .
 
-.PHONY: test
+py-develop:
+	docker run -t -v $(PWD):/app -w /app facho sh -c 'python3.7 setup.py develop --user'
+
+dev-shell:
+	docker run --rm -ti -v "$(PWD):/app" -w /app --name facho-cli facho bash
+
 test:
 	docker run -t -v $(PWD):/app -w /app facho sh -c 'cd /app; python3.7 setup.py test'
 
-.PHONY: tox
 tox:
 	docker run -it -v $(PWD)/:/app -w /app facho tox

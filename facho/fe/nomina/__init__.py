@@ -177,11 +177,9 @@ class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
     def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
         super().__init__(pkcs12_path, passphrase=passphrase, mockpolicy=mockpolicy)
 
-    def build(self, fachoxml):
-        signature = self.sign_xml_element(fachoxml.root)
-        xpath = fachoxml.xpath_from_root('/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
-        extcontent = fachoxml.get_element(xpath)
-        fachoxml.append_element(extcontent, signature)
+    def _element_extension_content(self, fachoxml):
+        return fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
+
 
 class DIANNominaXML:
     def __init__(self, tag_document):
