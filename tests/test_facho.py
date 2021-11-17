@@ -103,6 +103,7 @@ def test_facho_xml_fragment():
     invoice.set_element('/Invoice/Id', 1)
     assert xml.tostring() == '<root><Invoice><Id>1</Id></Invoice></root>'
 
+
 def test_facho_xml_fragments():
     xml = facho.FachoXML('Invoice')
 
@@ -128,6 +129,13 @@ def test_facho_xml_nested_fragments():
     party.set_element('/Party/LastName', 'test')
 
     assert xml.tostring() == '<Invoice><Party><Name>test</Name><Address><Line>line 1</Line></Address><LastName>test</LastName></Party></Invoice>'
+
+def test_facho_xml_get_element_text_of_fragment():
+    xml = facho.FachoXML('root')
+    invoice = xml.fragment('/root/Invoice')
+    invoice.set_element('/Invoice/Id', 1)
+    
+    assert invoice.get_element_text('/Invoice/Id') == '1'
 
 def test_facho_xml_get_element_text():
     xml = facho.FachoXML('Invoice')
@@ -171,6 +179,11 @@ def test_facho_xml_fragment_relative():
     invoice.set_element('./Id', 1)
     assert xml.tostring() == '<root><Invoice><Id>1</Id></Invoice></root>'
 
+def test_facho_xml_get_element_fragment_relative():
+    xml = facho.FachoXML('root')
+    invoice = xml.fragment('./Invoice')
+    invoice.set_element('./Id', 1)
+    assert invoice.get_element_text('./Id') == '1'
 
 def test_facho_xml_replacement_for():
     xml = facho.FachoXML('root')
@@ -371,6 +384,14 @@ def test_facho_xml_query_element_text_or_attribute():
     assert xml.get_element_text_or_attribute('/root/A') == 'contenido'
     assert xml.get_element_text_or_attribute('/root/A/@clave') == 'valor'
 
+def test_facho_xml_query_element_text_or_attribute_from_fragment():
+    xml = facho.FachoXML('root')
+
+    invoice = xml.fragment('/root/Invoice')
+    invoice.set_element('./A', 'contenido')
+
+    assert invoice.get_element_text_or_attribute('/Invoice/A') == 'contenido'
+
 def test_facho_xml_build_xml_absolute():
     xml = facho.FachoXML('root')
 
@@ -384,3 +405,13 @@ def test_facho_xml_build_xml_absolute_namespace():
 
     xpath = xml.xpath_from_root('/A')
     assert xpath == '/fe:root/A'
+
+
+def test_facho_xml_build_xml_absolute_namespace_from_fragment():
+    xml = facho.FachoXML('{%s}root' % ('http://www.dian.gov.co/contratos/facturaelectronica/v1'),
+                         nsmap={'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1'})
+    invoice = xml.fragment('/root/Invoice')
+    
+    xpath = invoice.xpath_from_root('/A')
+    assert xpath == '/fe:root/Invoice/A'
+

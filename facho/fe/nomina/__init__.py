@@ -57,6 +57,8 @@ class Proveedor:
     def post_apply(self, fexml, fragment):
         cune_xpath = fexml.xpath_from_root('/InformacionGeneral')
         cune = fexml.get_element_attribute(cune_xpath, 'CUNE')
+        # TODO(bit4bit) https://catalogo‐vpfe‐hab.dian.gov.co/document/searchqr?documentkey=CUNE para habilitacion
+        # https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey=CUNE
         codigo_qr = f"https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
         fragment.set_attributes('./ProveedorXML',
                                 CodigoQR=codigo_qr)
@@ -182,35 +184,39 @@ class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
 
 
 class DIANNominaXML:
-    def __init__(self, tag_document):
+    def __init__(self, tag_document, xpath_ajuste=None):
         self.tag_document = tag_document
         self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
         self.fexml.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
-        self.fexml.placeholder_for('./Novedad', optional=True)
-        self.fexml.placeholder_for('./Periodo')
-        self.fexml.placeholder_for('./NumeroSecuenciaXML')
-        self.fexml.placeholder_for('./LugarGeneracionXML')
-        self.fexml.placeholder_for('./ProveedorXML')
-        self.fexml.placeholder_for('./InformacionGeneral')
-        self.fexml.placeholder_for('./Empleador')
-        self.fexml.placeholder_for('./Trabajador')
-        self.fexml.placeholder_for('./Pago')
-        self.fexml.placeholder_for('./Devengados/Basico')
-        self.fexml.placeholder_for('./Devengados/Transporte', optional=True)
+        self.fexml.placeholder_for('./TipoNota', optional=True)
+        self.root_fragment = self.fexml
+        if xpath_ajuste is not None:
+            self.root_fragment = self.fexml.fragment(xpath_ajuste)
+        self.root_fragment.placeholder_for('./Novedad', optional=True)
+        self.root_fragment.placeholder_for('./Periodo')
+        self.root_fragment.placeholder_for('./NumeroSecuenciaXML')
+        self.root_fragment.placeholder_for('./LugarGeneracionXML')
+        self.root_fragment.placeholder_for('./ProveedorXML')
+        self.root_fragment.placeholder_for('./InformacionGeneral')
+        self.root_fragment.placeholder_for('./Empleador')
+        self.root_fragment.placeholder_for('./Trabajador')
+        self.root_fragment.placeholder_for('./Pago')
+        self.root_fragment.placeholder_for('./Devengados/Basico')
+        self.root_fragment.placeholder_for('./Devengados/Transporte', optional=True)
 
 
-        self.informacion_general_xml = self.fexml.fragment('./InformacionGeneral')
-        self.numero_secuencia_xml = self.fexml.fragment('./NumeroSecuenciaXML')
-        self.lugar_generacion_xml = self.fexml.fragment('./LugarGeneracionXML')
-        self.proveedor_xml = self.fexml.fragment('./ProveedorXML')
-        self.empleador = self.fexml.fragment('./Empleador')
-        self.trabajador = self.fexml.fragment('./Trabajador')
-        self.pago_xml = self.fexml.fragment('./Pago')
-        self.devengados = self.fexml.fragment('./Devengados')
-        self.deducciones = self.fexml.fragment('./Deducciones')
+        self.informacion_general_xml = self.root_fragment.fragment('./InformacionGeneral')
+        self.numero_secuencia_xml = self.root_fragment.fragment('./NumeroSecuenciaXML')
+        self.lugar_generacion_xml = self.root_fragment.fragment('./LugarGeneracionXML')
+        self.proveedor_xml = self.root_fragment.fragment('./ProveedorXML')
+        self.empleador = self.root_fragment.fragment('./Empleador')
+        self.trabajador = self.root_fragment.fragment('./Trabajador')
+        self.pago_xml = self.root_fragment.fragment('./Pago')
+        self.devengados = self.root_fragment.fragment('./Devengados')
+        self.deducciones = self.root_fragment.fragment('./Deducciones')
 
         self.informacion_general = None
         self.metadata = None
@@ -310,25 +316,25 @@ class DIANNominaXML:
             #TODO(bit4bit) acoplamiento temporal
             # es importante el orden de ejecucion
 
-            self.informacion_general.post_apply(self.fexml, self.informacion_general_xml)
+            self.informacion_general.post_apply(self.root_fragment, self.informacion_general_xml)
 
         if self.metadata is not None:
-            self.metadata.post_apply(self.fexml, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
+            self.metadata.post_apply(self.root_fragment, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
 
         return self.fexml
 
     def _comprobante_total(self):
-        devengados_total = self.fexml.get_element_text_or_attribute(self.fexml.xpath_from_root('/DevengadosTotal'), '0.0')
-        deducciones_total = self.fexml.get_element_text_or_attribute(self.fexml.xpath_from_root('/DeduccionesTotal'), '0.0')
+        devengados_total = self.root_fragment.get_element_text_or_attribute('./DevengadosTotal', '0.0')
+        deducciones_total = self.root_fragment.get_element_text_or_attribute('./DeduccionesTotal', '0.0')
 
         comprobante_total = Amount(devengados_total) - Amount(deducciones_total)
 
-        self.fexml.set_element(self.fexml.xpath_from_root('/ComprobanteTotal'), str(round(comprobante_total, 2)))
+        self.root_fragment.set_element('./ComprobanteTotal', str(round(comprobante_total, 2)))
 
     def _deducciones_total(self):
         xpaths = [
-            self.fexml.xpath_from_root('/Deducciones/Salud/@Deduccion'),
-            self.fexml.xpath_from_root('/Deducciones/FondoPension/@Deduccion')
+            self.root_fragment.xpath_from_root('/Deducciones/Salud/@Deduccion'),
+            self.root_fragment.xpath_from_root('/Deducciones/FondoPension/@Deduccion')
         ]
         deducciones = map(lambda valor: Amount(valor),
                           self._values_of_xpaths(xpaths))
@@ -338,14 +344,14 @@ class DIANNominaXML:
         for deduccion in deducciones:
             deducciones_total += deduccion
 
-        self.fexml.set_element(f'/fe:{self.tag_document}/DeduccionesTotal', str(round(deducciones_total, 2)))
+        self.root_fragment.set_element('./DeduccionesTotal', str(round(deducciones_total, 2)))
 
     def _devengados_total(self):
         xpaths = [
-            self.fexml.xpath_from_root('/Devengados/Basico/@SueldoTrabajado'),
-            self.fexml.xpath_from_root('/Devengados/Transporte/@AuxilioTransporte'),
-            self.fexml.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojS'),
-            self.fexml.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojNS')
+            self.root_fragment.xpath_from_root('/Devengados/Basico/@SueldoTrabajado'),
+            self.root_fragment.xpath_from_root('/Devengados/Transporte/@AuxilioTransporte'),
+            self.root_fragment.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojS'),
+            self.root_fragment.xpath_from_root('/Devengados/Transporte/@ViaticoManuAlojNS')
         ]
         devengados = map(lambda valor: Amount(valor),
                          self._values_of_xpaths(xpaths))
@@ -354,7 +360,7 @@ class DIANNominaXML:
         for devengado in devengados:
             devengados_total += devengado
             
-        self.fexml.set_element(self.fexml.xpath_from_root('/DevengadosTotal'), str(round(devengados_total,2)))
+        self.root_fragment.set_element('./DevengadosTotal', str(round(devengados_total,2)))
 
     def _values_of_xpaths(self, xpaths):
         xpaths_values_of_values = map(lambda val: self.fexml.get_element_text_or_attribute(val, multiple=True), xpaths)
@@ -378,5 +384,18 @@ class DIANNominaIndividual(DIANNominaXML):
 # TODO(bit4bit) confirmar que no tienen en comun con NominaIndividual
 class DIANNominaIndividualDeAjuste(DIANNominaXML):
 
+    class Reemplazar(DIANNominaXML):
+        def __init__(self):
+            super().__init__('NominaIndividualDeAjuste', './Reemplazar')
+            # NIAE214
+            self.root_fragment.set_element('TipoNota', '1')
+            
+    class Eliminar(DIANNominaXML):
+        def __init__(self):
+            super().__init__('NominaIndividualDeAjuste', './Eliminar')
+            # NIAE214
+            self.root_fragment.set_element('TipoNota', '2')
+            
     def __init__(self):
         super().__init__('NominaIndividualDeAjuste')
+
