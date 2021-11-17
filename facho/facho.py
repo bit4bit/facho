@@ -153,19 +153,20 @@ class FachoXML:
     """
     Decora XML con funciones de consulta XPATH de un solo elemento
     """
-    def __init__(self, root, builder=None, nsmap=None, fragment_prefix=''):
+    def __init__(self, root, builder=None, nsmap=None, fragment_prefix='',fragment_root_element=None):
         if builder is None:
             self.builder = LXMLBuilder(nsmap)
         else:
             self.builder = builder
 
         self.nsmap = nsmap
-
+        
         if isinstance(root, str):
             self.root = self.builder.build_element_from_string(root, nsmap)
         else:
             self.root = root
 
+        self.fragment_root_element = fragment_root_element
         self.fragment_prefix = fragment_prefix
         self.xpath_for = {}
         self.extensions = []
@@ -195,7 +196,7 @@ class FachoXML:
 
         if parent is None:
             parent = self.find_or_create_element(xpath, append=append)
-        return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix)
+        return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix, fragment_root_element=self.root)
 
     def register_alias_xpath(self, alias, xpath):
         self.xpath_for[alias] = xpath
@@ -374,6 +375,9 @@ class FachoXML:
 
     def get_element_text(self, xpath, format_=str, multiple=False):
         xpath = self.fragment_prefix + self._path_xpath_for(xpath)
+        # MACHETE(bit4bit) al usar ./ queda ../
+        xpath = re.sub(r'^\.\.+', '.', xpath)
+
         elem = self.builder.xpath(self.root, xpath, multiple=multiple)
         if multiple:
             vals = []
@@ -458,12 +462,19 @@ class FachoXML:
     def xpath_from_root(self, xpath):
         nsmap = {}
         ns = ''
-        
+
+        root = self.root
+        if self.fragment_root_element is not None:
+            root = self.fragment_root_element
+            
         if isinstance(self.nsmap, dict):
             nsmap = dict(map(reversed, self.nsmap.items()))
-            ns = nsmap[etree.QName(self.root).namespace] + ':'
+            ns = nsmap[etree.QName(root).namespace] + ':'
 
-        new_xpath = '/' + ns + etree.QName(self.root).localname + '/' + xpath.lstrip('/')
+        if self.fragment_root_element is not None:
+            new_xpath = '/' + ns + etree.QName(root).localname + '/' + etree.QName(self.root).localname + '/' + xpath.lstrip('/')
+        else:
+            new_xpath = '/' + ns + etree.QName(root).localname + '/' + xpath.lstrip('/')
         return new_xpath
 
     def __str__(self):

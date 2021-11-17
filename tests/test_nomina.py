@@ -239,3 +239,47 @@ def test_nomina_xmlsign(monkeypatch):
     print(xml.tostring())
     elem = xml.get_element('/fe:NominaIndividual/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
     assert elem is not None
+
+
+def atest_nomina_ajuste_reemplazar():
+    nomina = fe.nomina.DIANNominaIndividualDeAjuste.Reemplazar()
+
+    xml = nomina.toFachoXML()
+    print(xml)
+    assert False
+
+
+def test_adicionar_reemplazar_devengado_comprobante_total():
+    nomina = fe.nomina.DIANNominaIndividualDeAjuste.Reemplazar()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
+        dias_trabajados = 60,
+        sueldo_trabajado = fe.nomina.Amount(2_000_000)
+    ))
+
+    nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
+        porcentaje = fe.nomina.Amount(19),
+        deduccion = fe.nomina.Amount(1_000_000)
+    ))
+
+    xml = nomina.toFachoXML()
+
+    assert xml.get_element_text('/fe:NominaIndividualDeAjuste/Reemplazar/ComprobanteTotal') == '1000000.00'
+
+
+def test_adicionar_eliminar_devengado_comprobante_total():
+    nomina = fe.nomina.DIANNominaIndividualDeAjuste.Eliminar()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoBasico(
+        dias_trabajados = 60,
+        sueldo_trabajado = fe.nomina.Amount(2_000_000)
+    ))
+
+    nomina.adicionar_deduccion(fe.nomina.DeduccionSalud(
+        porcentaje = fe.nomina.Amount(19),
+        deduccion = fe.nomina.Amount(1_000_000)
+    ))
+
+    xml = nomina.toFachoXML()
+
+    assert xml.get_element_text('/fe:NominaIndividualDeAjuste/Eliminar/ComprobanteTotal') == '1000000.00'
