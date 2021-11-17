@@ -192,9 +192,12 @@ class DIANNominaXML:
         # esten ordenados segun el anexo tecnico
         self.fexml.placeholder_for('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
         self.fexml.placeholder_for('./TipoNota', optional=True)
+
         self.root_fragment = self.fexml
         if xpath_ajuste is not None:
             self.root_fragment = self.fexml.fragment(xpath_ajuste)
+        self.root_fragment.placeholder_for('./ReemplazandoPredecesor', optional=True)
+        self.root_fragment.placeholder_for('./EliminandoPredecesor', optional=True)
         self.root_fragment.placeholder_for('./Novedad', optional=True)
         self.root_fragment.placeholder_for('./Periodo')
         self.root_fragment.placeholder_for('./NumeroSecuenciaXML')
@@ -385,16 +388,60 @@ class DIANNominaIndividual(DIANNominaXML):
 class DIANNominaIndividualDeAjuste(DIANNominaXML):
 
     class Reemplazar(DIANNominaXML):
+        @dataclass
+        class Predecesor:
+            numero: str
+            cune: str
+            fecha_generacion: str
+
+            def apply(self, fragment):
+                fragment.set_element('./Reemplazar/ReemplazandoPredecesor', None,
+                                     # NIAE090
+                                     NumeroPred = self.numero,
+                                     # NIAE191
+                                     CUNEPred = self.cune,
+                                     # NIAE192
+                                     FechaGenPred = self.fecha_generacion
+                                     )
+
         def __init__(self):
             super().__init__('NominaIndividualDeAjuste', './Reemplazar')
             # NIAE214
-            self.root_fragment.set_element('TipoNota', '1')
-            
+            self.root_fragment.set_element('./TipoNota', '1')
+
+        def asignar_predecesor(self, predecesor):
+            if not isinstance(predecesor, self.Predecesor):
+                raise ValueError("se espera tipo Predecesor")
+            predecesor.apply(self.fexml)
+
+        
     class Eliminar(DIANNominaXML):
+        
+        @dataclass
+        class Predecesor:
+            numero: str
+            cune: str
+            fecha_generacion: str
+
+            def apply(self, fragment):
+                fragment.set_element('./Eliminar/EliminandoPredecesor', None,
+                                     # NIAE090
+                                     NumeroPred = self.numero,
+                                     # NIAE191
+                                     CUNEPred = self.cune,
+                                     # NIAE192
+                                     FechaGenPred = self.fecha_generacion
+                                     )
+
         def __init__(self):
             super().__init__('NominaIndividualDeAjuste', './Eliminar')
-            # NIAE214
-            self.root_fragment.set_element('TipoNota', '2')
+
+            self.root_fragment.set_element('./TipoNota', '2')
+
+        def asignar_predecesor(self, predecesor):
+            if not isinstance(predecesor, self.Predecesor):
+                raise ValueError("se espera tipo Eliminar.Predecesor")
+            predecesor.apply(self.fexml)
             
     def __init__(self):
         super().__init__('NominaIndividualDeAjuste')
