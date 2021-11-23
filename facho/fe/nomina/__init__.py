@@ -25,14 +25,17 @@ from .exception import *
 @dataclass
 class NumeroSecuencia:
     consecutivo: int
-    numero: str
+    prefijo: str
 
     def apply(self, fragment):
+        numero = f"{self.prefijo}{self.consecutivo}"
         fragment.set_attributes('./NumeroSecuenciaXML',
+                                # NIE010
+                                Prefijo=self.prefijo,
                                 # NIE011
                                 Consecutivo=self.consecutivo,
                                 # NIE012
-                                Numero = self.numero)
+                                Numero = numero)
 
 @dataclass
 class Periodo:
@@ -64,7 +67,7 @@ class Proveedor:
     nit: str
     dv: int
     software_id: str
-    software_sc: str
+    software_pin: str
 
     def apply(self, fragment):
         fragment.set_attributes('./ProveedorXML',
@@ -74,8 +77,8 @@ class Proveedor:
                                 DV=self.dv,
                                 # NIE019
                                 SoftwareID=self.software_id,
-                                # NIE020
-                                SoftwareSC=self.software_sc,
+
+                                SoftwareSC=None
                                 )
 
     def post_apply(self, fexml, fragment):
@@ -83,9 +86,24 @@ class Proveedor:
         cune = fexml.get_element_attribute(cune_xpath, 'CUNE')
         # TODO(bit4bit) https://catalogo‐vpfe‐hab.dian.gov.co/document/searchqr?documentkey=CUNE para habilitacion
         # https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey=CUNE
-        codigo_qr = f"https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
+        codigo_qr = f"https://catalogo‐vpfe-hab.dian.gov.co/document/searchqr?documentkey={cune}"
         fexml.set_element('./CodigoQR', codigo_qr)
-        
+
+        # NIE020
+        software_code = self._software_security_code(fexml)
+        fexml.set_attributes('./ProveedorXML', SoftwareSC=software_code)
+
+    def _software_security_code(self, fexml):
+        # 8.2
+        numero = fexml.get_element_text_or_attribute('./NumeroSecuenciaXML/@Numero')
+        id_software = self.software_id
+        software_pin = self.software_pin
+
+        code = "".join([id_software, software_pin, numero])
+        h = hashlib.sha384()
+        h.update(code.encode('utf-8'))
+        return h.hexdigest()
+    
 @dataclass
 class Metadata:
     secuencia: NumeroSecuencia
@@ -144,7 +162,7 @@ class InformacionGeneral:
     def apply(self, fragment):
         fragment.set_attributes('./InformacionGeneral',
                                 # NIE022
-                                Version = 'V1.0: Documento Soporte de Pago de Nómina ElectrónicaV1.0',
+                                Version = 'V1.0: Documento Soporte de Pago de Nómina Electrónica',
                                 # NIE023
                                 Ambiente = self.tipo_ambiente.valor,
                                 # NIE202
@@ -154,7 +172,7 @@ class InformacionGeneral:
                                 # NIE024
                                 CUNE = None,
                                 # NIE025
-                                EncripCUNE = 'SHA-384',
+                                EncripCUNE = 'CUNE-SHA384',
                                 # NIE026
                                 FechaGen = self.fecha_generacion,
                                 # NIE027

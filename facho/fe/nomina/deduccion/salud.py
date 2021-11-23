@@ -12,7 +12,7 @@ class DeduccionSalud(Deduccion):
         fragment.set_element('./Salud', None,
                              append_ = True,
                              # NIE161
-                             Porcentaje = self.porcentaje,
+                             Porcentaje = str(round(self.porcentaje, 2)),
                              #  NIE163
                              Deduccion = self.deduccion
                              )
