@@ -55,7 +55,7 @@ class Trabajador:
                                 LugarTrabajoPais = self.lugar_trabajo.pais.code,
 
                                 # NIE051
-                                LugarTrabajoDepartamentoEstadoEstado = self.lugar_trabajo.departamento.code,
+                                LugarTrabajoDepartamentoEstado = self.lugar_trabajo.departamento.code,
 
                                 # NIE052
                                 LugarTrabajoMunicipioCiudad = self.lugar_trabajo.municipio.code,

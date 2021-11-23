@@ -34,7 +34,31 @@ class NumeroSecuencia:
                                 # NIE012
                                 Numero = self.numero)
 
+@dataclass
+class Periodo:
+    fecha_ingreso: str
+    fecha_liquidacion_inicio: str
+    fecha_liquidacion_fin: str
+    fecha_generacion: str
 
+    tiempo_laborado: int = 1
+    fecha_retiro: str = None
+
+    def apply(self, fragment):
+        fragment.set_attributes('./Periodo',
+                                #NIE002
+                                FechaIngreso=self.fecha_ingreso,
+                                #NIE003
+                                FechaRetiro=self.fecha_retiro,
+                                #NIE004
+                                FechaLiquidacionInicio=self.fecha_liquidacion_inicio,
+                                #NIE005
+                                FechaLiquidacionFin=self.fecha_liquidacion_fin,
+                                #NIE006
+                                TiempoLaborado=self.tiempo_laborado,
+                                #NIE008
+                                FechaGen=self.fecha_generacion)
+        
 @dataclass
 class Proveedor:
     nit: str
@@ -60,8 +84,7 @@ class Proveedor:
         # TODO(bit4bit) https://catalogo‐vpfe‐hab.dian.gov.co/document/searchqr?documentkey=CUNE para habilitacion
         # https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey=CUNE
         codigo_qr = f"https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
-        fragment.set_attributes('./ProveedorXML',
-                                CodigoQR=codigo_qr)
+        fexml.set_element('./CodigoQR', codigo_qr)
         
 @dataclass
 class Metadata:
@@ -184,9 +207,12 @@ class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
 
 
 class DIANNominaXML:
-    def __init__(self, tag_document, xpath_ajuste=None):
+    def __init__(self, tag_document, xpath_ajuste=None,schemaLocation=None):
         self.tag_document = tag_document
         self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+
+        if schemaLocation is not None:
+            self.fexml.root.set("SchemaLocation", schemaLocation)
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
@@ -203,15 +229,19 @@ class DIANNominaXML:
         self.root_fragment.placeholder_for('./NumeroSecuenciaXML')
         self.root_fragment.placeholder_for('./LugarGeneracionXML')
         self.root_fragment.placeholder_for('./ProveedorXML')
+        self.root_fragment.placeholder_for('./CodigoQR')
         self.root_fragment.placeholder_for('./InformacionGeneral')
         self.root_fragment.placeholder_for('./Empleador')
         self.root_fragment.placeholder_for('./Trabajador')
         self.root_fragment.placeholder_for('./Pago')
+        self.root_fragment.placeholder_for('./FechasPagos')
         self.root_fragment.placeholder_for('./Devengados/Basico')
         self.root_fragment.placeholder_for('./Devengados/Transporte', optional=True)
 
 
         self.informacion_general_xml = self.root_fragment.fragment('./InformacionGeneral')
+        self.periodo_xml = self.root_fragment.fragment('./Periodo')
+
         self.numero_secuencia_xml = self.root_fragment.fragment('./NumeroSecuenciaXML')
         self.lugar_generacion_xml = self.root_fragment.fragment('./LugarGeneracionXML')
         self.proveedor_xml = self.root_fragment.fragment('./ProveedorXML')
@@ -236,10 +266,19 @@ class DIANNominaXML:
         self.informacion_general = general
         self.informacion_general.apply(self.informacion_general_xml)
 
+    def asignar_periodo(self, periodo):
+        if not isinstance(periodo, Periodo):
+            raise ValueError('se espera tipo Periodo')
+
+        periodo.apply(self.periodo_xml)
+
     def asignar_pago(self, pago):
         if not isinstance(pago, Pago):
             raise ValueError('se espera tipo Pago')
         pago.apply(self.pago_xml)
+
+    def asignar_fecha_pago(self, fecha):
+        self.fexml.set_element('./FechasPagos/FechaPago', fecha)
 
     def asignar_empleador(self, empleador):
         if not isinstance(empleador, Empleador):
@@ -381,8 +420,9 @@ class DIANNominaXML:
 class DIANNominaIndividual(DIANNominaXML):
 
     def __init__(self):
-        super().__init__('NominaIndividual')
+        schema = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
 
+        super().__init__('NominaIndividual', schemaLocation=schema)
         
 # TODO(bit4bit) confirmar que no tienen en comun con NominaIndividual
 class DIANNominaIndividualDeAjuste(DIANNominaXML):

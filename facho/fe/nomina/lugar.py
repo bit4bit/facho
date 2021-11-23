@@ -21,4 +21,5 @@ class Lugar:
         fragment.set_attributes(root,
                                 Pais=self.pais.code,
                                 DepartamentoEstado=self.departamento.code,
-                                MunicipioCiudad=self.municipio.code)
+                                MunicipioCiudad=self.municipio.code,
+                                Idioma=self.idioma)
