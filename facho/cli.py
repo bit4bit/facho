@@ -201,6 +201,18 @@ def validate_invoice(invoice_path):
 
 
 @click.command()
+@click.argument('nomina_path')
+def validate_nominaindividual(nomina_path):
+    from facho.fe.data.dian import XSD
+    content = open(nomina_path, 'r').read()
+    content = content.replace(
+        'xmlns="http://www.dian.gov.co/contratos/facturaelectronica/v1"',
+        'xmlns="dian:gov:co:facturaelectronica:NominaIndividual"',
+    )
+    XSD.validate(content, XSD.NominaIndividual)
+
+
+@click.command()
 @click.option('--private-key', type=click.Path(exists=True))
 @click.option('--passphrase')
 @click.option('--ssl/--no-ssl', default=False)
@@ -327,7 +339,6 @@ def soap_send_nomina_sync(private_key, public_key, habilitacion, password, filen
     if habilitacion:
         req = dian.Habilitacion.SendNominaSync
     resp = client.request(req(
-        filename,
         open(zipfile, 'rb').read()
     ))
     print(resp)
@@ -372,3 +383,4 @@ main.add_command(sign_xml)
 main.add_command(sign_verify_xml)
 main.add_command(generate_nomina)
 main.add_command(soap_send_nomina_sync)
+main.add_command(validate_nominaindividual)

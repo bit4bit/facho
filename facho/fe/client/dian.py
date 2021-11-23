@@ -177,7 +177,6 @@ class GetStatusZip(SOAPService):
 
 @dataclass
 class SendNominaSync(SOAPService):
-    fileName: str
     contentFile: bytes
 
     def get_wsdl(self):
