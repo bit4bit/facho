@@ -121,6 +121,7 @@ class Proveedor:
         # TODO(bit4bit) https://catalogo‐vpfe‐hab.dian.gov.co/document/searchqr?documentkey=CUNE para habilitacion
         # https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey=CUNE
         codigo_qr = f"https://catalogo‐vpfe-hab.dian.gov.co/document/searchqr?documentkey={cune}"
+
         fexml.set_element('./CodigoQR', codigo_qr)
 
         # NIE020
@@ -130,10 +131,15 @@ class Proveedor:
     def _software_security_code(self, fexml):
         # 8.2
         numero = fexml.get_element_text_or_attribute('./NumeroSecuenciaXML/@Numero')
+        if numero is None:
+            raise RuntimeError('fallo obtener NumeroSequenciaXML/@Numero')
+        
         id_software = self.software_id
         software_pin = self.software_pin
 
         code = "".join([id_software, software_pin, numero])
+
+        fexml.set_attributes('./ProveedorXML', fachoSoftwareSC=code)
         h = hashlib.sha384()
         h.update(code.encode('utf-8'))
         return h.hexdigest()
@@ -239,9 +245,9 @@ class InformacionGeneral:
             fexml.xpath_from_root('/InformacionGeneral/@Ambiente')
         ]
         campos = fexml.get_elements_text_or_attributes(xpaths)
-        
+
         cune = "".join(campos)
-        print(cune)
+
         h = hashlib.sha384()
         h.update(cune.encode('utf-8'))
         cune_hash = h.hexdigest()
@@ -249,7 +255,8 @@ class InformacionGeneral:
         fragment.set_attributes(
             './InformacionGeneral',
             # NIE024
-            CUNE = cune_hash
+            CUNE = cune_hash,
+            fachoCUNE = cune
         )
 
 class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):

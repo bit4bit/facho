@@ -124,7 +124,7 @@ def test_nomina_xml():
     nomina.asignar_metadata(fe.nomina.Metadata(
         secuencia=fe.nomina.NumeroSecuencia(
             prefijo = 'N',
-            consecutivo=232
+            consecutivo='00001'
         ),
         lugar_generacion=fe.nomina.Lugar(
             pais = fe.nomina.Pais(
@@ -207,17 +207,20 @@ def test_nomina_xml():
     xml = nomina.toFachoXML()
     # TODO(bit4bit) no logro generar cune igual al del anexo tecnico
     #assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == '16560dc8956122e84ffb743c817fe7d494e058a44d9ca3fa4c234c268b4f766003253fbee7ea4af9682dd57210f3bac2'
+
+    assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'fachoCUNE')  == "N000012020-01-161053:10-05:003500000.001000000.002500000.007000853718001994361026931"
     assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == 'b8f9b6c24de07ffd92ea5467433a3b69357cfaffa7c19722db94b2e0eca41d057085a54f484b5da15ff585e773b0b0ab'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Numero') == 'N00001'
-    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Consecutivo') == '232'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Consecutivo') == '00001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@Pais') == 'CO'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@DepartamentoEstado') == '05'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@MunicipioCiudad') == '05001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@NIT') == '999999'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@DV') == '2'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareID') == 'xx'
-    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') == 'yy'
-    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@CodigoQR') != None
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@fachoSoftwareSC') == 'xx12N00001'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') is not None
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/CodigoQR') != None
 
 
 def test_asignar_pago():
