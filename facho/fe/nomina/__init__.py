@@ -29,9 +29,19 @@ class Fecha:
         try:
             datetime.strptime(fecha, "%Y-%m-%d")
         except ValueError:
-            raise ValueError("fecha debe ser formato 2000-01-01")
-        
+            raise ValueError("fecha debe ser formato YYYY-MM-DD")
         self.value = fecha
+
+    @classmethod
+    def cast(cls, data, optional=False):
+        if isinstance(data, str):
+            return cls(data)
+        elif isinstance(data, cls):
+            return data
+        elif data is None and optional:
+            return None
+        else:
+            raise ValueError('no se logra hacer casting a Fecha')
 
     def __str__(self):
         return self.value
@@ -57,14 +67,20 @@ class NumeroSecuencia:
 
 @dataclass
 class Periodo:
-    fecha_ingreso: str
-    fecha_liquidacion_inicio: str
-    fecha_liquidacion_fin: str
-    fecha_generacion: str
+    fecha_ingreso: typing.Union[str, Fecha]
+    fecha_liquidacion_inicio: typing.Union[str, Fecha]
+    fecha_liquidacion_fin: typing.Union[str, Fecha]
+    fecha_generacion: typing.Union[str, Fecha]
 
     tiempo_laborado: int = 1
-    fecha_retiro: str = None
+    fecha_retiro: typing.Union[str, Fecha] = None
 
+    def __post_init__(self):
+        self.fecha_ingreso = Fecha.cast(self.fecha_ingreso)
+        self.fecha_liquidacion_inicio = Fecha.cast(self.fecha_liquidacion_inicio)
+        self.fecha_liquidacion_fin = Fecha.cast(self.fecha_liquidacion_fin)
+        self.fecha_retiro = Fecha.cast(self.fecha_retiro, optional=True)
+        
     def apply(self, fragment):
         fragment.set_attributes('./Periodo',
                                 #NIE002
@@ -170,12 +186,15 @@ class InformacionGeneral:
     class AMBIENTE_PRUEBAS(TIPO_AMBIENTE):
         valor: str = '2'
 
-    fecha_generacion: str
+    fecha_generacion: typing.Union[str, Fecha]
     hora_generacion: str
     periodo_nomina: PeriodoNomina
     tipo_moneda: TipoMoneda
     tipo_ambiente: TIPO_AMBIENTE
     software_pin: str
+
+    def __post_init__(self):
+        self.fecha_generacion = Fecha.cast(self.fecha_generacion)
 
     def apply(self, fragment):
         fragment.set_attributes('./InformacionGeneral',
