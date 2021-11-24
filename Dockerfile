@@ -17,7 +17,8 @@ RUN wget https://bootstrap.pypa.io/get-pip.py \
 RUN apt-get install -y --no-install-recommends \
         libxml2-dev \
         libxmlsec1-dev \
-        build-essential
+        build-essential \
+        zip
 
 RUN python3.6 --version
 RUN python3.7 --version
