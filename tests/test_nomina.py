@@ -208,8 +208,9 @@ def test_nomina_xml():
     # TODO(bit4bit) no logro generar cune igual al del anexo tecnico
     #assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == '16560dc8956122e84ffb743c817fe7d494e058a44d9ca3fa4c234c268b4f766003253fbee7ea4af9682dd57210f3bac2'
 
+    expected_cune = 'b8f9b6c24de07ffd92ea5467433a3b69357cfaffa7c19722db94b2e0eca41d057085a54f484b5da15ff585e773b0b0ab'
     assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'fachoCUNE')  == "N000012020-01-161053:10-05:003500000.001000000.002500000.007000853718001994361026931"
-    assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == 'b8f9b6c24de07ffd92ea5467433a3b69357cfaffa7c19722db94b2e0eca41d057085a54f484b5da15ff585e773b0b0ab'
+    assert xml.get_element_attribute('/fe:NominaIndividual/InformacionGeneral', 'CUNE') == expected_cune
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Numero') == 'N00001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/NumeroSecuenciaXML/@Consecutivo') == '00001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/LugarGeneracionXML/@Pais') == 'CO'
@@ -220,7 +221,7 @@ def test_nomina_xml():
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareID') == 'xx'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@fachoSoftwareSC') == 'xx12N00001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') is not None
-    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/CodigoQR') != None
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/CodigoQR') == f"https://catalogo‐vpfe-hab.dian.gov.co/document/searchqr?documentkey={expected_cune}"
 
 
 def test_asignar_pago():
