@@ -123,7 +123,7 @@ def test_nomina_xml():
 
     nomina.asignar_metadata(fe.nomina.Metadata(
         secuencia=fe.nomina.NumeroSecuencia(
-            numero = 'N00001',
+            prefijo = 'N',
             consecutivo=232
         ),
         lugar_generacion=fe.nomina.Lugar(
@@ -141,7 +141,7 @@ def test_nomina_xml():
             nit='999999',
             dv=2,
             software_id='xx',
-            software_sc='yy'
+            software_pin='12'
         )
     ))
 
@@ -343,3 +343,8 @@ def test_adicionar_eliminar_asignar_predecesor():
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@NumeroPred') == '123456'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@CUNEPred') == 'ABC123456'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@FechaGenPred') == '2021-11-16'
+
+
+def test_fecha_validacion():
+    with pytest.raises(ValueError) as e:
+        fe.nomina.Fecha('535-35-3')
