@@ -6,7 +6,9 @@
 # creando las estructuras minimas necesaras.
 
 from dataclasses import dataclass
+from datetime import datetime
 import hashlib
+import typing
 
 from .. import fe
 from .. import form
@@ -21,6 +23,22 @@ from .lugar import Lugar
 
 from .amount import Amount
 from .exception import *
+
+class Fecha:
+    def __init__(self, fecha):
+        try:
+            datetime.strptime(fecha, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("fecha debe ser formato 2000-01-01")
+        
+        self.value = fecha
+
+    def __str__(self):
+        return self.value
+
+class FechaPago(Fecha):
+    def apply(self, fragment):
+        fragment.set_element('./FechaPago', self.value)
 
 @dataclass
 class NumeroSecuencia:
@@ -259,7 +277,7 @@ class DIANNominaXML:
 
         self.informacion_general_xml = self.root_fragment.fragment('./InformacionGeneral')
         self.periodo_xml = self.root_fragment.fragment('./Periodo')
-
+        self.fecha_pagos_xml = self.root_fragment.fragment('./FechasPagos')
         self.numero_secuencia_xml = self.root_fragment.fragment('./NumeroSecuenciaXML')
         self.lugar_generacion_xml = self.root_fragment.fragment('./LugarGeneracionXML')
         self.proveedor_xml = self.root_fragment.fragment('./ProveedorXML')
@@ -295,8 +313,13 @@ class DIANNominaXML:
             raise ValueError('se espera tipo Pago')
         pago.apply(self.pago_xml)
 
-    def asignar_fecha_pago(self, fecha):
-        self.fexml.set_element('./FechasPagos/FechaPago', fecha)
+    def asignar_fecha_pago(self, data):
+        if isinstance(data, str):
+            fecha = FechaPago(data)
+        elif isinstance(data, FechaPago):
+            fecha = data
+
+        fecha.apply(self.fecha_pagos_xml)
 
     def asignar_empleador(self, empleador):
         if not isinstance(empleador, Empleador):
