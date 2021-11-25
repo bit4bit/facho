@@ -222,7 +222,8 @@ def test_nomina_xml():
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@fachoSoftwareSC') == 'xx12N00001'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/ProveedorXML/@SoftwareSC') is not None
     assert xml.get_element_text_or_attribute('/fe:NominaIndividual/CodigoQR') == f"https://catalogo‐vpfe-hab.dian.gov.co/document/searchqr?documentkey={expected_cune}"
-
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/Empleador/@NIT') == '700085371'
+    assert xml.get_element_text_or_attribute('/fe:NominaIndividual/Trabajador/@NumeroDocumento') == '800199436'
 
 def test_asignar_pago():
     nomina = fe.nomina.DIANNominaIndividual()
