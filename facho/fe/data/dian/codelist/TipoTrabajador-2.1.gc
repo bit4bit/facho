@@ -32,5 +32,125 @@
 				<SimpleValue>Dependiente</SimpleValue>
 			</Value>
 		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>02</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Servicio domestico</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>04</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Madre comunitaria</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>12</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Aprendices del Sena en etapa lectiva</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>18</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Funcionarios públicos sin tope máximo de ibc</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>19</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Aprendices del SENA en etapa productiva</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>21</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Estudiantes de postgrado en salud</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>22</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Profesor de establecimiento particular</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>23</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Estudiantes aportes solo riesgos laborales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>30</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Dependiente entidades o universidades públicas con régimen especial en salud</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>31</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Cooperados o pre cooperativas de trabajo asociado</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>47</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Trabajador dependiente de entidad beneficiaria del sistema general de participaciones ‐ aportes patronales</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>51</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Trabajador de tiempo parcial</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>54</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pre pensionado de entidad en liquidación.</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>56</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Pre pensionado con aporte voluntario a salud</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>58</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Estudiantes de prácticas laborales en el sector público</SimpleValue>
+			</Value>
+		</Row>
         </SimpleCodeList>
 </gc:CodeList>
