@@ -118,10 +118,15 @@ class Proveedor:
     def post_apply(self, fexml, fragment):
         cune_xpath = fexml.xpath_from_root('/InformacionGeneral')
         cune = fexml.get_element_attribute(cune_xpath, 'CUNE')
-        # TODO(bit4bit) https://catalogo‐vpfe‐hab.dian.gov.co/document/searchqr?documentkey=CUNE para habilitacion
-        # https://catalogo‐vpfe.dian.gov.co/document/searchqr?documentkey=CUNE
-        codigo_qr = f"https://catalogo‐vpfe-hab.dian.gov.co/document/searchqr?documentkey={cune}"
+        
+        ambiente = fexml.get_element_attribute(fexml.xpath_from_root('/InformacionGeneral'), 'Ambiente')
+        codigo_qr = f"https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
 
+        if InformacionGeneral.AMBIENTE_PRUEBAS.same(ambiente):
+            codigo_qr = f"https://catalogo-vpfe-hab.dian.gov.co/document/searchqr?documentkey={cune}"
+        elif ambiente is None:
+            raise RuntimeError('fail to get InformacionGeneral/@Ambiente')
+        
         fexml.set_element('./CodigoQR', codigo_qr)
 
         # NIE020
@@ -181,16 +186,28 @@ class TipoMoneda:
 
 @dataclass
 class InformacionGeneral:
+    @dataclass
     class TIPO_AMBIENTE:
-        pass
+        valor: str
+
+        @classmethod
+        def same(cls, value):
+            return cls.valor == str(value)
 
     # TABLA 5.1.1
     @dataclass
     class AMBIENTE_PRODUCCION(TIPO_AMBIENTE):
         valor: str = '1'
+
+        def __str__(self):
+            self.valor
+
     @dataclass
     class AMBIENTE_PRUEBAS(TIPO_AMBIENTE):
         valor: str = '2'
+
+        def __str__(self):
+            self.valor
 
     fecha_generacion: typing.Union[str, Fecha]
     hora_generacion: str
