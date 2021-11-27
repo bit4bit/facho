@@ -366,6 +366,25 @@ def sign_verify_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy
     else:
         print("-INVALID")
 
+@click.command()
+@click.option('--software-id')
+@click.option('--software-pin')
+@click.option('--nit')
+@click.option('--dv')
+@click.option('--output-zippath')
+def generate_nomina_habilitacion(software_id, software_pin, nit, dv, output_zippath):
+    from facho import fe
+
+    generador = fe.nomina.habilitacion.Habilitacion(
+        fe.nomina.habilitacion.Habilitacion.Metadata(
+            software_id=software_id,
+            software_pin=software_pin,
+            nit=nit,
+            dv=dv
+        )
+    )
+    generador.generar(output_zippath)
+
 @click.group()
 def main():
     pass
@@ -384,3 +403,4 @@ main.add_command(sign_verify_xml)
 main.add_command(generate_nomina)
 main.add_command(soap_send_nomina_sync)
 main.add_command(validate_nominaindividual)
+main.add_command(generate_nomina_habilitacion)

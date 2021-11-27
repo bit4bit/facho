@@ -451,7 +451,7 @@ class DianZIP:
         self.zipfile = zipfile.ZipFile(file_like, mode='w', compression=zipfile.ZIP_DEFLATED)
         self.num_files = 0
 
-    def add_invoice_xml(self, name, xml_data):
+    def add_xml(self, name, xml_data):
         self.num_files += 1
         # TODO cual es la norma para los nombres de archivos?
         m = hashlib.sha256()
@@ -461,6 +461,9 @@ class DianZIP:
             fp.write(xml_data.encode('utf-8'))
 
         return filename
+
+    def add_invoice_xml(self, name, xml_data):
+        return self.add_xml(name, xml_data)
 
     def __enter__(self):
         return self
