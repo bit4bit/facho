@@ -6,6 +6,7 @@ from ..municipio import Municipio
 
 @dataclass
 class Empleador:
+    razon_social: str
     nit: str
     dv: str
     pais: Pais
@@ -26,7 +27,9 @@ class Empleador:
                                 # NIE037
                                 MunicipioCiudad = self.municipio.code,
                                 # NIE038
-                                Direccion = self.direccion
+                                Direccion = self.direccion,
+
+                                RazonSocial=self.razon_social
                                 )
 
 

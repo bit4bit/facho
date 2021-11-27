@@ -98,6 +98,7 @@ class Periodo:
         
 @dataclass
 class Proveedor:
+    razon_social: str
     nit: str
     dv: int
     software_id: str
@@ -112,14 +113,16 @@ class Proveedor:
                                 # NIE019
                                 SoftwareID=self.software_id,
 
-                                SoftwareSC=None
+                                SoftwareSC=None,
+                                # NIE025
+                                RazonSocial=self.razon_social
                                 )
 
-    def post_apply(self, fexml, fragment):
-        cune_xpath = fexml.xpath_from_root('/InformacionGeneral')
+    def post_apply(self, fexml, scopexml, fragment):
+        cune_xpath = scopexml.xpath_from_root('/InformacionGeneral')
         cune = fexml.get_element_attribute(cune_xpath, 'CUNE')
         
-        ambiente = fexml.get_element_attribute(fexml.xpath_from_root('/InformacionGeneral'), 'Ambiente')
+        ambiente = fexml.get_element_attribute(scopexml.xpath_from_root('/InformacionGeneral'), 'Ambiente')
         codigo_qr = f"https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
 
         if InformacionGeneral.AMBIENTE_PRUEBAS.same(ambiente):
@@ -127,15 +130,17 @@ class Proveedor:
         elif ambiente is None:
             raise RuntimeError('fail to get InformacionGeneral/@Ambiente')
         
-        fexml.set_element('./CodigoQR', codigo_qr)
+        scopexml.set_element('./CodigoQR', codigo_qr)
 
         # NIE020
-        software_code = self._software_security_code(fexml)
-        fexml.set_attributes('./ProveedorXML', SoftwareSC=software_code)
+        software_code = self._software_security_code(fexml, scopexml)
+        fexml.set_attributes(scopexml.xpath_from_root('/ProveedorXML'), SoftwareSC=software_code)
 
-    def _software_security_code(self, fexml):
+    def _software_security_code(self, fexml, scopexml):
+        
+
         # 8.2
-        numero = fexml.get_element_text_or_attribute('./NumeroSecuenciaXML/@Numero')
+        numero = fexml.get_element_attribute(scopexml.xpath_from_root('/NumeroSecuenciaXML'), 'Numero')
         if numero is None:
             raise RuntimeError('fallo obtener NumeroSequenciaXML/@Numero')
         
@@ -144,7 +149,7 @@ class Proveedor:
 
         code = "".join([id_software, software_pin, numero])
 
-        fexml.set_attributes('./ProveedorXML', fachoSoftwareSC=code)
+        fexml.set_attributes(scopexml.xpath_from_root('/ProveedorXML'), fachoSoftwareSC=code)
         h = hashlib.sha384()
         h.update(code.encode('utf-8'))
         return h.hexdigest()
@@ -161,8 +166,8 @@ class Metadata:
         self.lugar_generacion.apply(lugar_generacion_xml, './LugarGeneracionXML')
         self.proveedor.apply(proveedor_xml)
 
-    def post_apply(self, fexml, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
-        self.proveedor.post_apply(fexml, proveedor_xml)
+    def post_apply(self, fexml, scopexml, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+        self.proveedor.post_apply(fexml, scopexml, proveedor_xml)
         
 @dataclass
 class PeriodoNomina:
@@ -219,10 +224,10 @@ class InformacionGeneral:
     def __post_init__(self):
         self.fecha_generacion = Fecha.cast(self.fecha_generacion)
 
-    def apply(self, fragment):
+    def apply(self, fragment, version):
         fragment.set_attributes('./InformacionGeneral',
                                 # NIE022
-                                Version = 'V1.0: Documento Soporte de Pago de Nómina Electrónica',
+                                Version = version,
                                 # NIE023
                                 Ambiente = self.tipo_ambiente.valor,
                                 # NIE202
@@ -245,22 +250,23 @@ class InformacionGeneral:
                                 # .....
                                 )
 
-    def post_apply(self, fexml, fragment):
+    def post_apply(self, fexml, scopexml, fragment):
         # generar cune
         # ver 8.1.1.1
         xpaths = [
-            fexml.xpath_from_root('/NumeroSecuenciaXML/@Numero'),
-            fexml.xpath_from_root('/InformacionGeneral/@FechaGen'),
-            fexml.xpath_from_root('/InformacionGeneral/@HoraGen'),
-            fexml.xpath_from_root('/DevengadosTotal'),
-            fexml.xpath_from_root('/DeduccionesTotal'),
-            fexml.xpath_from_root('/ComprobanteTotal'),
-            fexml.xpath_from_root('/Empleador/@NIT'),
-            fexml.xpath_from_root('/Trabajador/@NumeroDocumento'),
-            fexml.xpath_from_root('/InformacionGeneral/@TipoXML'),
+            scopexml.xpath_from_root('/NumeroSecuenciaXML/@Numero'),
+            scopexml.xpath_from_root('/InformacionGeneral/@FechaGen'),
+            scopexml.xpath_from_root('/InformacionGeneral/@HoraGen'),
+            scopexml.xpath_from_root('/DevengadosTotal'),
+            scopexml.xpath_from_root('/DeduccionesTotal'),
+            scopexml.xpath_from_root('/ComprobanteTotal'),
+            scopexml.xpath_from_root('/Empleador/@NIT'),
+            scopexml.xpath_from_root('/Trabajador/@NumeroDocumento'),
+            scopexml.xpath_from_root('/InformacionGeneral/@TipoXML'),
             tuple([self.software_pin]),
-            fexml.xpath_from_root('/InformacionGeneral/@Ambiente')
+            scopexml.xpath_from_root('/InformacionGeneral/@Ambiente')
         ]
+
         campos = fexml.get_elements_text_or_attributes(xpaths)
 
         cune = "".join(campos)
@@ -287,6 +293,8 @@ class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
 
 class DIANNominaXML:
     def __init__(self, tag_document, xpath_ajuste=None,schemaLocation=None):
+        self.informacion_general_version = None
+
         self.tag_document = tag_document
         self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
@@ -343,7 +351,7 @@ class DIANNominaXML:
         if not isinstance(general, InformacionGeneral):
             raise ValueError('se espera tipo InformacionGeneral')
         self.informacion_general = general
-        self.informacion_general.apply(self.informacion_general_xml)
+        self.informacion_general.apply(self.informacion_general_xml, self.informacion_general_version)
 
     def asignar_periodo(self, periodo):
         if not isinstance(periodo, Periodo):
@@ -442,10 +450,10 @@ class DIANNominaXML:
             #TODO(bit4bit) acoplamiento temporal
             # es importante el orden de ejecucion
 
-            self.informacion_general.post_apply(self.root_fragment, self.informacion_general_xml)
+            self.informacion_general.post_apply(self.fexml, self.root_fragment, self.informacion_general_xml)
 
         if self.metadata is not None:
-            self.metadata.post_apply(self.root_fragment, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
+            self.metadata.post_apply(self.fexml, self.root_fragment, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
 
         return self.fexml
 
@@ -507,7 +515,8 @@ class DIANNominaIndividual(DIANNominaXML):
         schema = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
 
         super().__init__('NominaIndividual', schemaLocation=schema)
-        
+        self.informacion_general_version = 'V1.0: Documento Soporte de Pago de Nómina Electrónica'
+
 # TODO(bit4bit) confirmar que no tienen en comun con NominaIndividual
 class DIANNominaIndividualDeAjuste(DIANNominaXML):
 
@@ -561,6 +570,7 @@ class DIANNominaIndividualDeAjuste(DIANNominaXML):
             super().__init__('NominaIndividualDeAjuste', './Eliminar')
 
             self.root_fragment.set_element('./TipoNota', '2')
+            self.informacion_general_version = "V1.0: Nota de Ajuste de Documento Soporte de Pago de Nómina Electrónica"
 
         def asignar_predecesor(self, predecesor):
             if not isinstance(predecesor, self.Predecesor):
