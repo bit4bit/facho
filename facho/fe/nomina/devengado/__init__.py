@@ -11,5 +11,6 @@ __all__ = [
     'DevengadoHoraExtra',
     'DevengadoHorasExtrasDiarias',
     'DevengadoHorasExtrasNocturnas',
-    'DevengadoHorasRecargoNocturno'
+    'DevengadoHorasRecargoNocturno',
+    'DevengadoHorasExtrasDiariasDominicalesYFestivos'
 ]
