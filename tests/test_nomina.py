@@ -562,6 +562,40 @@ def test_nomina_devengado_horas_extras_nocturnas_dominicales_y_festivos():
     assert extras[1].get('Porcentaje') == '2.0'
     assert extras[1].get('Pago') == '200.00'
 
+def test_nomina_devengado_horas_recargo_nocturno_dominicales_y_festivos():
+    nomina = fe.nomina.DIANNominaIndividual()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoHorasRecargoNocturnoDominicalesYFestivos(
+        horas_extras=[
+            fe.nomina.DevengadoHoraExtra(
+                hora_inicio='2021-11-30T19:09:55',
+                hora_fin='2021-11-30T20:09:55',
+                cantidad=1,
+                porcentaje=fe.nomina.Amount(1),
+                pago=fe.nomina.Amount(100)
+            ),
+            fe.nomina.DevengadoHoraExtra(
+                hora_inicio='2021-11-30T18:09:55',
+                hora_fin='2021-11-30T19:09:55',
+                cantidad=2,
+                porcentaje=fe.nomina.Amount(2),
+                pago=fe.nomina.Amount(200)
+            )
+        ]
+    ))
+
+    xml = nomina.toFachoXML()
+    extras = xml.get_element('/fe:NominaIndividual/Devengados/HRNDFs/HRNDF', multiple=True)
+    assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
+    assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
+    assert extras[0].get('Cantidad') == '1'
+    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Pago') == '100.00'
+    assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
+    assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
+    assert extras[1].get('Cantidad') == '2'
+    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Pago') == '200.00'
 
 def test_fecha_validacion():
     with pytest.raises(ValueError) as e:
