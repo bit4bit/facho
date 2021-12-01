@@ -141,7 +141,8 @@ def test_nomina_xml():
             nit='999999',
             dv=2,
             software_id='xx',
-            software_pin='12'
+            software_pin='12',
+            razon_social='facho'
         )
     ))
 
@@ -155,6 +156,7 @@ def test_nomina_xml():
     ))
 
     nomina.asignar_empleador(fe.nomina.Empleador(
+        razon_social='facho',
         nit = '700085371',
         dv = '1',
         pais = fe.nomina.Pais(
@@ -348,6 +350,41 @@ def test_adicionar_eliminar_asignar_predecesor():
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@NumeroPred') == '123456'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@CUNEPred') == 'ABC123456'
     assert xml.get_element_text_or_attribute('/fe:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@FechaGenPred') == '2021-11-16'
+
+def test_nomina_devengado_horas_extras_diarias():
+    nomina = fe.nomina.DIANNominaIndividual()
+
+    nomina.adicionar_devengado(fe.nomina.DevengadoHorasExtrasDiarias(
+        horas_extras=[
+            fe.nomina.DevengadoHoraExtra(
+                hora_inicio='2021-11-30T19:09:55',
+                hora_fin='2021-11-30T20:09:55',
+                cantidad=1,
+                porcentaje=fe.nomina.Amount(1),
+                pago=fe.nomina.Amount(100)
+            ),
+            fe.nomina.DevengadoHoraExtra(
+                hora_inicio='2021-11-30T18:09:55',
+                hora_fin='2021-11-30T19:09:55',
+                cantidad=2,
+                porcentaje=fe.nomina.Amount(2),
+                pago=fe.nomina.Amount(200)
+            )
+        ]
+    ))
+
+    xml = nomina.toFachoXML()
+    extras = xml.get_element('/fe:NominaIndividual/Devengados/HEDs/HED', multiple=True)
+    assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
+    assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
+    assert extras[0].get('Cantidad') == '1'
+    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Pago') == '100.00'
+    assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
+    assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
+    assert extras[1].get('Cantidad') == '2'
+    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Pago') == '200.00'
 
 
 def test_fecha_validacion():
