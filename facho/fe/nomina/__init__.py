@@ -441,6 +441,14 @@ class DIANNominaXML:
 
         return errors
 
+    def informacion_general(self):
+        xpath = self.root_fragment.xpath_from_root('/InformacionGeneral')
+        return {
+            'cune': self.fexml.get_element_attribute(cune_xpath, 'CUNE'),
+            'fecha_generacion': self.fexml.get_element_attribute(xpath, 'FechaGen'),
+            'numero': self.fexml.get_element_attribute(self.root_fragment('/NumeroSecuenciaXML', 'Numero'))
+        }
+
     def toFachoXML(self):
         self._devengados_total()
         self._deducciones_total()
