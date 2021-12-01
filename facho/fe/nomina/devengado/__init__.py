@@ -8,6 +8,7 @@ __all__ = [
     'Devengado',
     'DevengadoBasico',
     'DevengadoTransporte',
+    'DevengadoHoraExtra',
     'DevengadoHorasExtrasDiarias',
-    'DevengadoHoraExtra'
+    'DevengadoHorasExtrasNocturnas'
 ]
