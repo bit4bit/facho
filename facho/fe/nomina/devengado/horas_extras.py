@@ -23,7 +23,7 @@ class DevengadoHoraExtra:
                              # NIE076
                              Cantidad=self.cantidad,
                              # NIE077
-                             Porcentaje=self.porcentaje,
+                             Porcentaje=str(round(self.porcentaje, 2)),
                              # NIE078
                              Pago=str(round(self.pago, 2)))
 
