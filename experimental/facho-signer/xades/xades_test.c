@@ -6,7 +6,31 @@
 #include "xades.h"
 
 
+MU_TEST(test_xml_add_node_recursive) {
+  xmlDocPtr doc;
+  xmlNodePtr root;
+  xmlNodePtr child;
+  xmlChar* xmlbuff;
+  int xmlbuffsize;
+  
+  doc = xmlNewDoc(BAD_CAST "1.0");
+  root = xmlNewNode(NULL, BAD_CAST "root");
+  xmlDocSetRootElement(doc, root);
 
+  child = xmlXadesAddChildRecursiveNs(root, BAD_CAST "A/B/C", NULL);
+  mu_check(child != NULL);
+
+  xmlDocDumpMemory(doc, &xmlbuff, &xmlbuffsize);
+  mu_assert_string_eq("<?xml version=\"1.0\"?>\n"
+                      "<root>\n"
+                      "<A>\n"
+                      "<B>\n"
+                      "<C/>\n"
+                      "</B>\n"
+                      "</A>\n"
+                      "</root>\n"
+                      , (char *)xmlbuff);
+}
 
 MU_TEST(test_qualifying_properties_layout) {
   xmlDocPtr doc;
@@ -30,7 +54,7 @@ MU_TEST(test_qualifying_properties_layout) {
   xmlDocSetRootElement(doc, root);
   
   node = xmlXadesTmplQualifyingPropertiesCreateNsPref(doc, BAD_CAST "123", NULL);
-  xmlXadesTmplAddSignedSignatureProperties(node, NULL, &tm);
+  xmlXadesTmplAddSignedSignatureProperties(node, &tm);
   mu_check(node != NULL);
   
   xmlSecAddChildNode(root, node);
@@ -53,12 +77,8 @@ MU_TEST(test_qualifying_properties_layout) {
   xmlFreeDoc(doc);
 }
 
-MU_TEST(test_check) {
-  mu_check(5 == 7);
-}
-
 MU_TEST_SUITE(test_suite) {
-  MU_RUN_TEST(test_check);
+  MU_RUN_TEST(test_xml_add_node_recursive);
   MU_RUN_TEST(test_qualifying_properties_layout);
 }
 

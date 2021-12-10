@@ -33,13 +33,13 @@ xmlXadesTmplQualifyingPropertiesCreateNsPref(xmlDocPtr doc, const xmlChar* id, c
 
 
 xmlNodePtr
-xmlXadesTmplAddSignedSignatureProperties(xmlNodePtr parentNode, const xmlChar* id, struct tm* signingTime);
-
-xmlNodePtr
 xmlXadesTmplAddSigningCertificate(xmlNodePtr parentNode);
 xmlNodePtr
 xmlXadesTmplAddCert(xmlNodePtr signingCertificateNode);
 xmlNodePtr
 xmlXadesTmplAddSignaturePolicyIdentifierSignaturePolicyId(xmlNodePtr signedSignaturePropertiesNode);
-
+xmlNodePtr
+xmlXadesTmplAddSignedSignatureProperties(xmlNodePtr parentNode, struct tm* signingTime);
+xmlNodePtr
+xmlXadesAddChildRecursiveNs(xmlNodePtr parentNode, const xmlChar* path, const xmlChar* nsPrefix);
 #endif //XADES_H
