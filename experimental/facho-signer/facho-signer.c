@@ -1,12 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "xades/xades.h"
 
 #include <xmlsec/xmlsec.h>
 #include <xmlsec/xmltree.h>
 #include <xmlsec/xmldsig.h>
 #include <xmlsec/templates.h>
 #include <xmlsec/crypto.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 
 #define print_error(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
@@ -19,6 +20,76 @@ char *basename = NULL;
 // crea elemento /Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent
 xmlNodePtr
 xmlFachoTmplUBLExtensionAddExtensionContent(xmlDocPtr doc);
+
+int
+xmlFachoTmplXadesCreate(xmlDocPtr doc, xmlNodePtr signNode) {
+  xmlNodePtr qualifyingPropertiesNode = NULL;
+  xmlNodePtr signedPropertiesNode = NULL;
+  xmlNodePtr signedSignaturePropertiesNode = NULL;
+  xmlNodePtr signingCertificateNode = NULL;
+  xmlNodePtr signaturePolicyIdentifierNode = NULL;
+  xmlNodePtr signerRoleNode = NULL;
+  xmlNodePtr refNode = NULL;
+  const xmlChar signedPropertiesId[] = "xmldsig-facho-signed-props";
+  const xmlChar signedPropertiesRef[] = "#xmldsig-facho-signed-props";
+  
+  qualifyingPropertiesNode = xmlXadesTmplQualifyingPropertiesCreate(doc, signNode, BAD_CAST "xades-ref1");
+  if (  qualifyingPropertiesNode == NULL ) {
+    print_error("error: failed to add QualifyingProperties node.\n");
+    goto fail;
+  }
+
+  signedPropertiesNode = xmlXadesTmplAddSignedProperties(qualifyingPropertiesNode, signedPropertiesId);
+  if ( signedPropertiesNode == NULL ) {
+    print_error("error: xades failed to add signed properties node.\n");
+    goto fail;
+  }
+
+  refNode = xmlSecTmplSignatureAddReference(signNode,
+                                            xmlSecTransformSha256Id,
+                                            BAD_CAST "xmldsig-facho-ref1",
+                                            signedPropertiesRef,
+                                            BAD_CAST "http://uri.etsi.org/01903#SignedProperties");
+  if ( refNode == NULL ) {
+    print_error("error: failed to add reference to signature template xades.\n");
+    goto fail;
+  }
+  if ( xmlSecTmplReferenceAddTransform(refNode, xmlSecTransformInclC14NId) == NULL ) {
+    print_error("error: failed to add enveloped transform to reference for xades\n");
+    goto fail;
+  }
+
+  const time_t now = time(NULL);
+  signedSignaturePropertiesNode = xmlXadesTmplAddSignedSignatureProperties(signedPropertiesNode, localtime(&now));
+  if ( signedSignaturePropertiesNode == NULL ) {
+    print_error("error: xades failed to add signed signature properties node.\n");
+    goto fail;
+  }
+
+  signingCertificateNode = xmlXadesTmplAddSigningCertificate(signedSignaturePropertiesNode, xmlSecTransformSha256Id);
+  if ( signingCertificateNode == NULL ) {
+    print_error("error: failed to add SigningCertificate node \n");
+    goto fail;
+  }
+
+  signaturePolicyIdentifierNode = xmlXadesTmplAddSignaturePolicyIdentifier(signedSignaturePropertiesNode);
+  if ( signaturePolicyIdentifierNode == NULL ) {
+    print_error("error: failed to add PolicyIdentifier node\n");
+    goto fail;
+  }
+
+  signerRoleNode = xmlXadesTmplAddSignerRole(signedSignaturePropertiesNode, BAD_CAST "supplier");
+  if ( signerRoleNode == NULL ) {
+    print_error("error: failed to add SignerRole node.\n");
+    goto fail;
+  }
+
+  return(0);
+ fail:
+  xmlUnlinkNode(qualifyingPropertiesNode);
+  xmlFreeNode(qualifyingPropertiesNode);
+  return(-1);
+}
 
 static int
 xmlXadesAppInit() {
@@ -107,6 +178,7 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
   xmlNodePtr x509DataNode = NULL;
   xmlNodePtr node = NULL;
   xmlSecDSigCtxPtr dsigCtx = NULL;
+  xmlXadesDSigCtxPtr xadesDsigCtx = NULL;
 
   int res = -1;
   
@@ -170,6 +242,12 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
     goto done;
   }
 
+
+  if ( xmlFachoTmplXadesCreate(doc, signNode) < 0 ){
+    print_error("error: xmlFachoTmplXadesCreate failed.\n");
+    goto done;
+  }
+
   dsigCtx = xmlSecDSigCtxCreate(NULL);
   if ( dsigCtx == NULL ) {
     print_error("error: dsig context creating failed\n");
@@ -185,7 +263,13 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
     goto done;
   }
 
-  if ( xmlSecDSigCtxSign(dsigCtx, signNode) < 0 ) {
+  xadesDsigCtx = xmlXadesDSigCtxCreate(dsigCtx);
+  if ( xadesDsigCtx == NULL ) {
+    print_error("error: xades context creating failed.\n");
+    return(-1);
+  }
+
+  if ( xmlXadesDSigCtxSign(xadesDsigCtx, signNode) < 0 ) {
     print_error("error: signature failed\n");
     goto done;
   }
@@ -203,6 +287,10 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
   res = 0;
 
  done:
+  if ( xadesDsigCtx != NULL ) {
+    xmlXadesDSigCtxDestroy(xadesDsigCtx);
+  }
+
   if ( dsigCtx != NULL ) {
     xmlSecDSigCtxDestroy(dsigCtx);
   }
