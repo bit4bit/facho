@@ -215,7 +215,7 @@ xmlXadesTmplAddCertDigest(xmlNodePtr certNode, const xmlChar *digestMethod, cons
 xmlNodePtr
 xmlXadesTmplAddSignaturePolicyIdentifier(xmlNodePtr signedSignaturePropertiesNode) {
   xmlNodePtr cur;
-  
+
   xmlXadesAssert2(signedSignaturePropertiesNode != NULL, NULL);
 
   cur = xmlSecAddChild(signedSignaturePropertiesNode, xmlXadesNodeSignaturePolicyIdentifier, xmlXadesDSigNs);
@@ -230,20 +230,20 @@ xmlXadesTmplAddSignaturePolicyIdentifier(xmlNodePtr signedSignaturePropertiesNod
 xmlNodePtr
 xmlXadesTmplAddSignaturePolicyId(xmlNodePtr signaturePolicyIdentifierNode) {
   xmlNodePtr cur;
-  
+
   xmlXadesAssert2(signaturePolicyIdentifierNode != NULL, NULL);
 
   cur = xmlSecAddChild(signaturePolicyIdentifierNode, xmlXadesNodeSignaturePolicyId, xmlXadesDSigNs);
   if (cur == NULL) {
-    xmlXadesInternalError("xmlsecAddChild(xmlXadesNodeSignaturePolicyId)", NULL);
+    xmlXadesInternalError("xmlsecAddChild(cur)", NULL);
     return(NULL);
   }
-  
+
   return(cur);
 }
 
 xmlNodePtr
-xmlXadesTmplAddSigPolicyId(xmlNodePtr signaturePolicyId, const xmlChar* identifier, const xmlChar *description, xmlSecTransformId policyDigestMethodId) {
+xmlXadesTmplAddSigPolicyId(xmlNodePtr signaturePolicyId, const xmlChar* identifier, const xmlChar *description) {
   xmlNodePtr sigPolicyIdNode;
   xmlNodePtr node;
   int ret;
@@ -276,7 +276,7 @@ xmlXadesTmplAddSigPolicyId(xmlNodePtr signaturePolicyId, const xmlChar* identifi
     return(NULL);
   }
 
-  ret = xmlSecNodeEncodeAndSetContent(node, identifier);
+  ret = xmlSecNodeEncodeAndSetContent(node, description);
   if (ret < 0) {
     xmlXadesInternalError("xmlSecNodeEncodeAndSetContent", NULL);
     xmlFreeNode(sigPolicyIdNode);
@@ -288,7 +288,7 @@ xmlXadesTmplAddSigPolicyId(xmlNodePtr signaturePolicyId, const xmlChar* identifi
 }
 
 xmlNodePtr
-xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode) {
+xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode, xmlSecTransformId digestMethodId) {
   xmlNodePtr node;
   xmlXadesAssert2(parentNode != NULL, NULL);
 
@@ -296,6 +296,11 @@ xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode) {
   node = xmlSecAddChild(parentNode, xmlXadesNodeSigPolicyHash, xmlXadesDSigNs);
   if (node == NULL) {
     xmlXadesInternalError("xmlSecAddChild(xmlXadesNodeSigPolicyHash)", NULL);
+    return(NULL);
+  }
+
+  if ( xmlXadesTmplAddDigest(node, digestMethodId->href, BAD_CAST "") == NULL) {
+    xmlXadesInternalError("xmlXadesTmplAddDigest(node, digestMethodId)", NULL);
     return(NULL);
   }
 

@@ -14,12 +14,20 @@
 #define print_info(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
 
 const xmlChar ublExtensionDSigNs[] = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
-
+const xmlChar policyIdDescription[] = "Política de firma para facturas electrónicas de la República de Colombia.";
+const xmlChar policyIdIdentifier[] = "https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf";
+  
 char *basename = NULL;
 
 // crea elemento /Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent
 xmlNodePtr
 xmlFachoTmplUBLExtensionAddExtensionContent(xmlDocPtr doc);
+
+// FeC requiere que el digest value del policy identifier sea
+// apartir del contenido de la url.
+xmlXadesPolicyIdentifierCtxPtr
+xmlFachoPolicyIdentifierCtxFromFilename(const char *filename);
+
 
 int
 xmlFachoTmplXadesCreate(xmlDocPtr doc, xmlNodePtr signNode) {
@@ -28,6 +36,9 @@ xmlFachoTmplXadesCreate(xmlDocPtr doc, xmlNodePtr signNode) {
   xmlNodePtr signedSignaturePropertiesNode = NULL;
   xmlNodePtr signingCertificateNode = NULL;
   xmlNodePtr signaturePolicyIdentifierNode = NULL;
+  xmlNodePtr signaturePolicyIdNode = NULL;
+  xmlNodePtr sigPolicyIdNode = NULL;
+  xmlNodePtr sigPolicyHashNode = NULL;
   xmlNodePtr signerRoleNode = NULL;
   xmlNodePtr refNode = NULL;
   const xmlChar signedPropertiesId[] = "xmldsig-facho-signed-props";
@@ -78,12 +89,31 @@ xmlFachoTmplXadesCreate(xmlDocPtr doc, xmlNodePtr signNode) {
     goto fail;
   }
 
+  signaturePolicyIdNode = xmlXadesTmplAddSignaturePolicyId(signaturePolicyIdentifierNode);
+  if ( signaturePolicyIdNode == NULL ) {
+    print_error("error: failed to add SignaturePolicyId node.\n");
+    goto fail;
+  }
+
+  sigPolicyIdNode = xmlXadesTmplAddSigPolicyId(signaturePolicyIdNode, policyIdIdentifier, policyIdDescription);
+  if ( sigPolicyIdNode == NULL ) {
+    print_error("error: failed to add SigPolicyId node.\n");
+    goto fail;
+  }
+
+  sigPolicyHashNode = xmlXadesTmplAddSigPolicyHash(signaturePolicyIdNode, xmlSecTransformSha256Id);
+  if ( sigPolicyHashNode == NULL ) {
+    print_error("error: failed to add SigPolicyHash node.\n");
+    goto fail;
+  }
+
   signerRoleNode = xmlXadesTmplAddSignerRole(signedSignaturePropertiesNode, BAD_CAST "supplier");
   if ( signerRoleNode == NULL ) {
     print_error("error: failed to add SignerRole node.\n");
     goto fail;
   }
 
+  
   return(0);
  fail:
   xmlUnlinkNode(qualifyingPropertiesNode);
@@ -217,7 +247,7 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
 
   refNode = xmlSecTmplSignatureAddReference(signNode,
                                             xmlSecTransformSha256Id,
-                                            BAD_CAST "xmldsig-facho-ref1",
+                                            BAD_CAST "xmldsig-facho-ref2",
                                             BAD_CAST "#xmldsig-facho-KeyInfo",
                                             NULL);
   if ( refNode == NULL ) {
@@ -263,7 +293,7 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
     goto done;
   }
 
-  xadesDsigCtx = xmlXadesDSigCtxCreate(dsigCtx);
+  xadesDsigCtx = xmlXadesDSigCtxCreate(dsigCtx, XADES_DIGEST_SHA256, NULL);
   if ( xadesDsigCtx == NULL ) {
     print_error("error: xades context creating failed.\n");
     return(-1);
@@ -357,4 +387,9 @@ xmlFachoTmplUBLExtensionAddExtensionContent(xmlDocPtr doc) {
   }
 
   return(node);
+}
+
+xmlXadesPolicyIdentifierCtxPtr
+xmlFachoPolicyIdentifierCtxFromFilename(const char *filename) {
+  return(NULL);
 }

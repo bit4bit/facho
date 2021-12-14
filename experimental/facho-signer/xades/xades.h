@@ -1,8 +1,6 @@
 #ifndef XADES_H
 #define XADES_H
 
-
-
 #include <libxml/tree.h>
 
 #include <xmlsec/xmltree.h>
@@ -42,7 +40,7 @@ static const xmlChar xmlXadesNodeCert[] = "Cert";
 static const xmlChar xmlXadesNodeCertDigest[] = "CertDigest";
 static const xmlChar xmlXadesNodeSignaturePolicyIdentifier[] = "SignaturePolicyIdentifier";
 static const xmlChar xmlXadesNodeSignaturePolicyId[] = "SignaturePolicyId";
-static const xmlChar xmlXadesNodeSigPolicyId[] = "SignaturePolicyId";
+static const xmlChar xmlXadesNodeSigPolicyId[] = "SigPolicyId";
 static const xmlChar xmlXadesNodeIdentifier[] = "Identifier";
 static const xmlChar xmlXadesNodeDescription[] = "Description";
 static const xmlChar xmlXadesNodeSigPolicyHash[] = "SigPolicyHash";
@@ -56,14 +54,28 @@ static const xmlChar xmlXadesNodeX509IssuerNumber[] = "X509IssuerNumber";
   
 static const xmlChar xmlXadesDSigNs[] = "http://uri.etsi.org/01903/v1.3.2#";
 
+typedef int xmlXadesSize;
+typedef enum _XADES_DIGEST_METHOD{
+  XADES_DIGEST_SHA256
+} XADES_DIGEST_METHOD;
+
+typedef int (*xmlXadesPolicyIdentifierContentCallback)(const xmlChar *policyId, xmlChar *content, xmlXadesSize *content_length);
+
+typedef struct _xmlXadesPolicyIdentifierCtx *xmlXadesPolicyIdentifierCtxPtr;
+struct _xmlXadesPolicyIdentifierCtx {
+  XADES_DIGEST_METHOD digestMethod;
+  xmlXadesPolicyIdentifierContentCallback contentCallback;
+};
+  
 typedef struct _xmlXadesDSigCtx xmlXadesDSigCtx, *xmlXadesDSigCtxPtr;
 struct _xmlXadesDSigCtx {
   xmlSecDSigCtxPtr dsigCtx;
+  XADES_DIGEST_METHOD digestMethod;
+  xmlXadesPolicyIdentifierCtxPtr policyCtx;
 };
 
-
 xmlXadesDSigCtxPtr
-xmlXadesDSigCtxCreate(xmlSecDSigCtxPtr dsigCtx);
+xmlXadesDSigCtxCreate(xmlSecDSigCtxPtr dsigCtx, XADES_DIGEST_METHOD digestMethod,  xmlXadesPolicyIdentifierCtxPtr policyCtx);
 
 int
 xmlXadesDSigCtxSign(xmlXadesDSigCtxPtr ctx, xmlNodePtr signNode);
@@ -75,13 +87,11 @@ xmlNodePtr
 xmlXadesTmplQualifyingPropertiesCreate(xmlDocPtr doc, xmlNodePtr signatureNode, const xmlChar *id);
 
 xmlNodePtr
-xmlXadesTmplQualifyingPropertiesCreateNsPref(xmlDocPtr doc, const xmlChar* id, const xmlChar* nsPrefix);
-
-xmlNodePtr
 xmlXadesTmplAddSignedProperties(xmlNodePtr qualifyingPropertiesNode, const xmlChar* id);
 
 xmlNodePtr
 xmlXadesTmplAddSigningCertificate(xmlNodePtr parentNode, xmlSecTransformId digestMethodId);
+
 xmlNodePtr
 xmlXadesTmplAddCert(xmlNodePtr signingCertificateNode);
 
@@ -89,20 +99,24 @@ xmlNodePtr
 xmlXadesTmplAddCertDigest(xmlNodePtr signingCertificateNode, const xmlChar *digestMethod, const xmlChar *digestValue);
 
 xmlNodePtr
+xmlXadesTmplAddSignedSignatureProperties(xmlNodePtr parentNode, struct tm* signingTime);
+
+xmlNodePtr
 xmlXadesTmplAddSignaturePolicyIdentifier(xmlNodePtr signedSignaturePropertiesNode);
+
+xmlNodePtr
+xmlXadesTmplAddSignaturePolicyId(xmlNodePtr signaturePolicyIdentifierNode);
+
+xmlNodePtr
+xmlXadesTmplAddSigPolicyId(xmlNodePtr signaturePolicyId, const xmlChar* identifier, const xmlChar *description);
+
+xmlNodePtr
+xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode, xmlSecTransformId digestMethodId);
 
 xmlNodePtr
 xmlXadesTmplAddSignerRole(xmlNodePtr signedSignaturePropertiesNode, const xmlChar* role);
 
 xmlNodePtr
-xmlXadesTmplAddSignaturePolicyIdentifierSignaturePolicyId(xmlNodePtr signedSignaturePropertiesNode);
-
-xmlNodePtr
-xmlXadesTmplAddSignedSignatureProperties(xmlNodePtr parentNode, struct tm* signingTime);
-
-xmlNodePtr
 xmlXadesTmplAddIssuerSerial(xmlNodePtr certNode, const xmlChar *issuerName, const xmlChar *issuerNumber);
 
-xmlNodePtr
-xmlXadesAddChildRecursiveNs(xmlNodePtr parentNode, const xmlChar* path, const xmlChar* nsPrefix);
 #endif //XADES_H
