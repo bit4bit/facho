@@ -12,48 +12,10 @@
 #include <ctype.h>
 
 static xmlNodePtr
-xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath) {
-  xmlXPathContextPtr xpathCtx;
-  xmlXPathObjectPtr xpathResult;
-  xmlNodePtr node;
-
-  // obtener QualifyingProteries
-
-  xpathCtx = xmlXPathNewContext(doc);
-  /* register namespaces */
-  // TOMADO DE: xmlsec1/src/xpath.c
-  for(xmlNsPtr ns = xmlDocGetRootElement(doc)->nsDef; ns != NULL; ns = ns->next) {
-    /* check that we have no other namespace with same prefix already */
-    if((ns->prefix != NULL) && (xmlXPathNsLookup(xpathCtx, ns->prefix) == NULL)){
-      int ret = xmlXPathRegisterNs(xpathCtx, ns->prefix, ns->href);
-      if(ret != 0) {
-        xmlXadesXmlError2("xmlXPathRegisterNs", NULL,
-                          "prefix=%s", xmlSecErrorsSafeString(ns->prefix));
-        return(NULL);
-      }
-    }
-  }
-
-
-  xpathResult = xmlXPathEvalExpression(BAD_CAST "//ds:Object/xades:QualifyingProperties[1]", xpathCtx);
-  if ( xmlXPathNodeSetIsEmpty( xpathResult->nodesetval ) ) {
-    xmlXadesInternalError("can't find ds:Signature/ds:Object/xades:QualifyingProperties \n", NULL);
-    xmlXPathFreeObject(xpathResult);
-    return(NULL);
-  }
-
-  // obtener puntero a nodo
-  node = xpathResult->nodesetval->nodeTab[0];
-  if ( node->type != XML_ELEMENT_NODE ) {
-    xmlXadesInternalError("expected element QualifyingProperties\n", NULL);
-    return(NULL);
-  }
-
-  return(node);
-}
+xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath);
 
 xmlXadesDSigCtxPtr
-xmlXadesDSigCtxCreate(xmlSecDSigCtxPtr dsigCtx) {
+xmlXadesDSigCtxCreate(xmlSecDSigCtxPtr dsigCtx, XADES_DIGEST_METHOD digestMethod, xmlXadesPolicyIdentifierCtxPtr policyCtx) {
   xmlXadesDSigCtxPtr ctx = NULL;
 
   ctx = malloc(sizeof(xmlXadesDSigCtx));
@@ -62,6 +24,8 @@ xmlXadesDSigCtxCreate(xmlSecDSigCtxPtr dsigCtx) {
   }
 
   ctx->dsigCtx = dsigCtx;
+  ctx->digestMethod = digestMethod;
+  ctx->policyCtx = policyCtx;
   return ctx;
 }
 
@@ -88,8 +52,18 @@ xmlXadesDSigCtxSign(xmlXadesDSigCtxPtr ctx, xmlNodePtr signNode) {
     unsigned char md[EVP_MAX_MD_SIZE];
     unsigned int md_n;
     // TODO(bit4bit) podemos obtener el digest de openssl por medio de la transformacion? o se puede usar la transformacion para generar el digest?
-    xmlChar *digestMethod = (xmlChar *)xmlSecTransformSha256Id->href;
-    const EVP_MD *digest = EVP_sha256();
+    xmlChar *digestMethod = NULL;
+    EVP_MD *digest = NULL;
+
+    switch(ctx->digestMethod) {
+    case XADES_DIGEST_SHA256:
+      digestMethod = (xmlChar *)xmlSecTransformSha256Id->href;
+      digest = (EVP_MD *) EVP_sha256();
+      break;
+    default:
+      xmlXadesInternalError("xmlXadesDSigCtxSign not known how to handle digest method.\n", NULL);
+      return(-1);
+    }
 
     X509 *cert = xmlSecOpenSSLKeyDataX509GetCert(keyDataX509, i);
     if ( cert == NULL ) {
@@ -144,6 +118,15 @@ xmlXadesDSigCtxSign(xmlXadesDSigCtxPtr ctx, xmlNodePtr signNode) {
     OPENSSL_free(issuerNumber);
   }
 
+  // digest de policy identifier
+  xmlNodePtr sigPolicyId = xmlXadesXPathFirstElement(signNode->doc, BAD_CAST "//xades:SigPolicyId/xades:Identifier[1]");
+  if ( sigPolicyId == NULL ) {
+    xmlXadesInternalError("xmlXadesXPathFirstElement(xades:SigPolicyId/xades:Identifier\n", NULL);
+    return(-1);
+  }
+  xmlChar *identifier = xmlNodeListGetString(signNode->doc, sigPolicyId->xmlChildrenNode, 1);
+  printf("IDENTIFIER %s\n", identifier);
+  xmlFree(identifier);
   return xmlSecDSigCtxSign(ctx->dsigCtx, signNode);
 }
 
@@ -156,4 +139,45 @@ xmlXadesDSigCtxDestroy(xmlXadesDSigCtxPtr ctx) {
 
   free(ctx);
   return(0);
+}
+
+xmlNodePtr
+xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath) {
+  xmlXPathContextPtr xpathCtx;
+  xmlXPathObjectPtr xpathResult;
+  xmlNodePtr node;
+
+  // obtener QualifyingProteries
+
+  xpathCtx = xmlXPathNewContext(doc);
+  /* register namespaces */
+  // TOMADO DE: xmlsec1/src/xpath.c
+  for(xmlNsPtr ns = xmlDocGetRootElement(doc)->nsDef; ns != NULL; ns = ns->next) {
+    /* check that we have no other namespace with same prefix already */
+    if((ns->prefix != NULL) && (xmlXPathNsLookup(xpathCtx, ns->prefix) == NULL)){
+      int ret = xmlXPathRegisterNs(xpathCtx, ns->prefix, ns->href);
+      if(ret != 0) {
+        xmlXadesXmlError2("xmlXPathRegisterNs", NULL,
+                          "prefix=%s", xmlSecErrorsSafeString(ns->prefix));
+        return(NULL);
+      }
+    }
+  }
+
+
+  xpathResult = xmlXPathEvalExpression(BAD_CAST "//ds:Object/xades:QualifyingProperties[1]", xpathCtx);
+  if ( xmlXPathNodeSetIsEmpty( xpathResult->nodesetval ) ) {
+    xmlXadesInternalError("can't find ds:Signature/ds:Object/xades:QualifyingProperties \n", NULL);
+    xmlXPathFreeObject(xpathResult);
+    return(NULL);
+  }
+
+  // obtener puntero a nodo
+  node = xpathResult->nodesetval->nodeTab[0];
+  if ( node->type != XML_ELEMENT_NODE ) {
+    xmlXadesInternalError("expected element QualifyingProperties\n", NULL);
+    return(NULL);
+  }
+
+  return(node);
 }
