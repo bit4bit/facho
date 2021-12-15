@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="http://www.dian.gov.co/contratos/facturaelectronica/v1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cdt="urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1" xmlns:clm54217="urn:un:unece:uncefact:codelist:specification:54217:2001" xmlns:clmIANAMIMEMediaType="urn:un:unece:uncefact:codelist:specification:IANAMIMEMediaType:2003" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sts="http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sig="http://www.w3.org/2000/09/xmldsig#">
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent>
+        <sts:DianExtensions>
+          <sts:SoftwareSecurityCode schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195">2bd9a18f23cf1188d36888d218e9b0c31df77aa00bc036eaeaa1619184054237eee56d2d8db4ecab0173f65f8dab7753</sts:SoftwareSecurityCode>
+          <sts:AuthorizationProvider>
+            <sts:AuthorizationProviderID schemeID="4" schemeName="31" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195">800197268</sts:AuthorizationProviderID>
+          </sts:AuthorizationProvider>
+          <sts:SoftwareProvider>
+            <sts:ProviderID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195" schemeID="5" schemaName="31">900579212</sts:ProviderID>
+            <sts:SoftwareID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195">01ab9caa-6838-461e-82fb-da44da36a084</sts:SoftwareID>
+          </sts:SoftwareProvider>
+          <sts:InvoiceSource>
+            <cbc:IdentificationCode>CO</cbc:IdentificationCode>
+          </sts:InvoiceSource>
+          <sts:InvoiceControl>
+            <sts:InvoiceAuthorization>fc8eac422eba16e22ffd8c6f94b3f40a6e38162c</sts:InvoiceAuthorization>
+            <sts:AuthorizationPeriod>
+              <cbc:StartDate>2019-01-19</cbc:StartDate>
+              <cbc:EndDate>2030-01-19</cbc:EndDate>
+            </sts:AuthorizationPeriod>
+            <sts:AuthorizedInvoices>
+              <sts:Prefix>SETP</sts:Prefix>
+              <sts:From>990000000</sts:From>
+              <sts:To>995000000</sts:To>
+            </sts:AuthorizedInvoices>
+          </sts:InvoiceControl>
+        </sts:DianExtensions>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  </ext:UBLExtensions>
+  <cbc:UBLVersionID>UBL 2.1</cbc:UBLVersionID>
+  <cbc:CustomizationID>10</cbc:CustomizationID>
+  <cbc:ProfileID>DIAN 2.1</cbc:ProfileID>
+  <cbc:ProfileExecutionID>2</cbc:ProfileExecutionID>
+  <cbc:ID>SETP990000001</cbc:ID>
+  <cbc:UUID schemeID="2" schemeName="CUFE-SHA384">50578625ce1fb2f6bb2bc57b22180d2763c8a868c4e62da72e0e43001f9c7f3459c81e2bf9324830175b1225af37e435</cbc:UUID>
+  <cbc:DocumentCurrencyCode>COP</cbc:DocumentCurrencyCode>
+  <cbc:IssueDate>2020-09-05</cbc:IssueDate>
+  <cbc:IssueTime>22:38:53-05:00</cbc:IssueTime>
+  <cbc:InvoiceTypeCode listAgencyID="195" listAgencyName="No matching global declaration available for the validation root" listURI="http://www.dian.gov.co">01</cbc:InvoiceTypeCode>
+  <cbc:LineCountNumeric>1</cbc:LineCountNumeric>
+  <cac:InvoicePeriod>
+    <cbc:StartDate>2020-09-05</cbc:StartDate>
+    <cbc:EndDate>2020-09-05</cbc:EndDate>
+  </cac:InvoicePeriod>
+  <cac:AccountingSupplierParty>
+    <cbc:AdditionalAccountID>1</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>NEUROTEC TECNOLOGIA S.A.S</cbc:Name>
+      </cac:PartyName>
+      <cac:PhysicalLocation>
+        <cac:Address>
+          <cac:AddressLine>
+            <cbc:Line/>
+          </cac:AddressLine>
+        </cac:Address>
+      </cac:PhysicalLocation>
+      <cac:PartyLegalEntity>
+        <cbc:CompanyID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195" schemeID="5" schemeName="31">900579212</cbc:CompanyID>
+        <cbc:RegistrationName>NEUROTEC TECNOLOGIA S.A.S</cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:CityName/>
+          <cac:AddressLine>
+            <cbc:Line/>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>CO</cbc:IdentificationCode>
+            <cbc:Name>COLOMBIA</cbc:Name>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+      <cac:PartyTaxScheme>
+        <cbc:RegistrationName>NEUROTEC TECNOLOGIA S.A.S</cbc:RegistrationName>
+        <cbc:CompanyID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195" schemeID="5" schemeName="31">900579212</cbc:CompanyID>
+        <cbc:TaxLevelCode listName="48">O-07;O-09;O-14;O-48</cbc:TaxLevelCode>
+        <cac:TaxScheme/>
+      </cac:PartyTaxScheme>
+      <cac:Contact>
+        <cbc:ElectronicMail>sdds@sd.com</cbc:ElectronicMail>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cbc:AdditionalAccountID>2</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>facho-customer</cbc:Name>
+      </cac:PartyName>
+      <cac:PhysicalLocation>
+        <cac:Address>
+          <cac:AddressLine>
+            <cbc:Line/>
+          </cac:AddressLine>
+        </cac:Address>
+      </cac:PhysicalLocation>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195" schemeID="" schemeName="13">43851425</cbc:CompanyID>
+        <cbc:RegistrationName>facho-customer</cbc:RegistrationName>
+        <cbc:TaxLevelCode>ZZ</cbc:TaxLevelCode>
+        <cac:TaxScheme/>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>facho-customer</cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:CityName/>
+          <cac:AddressLine>
+            <cbc:Line/>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>CO</cbc:IdentificationCode>
+            <cbc:Name>COLOMBIA</cbc:Name>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="COP">100.00</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="COP">100.00</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="COP">119.00</cbc:TaxInclusiveAmount>
+    <cbc:ChargeTotalAmount currencyID="COP">19.00</cbc:ChargeTotalAmount>
+    <cbc:PayableAmount currencyID="COP">119.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:TaxTotal/>
+  <cac:TaxTotal>
+    <cac:TaxSubtotal>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>01</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+    <cbc:TaxAmount>19.00</cbc:TaxAmount>
+  </cac:TaxTotal>
+  <cac:TaxTotal>
+    <cac:TaxSubtotal>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>04</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+    <cbc:TaxAmount>0.00</cbc:TaxAmount>
+  </cac:TaxTotal>
+  <cac:TaxTotal>
+    <cac:TaxSubtotal>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>03</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+    <cbc:TaxAmount>0.00</cbc:TaxAmount>
+  </cac:TaxTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="NAR">1</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="COP">100.0</cbc:LineExtensionAmount>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="COP">19.0</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxableAmount currencyID="COP">100.0</cbc:TaxableAmount>
+        <cbc:TaxAmount currencyID="COP">19.0</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:Percent>19.0</cbc:Percent>
+          <cac:TaxScheme>
+            <cbc:ID>01</cbc:ID>
+            <cbc:Name>IVA</cbc:Name>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="COP">100.0</cbc:PriceAmount>
+        <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+        <cbc:PriceType>x</cbc:PriceType>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <cac:Item>
+      <cbc:Description>test</cbc:Description>
+      <cac:StandardItemIdentification>
+        <cbc:ID>9999</cbc:ID>
+      </cac:StandardItemIdentification>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="COP">100.0</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  <cac:PaymentMeans>
+    <cbc:ID>1</cbc:ID>
+    <cbc:PaymentMeansCode>10</cbc:PaymentMeansCode>
+    <cbc:PaymentDueDate>2020-09-05</cbc:PaymentDueDate>
+    <cbc:PaymentID>1</cbc:PaymentID>
+  </cac:PaymentMeans>
+</Invoice>

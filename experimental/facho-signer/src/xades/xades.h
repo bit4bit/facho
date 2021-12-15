@@ -5,7 +5,6 @@
 
 #include <xmlsec/xmltree.h>
 #include <xmlsec/transforms.h>
-#include <xmlsec/app.h>
 #include <xmlsec/xmldsig.h>
 #include <xmlsec/openssl/x509.h>
 #include <xmlsec/base64.h>

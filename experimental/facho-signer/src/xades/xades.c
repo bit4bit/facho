@@ -1,3 +1,4 @@
+#include "config.h"
 #include "xades.h"
 
 #include <libxml/xpath.h>
@@ -9,6 +10,15 @@
 #include <openssl/bn.h>
 
 #include <xmlsec/buffer.h>
+#include <xmlsec/app.h>
+#include <xmlsec/transforms.h>
+#include <xmlsec/keysdata.h>
+
+#ifndef XMLSEC_CRYPTO_DYNAMIC_LOADING
+#include <xmlsec/openssl/crypto.h>
+#include <xmlsec/openssl/symbols.h>
+#endif
+
 #include <string.h>
 #include <ctype.h>
 

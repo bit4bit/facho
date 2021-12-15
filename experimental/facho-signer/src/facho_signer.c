@@ -1,3 +1,4 @@
+#include "config.h"
 #include "xades/xades.h"
 
 #include <xmlsec/xmlsec.h>
