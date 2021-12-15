@@ -59,11 +59,10 @@ typedef enum _XADES_DIGEST_METHOD{
   XADES_DIGEST_SHA256
 } XADES_DIGEST_METHOD;
 
-typedef int (*xmlXadesPolicyIdentifierContentCallback)(const xmlChar *policyId, xmlChar *content, xmlXadesSize *content_length);
+typedef int(*xmlXadesPolicyIdentifierContentCallback)(const xmlChar *policyId, xmlSecBuffer *);
 
-typedef struct _xmlXadesPolicyIdentifierCtx *xmlXadesPolicyIdentifierCtxPtr;
+typedef struct _xmlXadesPolicyIdentifierCtx  xmlXadesPolicyIdentifierCtx, *xmlXadesPolicyIdentifierCtxPtr;
 struct _xmlXadesPolicyIdentifierCtx {
-  XADES_DIGEST_METHOD digestMethod;
   xmlXadesPolicyIdentifierContentCallback contentCallback;
 };
   
@@ -115,6 +114,9 @@ xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode, xmlSecTransformId digestMeth
 
 xmlNodePtr
 xmlXadesTmplAddSignerRole(xmlNodePtr signedSignaturePropertiesNode, const xmlChar* role);
+
+xmlNodePtr
+xmlXadesTmplAddDigest(xmlNodePtr parentNode, const xmlChar *digestMethod, const xmlChar *digestValue);
 
 xmlNodePtr
 xmlXadesTmplAddIssuerSerial(xmlNodePtr certNode, const xmlChar *issuerName, const xmlChar *issuerNumber);

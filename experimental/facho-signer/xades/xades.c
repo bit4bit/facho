@@ -8,8 +8,13 @@
 #include <openssl/asn1.h>
 #include <openssl/bn.h>
 
+#include <xmlsec/buffer.h>
 #include <string.h>
 #include <ctype.h>
+
+
+static xmlChar *
+xmlXadesSha256DigestValueInBase64(const unsigned char *message, size_t message_len);
 
 static xmlNodePtr
 xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath);
@@ -124,9 +129,74 @@ xmlXadesDSigCtxSign(xmlXadesDSigCtxPtr ctx, xmlNodePtr signNode) {
     xmlXadesInternalError("xmlXadesXPathFirstElement(xades:SigPolicyId/xades:Identifier\n", NULL);
     return(-1);
   }
-  xmlChar *identifier = xmlNodeListGetString(signNode->doc, sigPolicyId->xmlChildrenNode, 1);
-  printf("IDENTIFIER %s\n", identifier);
-  xmlFree(identifier);
+
+  if ( ctx->policyCtx == NULL ) {
+    xmlXadesInternalError("not found policy context.\n", NULL);
+    return(-1);
+  }
+
+  if ( ctx->policyCtx != NULL ) {
+
+
+    if ( ctx->policyCtx->contentCallback == NULL ) {
+      xmlXadesInternalError("not found policy content callback.\n", NULL);
+      return(-1);
+    }
+
+
+    xmlSecTransformCtxPtr transformCtx = xmlSecTransformCtxCreate();
+    if (transformCtx == NULL ) {
+      xmlXadesInternalError("xmlSecTransformCtxCreate().\n", NULL);
+      return(-1);
+    }
+
+    // elemento del digest
+    xmlNodePtr sigPolicyHashDigestMethod = xmlXadesXPathFirstElement(signNode->doc, BAD_CAST "//xades:SigPolicyHash/ds:DigestMethod[1]");
+    if ( sigPolicyHashDigestMethod == NULL ) {
+      xmlXadesInternalError("xmlXadesXPathFirstElement(xades:SigPolicyHash/xades:DigestMethod\n", NULL);
+      return(-1);
+    }
+    xmlSecTransformPtr transformPolicyDigestMethod = xmlSecTransformNodeRead(sigPolicyHashDigestMethod,
+                                                                             xmlSecTransformUsageDigestMethod,
+                                                                             transformCtx);
+    if ( transformPolicyDigestMethod == NULL ) {
+      xmlXadesInternalError("xmlSecTransformNodeRead\n", NULL);
+      xmlFreeNode(sigPolicyHashDigestMethod);
+      return(-1);
+    }
+
+    if ( xmlSecTransformCheckId(transformPolicyDigestMethod, xmlSecTransformSha256Id) == 0 ) {
+      xmlXadesInternalError("sigPolicyHash only support sha256 digest method .\n", NULL);
+      xmlFreeNode(sigPolicyHashDigestMethod);
+      return(-1);
+    }
+
+    // TODO(bit4bit) podemos usar xmlSecTransform para calcular el digest?
+    xmlNodePtr sigPolicyHashNode = xmlXadesXPathFirstElement(signNode->doc, BAD_CAST "//xades:SigPolicyHash[1]");
+    if ( sigPolicyHashNode == NULL ) {
+      xmlXadesInternalError("failed to find sigPolicyHash node.\n", NULL);
+      xmlFreeNode(sigPolicyHashDigestMethod);
+      return(-1);
+    }
+
+    // obtenemos contenido de la policy
+    xmlChar *identifier = xmlNodeListGetString(signNode->doc, sigPolicyId->xmlChildrenNode, 1);
+    xmlSecBufferPtr policyContent = xmlSecBufferCreate(1024);
+    ;
+    if ( (ctx->policyCtx->contentCallback)(identifier, policyContent) < 0 ) {
+      xmlXadesInternalError("policyContext callback fails.\n", NULL);
+      xmlFree(identifier);
+      return(-1);
+    }
+    xmlFree(identifier);
+
+    xmlChar *policyHashValue = xmlXadesSha256DigestValueInBase64(xmlSecBufferGetData(policyContent),
+                                                                 xmlSecBufferGetSize(policyContent));
+
+    xmlSecBufferDestroy(policyContent);
+    xmlXadesTmplAddDigest(sigPolicyHashNode, NULL, policyHashValue);
+  }
+
   return xmlSecDSigCtxSign(ctx->dsigCtx, signNode);
 }
 
@@ -165,9 +235,9 @@ xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath) {
   }
 
 
-  xpathResult = xmlXPathEvalExpression(BAD_CAST "//ds:Object/xades:QualifyingProperties[1]", xpathCtx);
+  xpathResult = xmlXPathEvalExpression(xpath, xpathCtx);
   if ( xmlXPathNodeSetIsEmpty( xpathResult->nodesetval ) ) {
-    xmlXadesInternalError("can't find ds:Signature/ds:Object/xades:QualifyingProperties \n", NULL);
+    xmlXadesInternalError("can't find %s \n", xpath);
     xmlXPathFreeObject(xpathResult);
     return(NULL);
   }
@@ -175,9 +245,40 @@ xmlXadesXPathFirstElement(xmlDocPtr doc, const xmlChar *xpath) {
   // obtener puntero a nodo
   node = xpathResult->nodesetval->nodeTab[0];
   if ( node->type != XML_ELEMENT_NODE ) {
-    xmlXadesInternalError("expected element QualifyingProperties\n", NULL);
+    xmlXadesInternalError("expected element\n", NULL);
     return(NULL);
   }
 
   return(node);
+}
+
+static xmlChar *
+xmlXadesSha256DigestValueInBase64(const unsigned char *message, size_t message_len)
+{
+  unsigned char digest[2048];
+  unsigned int digest_len;
+  EVP_MD_CTX *mdctx;
+
+  if((mdctx = EVP_MD_CTX_new()) == NULL) {
+    xmlXadesInternalError("EVP_MD_CTX_new().\n", NULL);
+    return(NULL);
+  }
+
+  if(1 != EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL)) {
+    xmlXadesInternalError("EVP_DigestInit_ex().\n", NULL);
+    return(NULL);
+  }
+
+  if(1 != EVP_DigestUpdate(mdctx, message, message_len)) {
+    xmlXadesInternalError("EVP_DigestUpdate().\n", NULL);
+    return(NULL);
+  }
+
+  if(1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+    xmlXadesInternalError("EVP_DigestFinal_ex().\n", NULL);
+    return(NULL);
+  }
+
+  EVP_MD_CTX_free(mdctx);
+  return(xmlSecBase64Encode(digest, digest_len, 0));
 }
