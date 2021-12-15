@@ -6,9 +6,6 @@
 #include <string.h>
 
 
-static xmlNodePtr
-xmlXadesTmplAddDigest(xmlNodePtr parentNode, const xmlChar *digestMethod, const xmlChar *digestValue);
-
 xmlNodePtr
 xmlXadesAddChildRecursiveNs(xmlNodePtr startNode, const xmlChar* path, const xmlChar* nsPrefix) {
   char *curToken;
@@ -299,7 +296,7 @@ xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode, xmlSecTransformId digestMeth
     return(NULL);
   }
 
-  if ( xmlXadesTmplAddDigest(node, digestMethodId->href, BAD_CAST "") == NULL) {
+  if ( xmlXadesTmplAddDigest(node, digestMethodId->href, NULL) == NULL) {
     xmlXadesInternalError("xmlXadesTmplAddDigest(node, digestMethodId)", NULL);
     return(NULL);
   }
@@ -308,36 +305,40 @@ xmlXadesTmplAddSigPolicyHash(xmlNodePtr parentNode, xmlSecTransformId digestMeth
 }
 
 // MACHETE(bit4bit) como usar SecTransform para almacenar el digest
-static xmlNodePtr
+xmlNodePtr
 xmlXadesTmplAddDigest(xmlNodePtr parentNode, const xmlChar *digestMethod, const xmlChar *digestValue) {
   xmlNodePtr node;
   
   xmlXadesAssert2(parentNode != NULL, NULL);
 
-  node = xmlSecAddChild(parentNode, xmlSecNodeDigestMethod, xmlSecDSigNs);
-  if (node == NULL) {
-    xmlXadesInternalError("xmlSecAddChild(xmlSecNodeDigestMethod)", NULL);
-    return(NULL);
-  }
-  if (xmlSetProp(node, xmlSecAttrAlgorithm, digestMethod) == NULL) {
-    xmlXadesXmlError2("xmlSetProp", NULL,
-                      "name=%s", xmlXadesErrorsSafeString(xmlSecAttrAlgorithm));
-    xmlUnlinkNode(node);
-    xmlFreeNode(node);
-    return(NULL);
-  }
-
-  node = xmlSecAddChild(parentNode, xmlSecNodeDigestValue, xmlSecDSigNs);
-  if (node == NULL) {
-    xmlXadesInternalError("xmlSecAddChild(xmlSecNodeDigestValue)", NULL);
-    return(NULL);
+  if ( digestMethod != NULL ) {
+    node = xmlSecAddChild(parentNode, xmlSecNodeDigestMethod, xmlSecDSigNs);
+    if (node == NULL) {
+      xmlXadesInternalError("xmlSecAddChild(xmlSecNodeDigestMethod)", NULL);
+      return(NULL);
+    }
+    if (xmlSetProp(node, xmlSecAttrAlgorithm, digestMethod) == NULL) {
+      xmlXadesXmlError2("xmlSetProp", NULL,
+                        "name=%s", xmlXadesErrorsSafeString(xmlSecAttrAlgorithm));
+      xmlUnlinkNode(node);
+      xmlFreeNode(node);
+      return(NULL);
+    }
   }
 
-  if (xmlSecNodeEncodeAndSetContent(node, digestValue) < 0) {
-    xmlXadesInternalError("xmlSecNodeEncodeAndSetContent", NULL);
-    return(NULL);
+  if ( digestValue != NULL ) {
+    node = xmlSecAddChild(parentNode, xmlSecNodeDigestValue, xmlSecDSigNs);
+    if (node == NULL) {
+      xmlXadesInternalError("xmlSecAddChild(xmlSecNodeDigestValue)", NULL);
+      return(NULL);
+    }
+    
+    if (xmlSecNodeEncodeAndSetContent(node, digestValue) < 0) {
+      xmlXadesInternalError("xmlSecNodeEncodeAndSetContent", NULL);
+      return(NULL);
+    }
   }
-
+  
   return parentNode;
 }
 

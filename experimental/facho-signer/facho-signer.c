@@ -25,8 +25,8 @@ xmlFachoTmplUBLExtensionAddExtensionContent(xmlDocPtr doc);
 
 // FeC requiere que el digest value del policy identifier sea
 // apartir del contenido de la url.
-xmlXadesPolicyIdentifierCtxPtr
-xmlFachoPolicyIdentifierCtxFromFilename(const char *filename);
+int
+xmlFachoPolicyIdentifierCtxFromFilename(const xmlChar *, xmlSecBufferPtr);
 
 
 int
@@ -293,7 +293,11 @@ xmlXadesSignFile(const char *filename, const char *pkcs12name, const char *passw
     goto done;
   }
 
-  xadesDsigCtx = xmlXadesDSigCtxCreate(dsigCtx, XADES_DIGEST_SHA256, NULL);
+  xmlXadesPolicyIdentifierCtx policyIdCtx;
+
+  policyIdCtx.contentCallback = &xmlFachoPolicyIdentifierCtxFromFilename;
+    
+  xadesDsigCtx = xmlXadesDSigCtxCreate(dsigCtx, XADES_DIGEST_SHA256, &policyIdCtx);
   if ( xadesDsigCtx == NULL ) {
     print_error("error: xades context creating failed.\n");
     return(-1);
@@ -389,7 +393,14 @@ xmlFachoTmplUBLExtensionAddExtensionContent(xmlDocPtr doc) {
   return(node);
 }
 
-xmlXadesPolicyIdentifierCtxPtr
-xmlFachoPolicyIdentifierCtxFromFilename(const char *filename) {
-  return(NULL);
+int
+xmlFachoPolicyIdentifierCtxFromFilename(const xmlChar *policyId, xmlSecBufferPtr buffer) {
+  static unsigned char politicafirmav2[] = {
+    /**
+     * generado con https://github.com/Jamesits/bin2array
+     */
+#include "politicafirmav2.c"
+  };
+
+  return xmlSecBufferAppend(buffer, politicafirmav2, sizeof(politicafirmav2));
 }
