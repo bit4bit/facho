@@ -11,18 +11,17 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 
 # Checks for libraries.
-
-# Checks for header files.
-AC_CHECK_HEADERS([sys/time.h unistd.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime gethrtime gettimeofday memset strdup])
-
+PKG_CHECK_MODULES([OPENSSL], [openssl])
 PKG_CHECK_MODULES([XMLSEC1], [xmlsec1-openssl])
+PKG_CHECK_MODULES([LZMA], [liblzma])
+AC_CHECK_HEADER([ltdl.h], [
+		AC_CHECK_LIB(
+			[ltdl],
+			[lt_dlopenext],
+			[LIBLTDL=-lltdl],
+			[LIBLTDL=]
+			)
+		], [ LIBLTDL= ])
 
 AC_ARG_ENABLE([xmlsec-crypto-dynamic-loading],
         AS_HELP_STRING([--enable-xmlsec-crypto-dynamic-loading],
@@ -34,6 +33,17 @@ if test "x$enable_xmlsec_crypto_dynamic_loading" == xyes; then
 else
   AC_DEFINE([XMLSEC_NO_CRYPTO_DYNAMIC_LOADING], [1], [disable xmlsec crypto dynamic loading])
 fi
+
+# Checks for header files.
+AC_CHECK_HEADERS([sys/time.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([clock_gettime gethrtime gettimeofday memset strdup])
+
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
