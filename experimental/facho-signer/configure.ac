@@ -6,6 +6,7 @@ AC_INIT([facho-signer], [0.0.1], [bit4bit@riseup.net])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/facho_signer.c])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
 AC_PROG_CC
@@ -44,6 +45,9 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([clock_gettime gethrtime gettimeofday memset strdup])
 
+# libtool
+
+LT_INIT([dlopen])
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
