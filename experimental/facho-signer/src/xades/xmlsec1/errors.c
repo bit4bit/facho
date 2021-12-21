@@ -15,6 +15,7 @@
  */
 
 #define XMLSEC_PRIVATE 1
+#define XMLSEC_NO_XSLT 1
 
 #include <stdlib.h>
 #include <stdio.h>

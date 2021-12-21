@@ -23,6 +23,8 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 
+#define XMLSEC_NO_XSLT 1
+
 #include <xmlsec/xmlsec.h>
 #include <xmlsec/xmltree.h>
 #include <xmlsec/parser.h>
