@@ -1,3 +1,3 @@
 #!/bin/sh
-libtoolize -c
-autoreconf --install
+libtoolize -c --force
+autoreconf --install --force

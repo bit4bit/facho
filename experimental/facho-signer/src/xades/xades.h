@@ -1,12 +1,15 @@
 #ifndef XADES_H
 #define XADES_H
 
+
+
 #include <libxml/tree.h>
+
+#define XMLSEC_NO_XSLT 1
 
 #include <xmlsec/xmltree.h>
 #include <xmlsec/transforms.h>
 #include <xmlsec/xmldsig.h>
-#include <xmlsec/openssl/x509.h>
 #include <xmlsec/base64.h>
 
 #include "xmlsec1/errors_helpers.h"
