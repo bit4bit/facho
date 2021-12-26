@@ -12,13 +12,14 @@
 
 static char *basename = NULL;
 
+void usage(FILE *out);
+
 int main(int argc, char *argv[]) {
   int exitStatus = EXIT_SUCCESS;
-
   basename = argv[0];
   
   if (argc != 4) {
-    fprintf(stderr, "%s: <factura.xml> <pc12> <password>\n", basename);
+    usage(stderr);
     return(EXIT_FAILURE);
   }
 
@@ -34,4 +35,13 @@ int main(int argc, char *argv[]) {
 
   xmlFachoShutdown();  
   return(exitStatus);
+}
+
+void
+usage(FILE *out) {
+  fprintf(out, "%s: <factura.xml> <pc12> <password>\n", basename);
+  fprintf(out, "%s", "Firmado electronico para facturacion en Colombia.\n"
+          "Segun el documento (Anexo Técnico de Factura Electrónica de Venta – Versión 1.7.-2020).\n"
+          "A considerar:\n" \
+          " * adiciona un nuevo elemento //ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent\n");
 }
