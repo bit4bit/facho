@@ -18,9 +18,9 @@
 #define xmlFachoPrintError(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
 #define xmlFachoPrintInfo(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
 
-const xmlChar ublExtensionDSigNs[] = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
-const xmlChar policyIdDescription[] = "Política de firma para facturas electrónicas de la República de Colombia.";
-const xmlChar policyIdIdentifier[] = "https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf";
+static const xmlChar ublExtensionDSigNs[] = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
+static const xmlChar policyIdDescription[] = "Política de firma para facturas electrónicas de la República de Colombia.";
+static const xmlChar policyIdIdentifier[] = "https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf";
   
 // crea elemento /Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent
 static xmlNodePtr
