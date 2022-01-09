@@ -37,29 +37,6 @@
 #define xmlXadesNodeAlreadyPresentError(parent, nodeName, errObject) \
   xmlSecNodeAlreadyPresentError(parent, nodeName, errObject)
 
-static const xmlChar xmlXadesNodeQualifyingProperties[] = "QualifyingProperties";
-static const xmlChar xmlXadesNodeSignedProperties[] = "SignedProperties";
-
-static const xmlChar xmlXadesNodeSignedSignatureProperties[] = "SignedSignatureProperties";
-static const xmlChar xmlXadesNodeSigningTime[] = "SigningTime";
-static const xmlChar xmlXadesNodeSigningCertificate[] = "SigningCertificate";
-static const xmlChar xmlXadesNodeCert[] = "Cert";
-static const xmlChar xmlXadesNodeCertDigest[] = "CertDigest";
-static const xmlChar xmlXadesNodeSignaturePolicyIdentifier[] = "SignaturePolicyIdentifier";
-static const xmlChar xmlXadesNodeSignaturePolicyId[] = "SignaturePolicyId";
-static const xmlChar xmlXadesNodeSigPolicyId[] = "SigPolicyId";
-static const xmlChar xmlXadesNodeIdentifier[] = "Identifier";
-static const xmlChar xmlXadesNodeDescription[] = "Description";
-static const xmlChar xmlXadesNodeSigPolicyHash[] = "SigPolicyHash";
-
-static const xmlChar xmlXadesNodeSignerRole[] = "SignerRole";
-static const xmlChar xmlXadesNodeClaimedRoles[] = "ClaimedRoles";
-static const xmlChar xmlXadesNodeClaimedRole[] = "ClaimedRole";
-static const xmlChar xmlXadesNodeIssuerSerial[] = "IssuerSerial";
-static const xmlChar xmlXadesNodeX509IssuerName[] = "X509IssuerName";
-static const xmlChar xmlXadesNodeX509IssuerNumber[] = "X509IssuerNumber";
-  
-static const xmlChar xmlXadesDSigNs[] = "http://uri.etsi.org/01903/v1.3.2#";
 
 typedef int xmlXadesSize;
 typedef enum _XADES_DIGEST_METHOD{
