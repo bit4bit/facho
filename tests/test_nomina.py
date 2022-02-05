@@ -378,12 +378,12 @@ def test_nomina_devengado_horas_extras_diarias():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_nomina_devengado_horas_extras_nocturnas():
@@ -413,12 +413,12 @@ def test_nomina_devengado_horas_extras_nocturnas():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_nomina_devengado_horas_recargo_nocturno():
@@ -448,12 +448,12 @@ def test_nomina_devengado_horas_recargo_nocturno():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_nomina_devengado_horas_extras_diarias_dominicales_y_festivos():
@@ -483,12 +483,12 @@ def test_nomina_devengado_horas_extras_diarias_dominicales_y_festivos():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_nomina_devengado_horas_recargo_diarias_dominicales_y_festivos():
@@ -518,12 +518,12 @@ def test_nomina_devengado_horas_recargo_diarias_dominicales_y_festivos():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 
@@ -554,12 +554,12 @@ def test_nomina_devengado_horas_extras_nocturnas_dominicales_y_festivos():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_nomina_devengado_horas_recargo_nocturno_dominicales_y_festivos():
@@ -589,12 +589,12 @@ def test_nomina_devengado_horas_recargo_nocturno_dominicales_y_festivos():
     assert extras[0].get('HoraInicio') == '2021-11-30T19:09:55'
     assert extras[0].get('HoraFin') == '2021-11-30T20:09:55'
     assert extras[0].get('Cantidad') == '1'
-    assert extras[0].get('Porcentaje') == '1.0'
+    assert extras[0].get('Porcentaje') == '1.00'
     assert extras[0].get('Pago') == '100.00'
     assert extras[1].get('HoraInicio') == '2021-11-30T18:09:55'
     assert extras[1].get('HoraFin') == '2021-11-30T19:09:55'
     assert extras[1].get('Cantidad') == '2'
-    assert extras[1].get('Porcentaje') == '2.0'
+    assert extras[1].get('Porcentaje') == '2.00'
     assert extras[1].get('Pago') == '200.00'
 
 def test_fecha_validacion():
