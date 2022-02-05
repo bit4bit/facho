@@ -34,6 +34,7 @@ POLICY_NAME = u'Política de firma para facturas electrónicas de la República 
 
 NAMESPACES = {
     'facho': 'http://git.disroot.org/Etrivial/facho',
+    'atd': 'urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2',
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
     'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
