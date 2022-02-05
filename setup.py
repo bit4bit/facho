@@ -14,12 +14,14 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['Click>=6.0',
-                'zeep>=3.4.0',
-                'pyOpenSSL>=19.1.0',
-                'xmlsig>=0.1.3',
-                'xades>=0.2.1',
-                'mock==2.0.0',
-                'xmlsec>=1.3.8',
+                'zeep==4.0.0',
+                'lxml==4.6.3',
+                'cryptography==3.3.2',
+                'pyOpenSSL==20.0.1',
+                'xmlsig==0.1.7',
+                'xades==0.2.2',
+                'mock>=2.0.0',
+                'xmlsec==1.3.12',
                 'xmlschema>=1.8']
 
 setup_requirements = ['pytest-runner', ]
@@ -62,6 +64,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/bit4bit/facho',
-    version='0.1.2',
+    version='0.2.0',
     zip_safe=False,
 )
