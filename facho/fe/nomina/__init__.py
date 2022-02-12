@@ -284,8 +284,8 @@ class InformacionGeneral:
 
 class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
 
-    def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
-        super().__init__(pkcs12_path, passphrase=passphrase, mockpolicy=mockpolicy)
+    def __init__(self, pkcs12_path, passphrase=None, localpolicy=True):
+        super().__init__(pkcs12_path, passphrase=passphrase, localpolicy=localpolicy)
 
     def _element_extension_content(self, fachoxml):
         return fachoxml.builder.xpath(fachoxml.root, './ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')

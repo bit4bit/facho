@@ -40,10 +40,7 @@ def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
 
     print(xml.tostring())
-    with monkeypatch.context() as m:
-        import helpers
-        helpers.mock_urlopen(m)
-        xml.add_extension(signer)
+    xml.add_extension(signer)
 
     elem = xml.get_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension[2]/ext:ExtensionContent/ds:Signature')
     assert elem.text is not None

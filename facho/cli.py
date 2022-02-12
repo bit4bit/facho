@@ -227,7 +227,7 @@ def sign_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy=False,
     if use_cache_policy:
         warnings.warn("xades using cache policy")
 
-    signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
+    signer = fe.DianXMLExtensionSigner(private_key, passphrase=passphrase, localpolicy=use_cache_policy)
     document = open(xmlfile, 'r').read().encode('utf-8')
     with open(output, 'w') as f:
         f.write(signer.sign_xml_string(document))
@@ -358,7 +358,7 @@ def sign_verify_xml(private_key, passphrase, xmlfile, ssl=True, use_cache_policy
         warnings.warn("xades using cache policy")
 
     print("THIS ONLY WORKS FOR DOCUMENTS GENERATE WITH FACHO")
-    signer = fe.DianXMLExtensionSignerVerifier(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
+    signer = fe.DianXMLExtensionSignerVerifier(private_key, passphrase=passphrase, localpolicy=use_cache_policy)
     document = open(xmlfile, 'r').read().encode('utf-8')
 
     if signer.verify_string(document):
