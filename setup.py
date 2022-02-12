@@ -20,13 +20,12 @@ requirements = ['Click>=6.0',
                 'pyOpenSSL==20.0.1',
                 'xmlsig==0.1.7',
                 'xades==0.2.2',
-                'mock>=2.0.0',
                 'xmlsec==1.3.12',
                 'xmlschema>=1.8']
 
 setup_requirements = ['pytest-runner', ]
 
-test_requirements = ['pytest', ]
+test_requirements = ['pytest', 'mock>=2.0.0']
 
 setup(
     author="Jovany Leandro G.C",
