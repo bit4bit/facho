@@ -27,7 +27,7 @@ class SOAPService:
     def get_service(self):
         raise NotImplementedError()
 
-    def builder_response(self, as_dict):
+    def build_response(self, as_dict):
         raise NotImplementedError()
 
     def todict(self):
