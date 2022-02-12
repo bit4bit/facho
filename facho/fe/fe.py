@@ -79,18 +79,15 @@ class FeXML(FachoXML):
         super().__init__("{%s}%s" % (namespace, root),
                          nsmap=NAMESPACES)
 
-        self._cn = root.rstrip('/')
-        #self.find_or_create_element(self._cn)
-
     @classmethod
     def from_string(cls, document: str) -> 'FeXML':
         return super().from_string(document, namespaces=NAMESPACES)
     
     def tostring(self, **kw):
+        # MACHETE(bit4bit) la DIAN espera que la etiqueta raiz no este en un namespace
         return super().tostring(**kw)\
             .replace("fe:", "")\
             .replace("xmlns:fe", "xmlns")
-
 
 
 class DianXMLExtensionCUDFE(FachoXMLExtension):
@@ -463,10 +460,18 @@ class DianZIP:
 
         return filename
 
+    # DEPRECATED usar add_xml
     def add_invoice_xml(self, name, xml_data):
         return self.add_xml(name, xml_data)
 
     def __enter__(self):
+        """
+        Facilita el uso de esta manera:
+        
+        f = open('xxx', 'rb')
+        with DianZIP(f) as zip:
+          zip.add_invoice_xml('name', 'data xml')
+        """
         return self
 
     def __exit__(self, type, value, traceback):
@@ -483,24 +488,25 @@ class DianXMLExtensionSignerVerifier:
             self._passphrase = passphrase.encode('utf-8')
 
     def verify_string(self, document):
+        # Obtener FachoXML
         xml = LXMLBuilder.from_string(document)
         fachoxml = FachoXML(xml,nsmap=NAMESPACES)
 
+        # Obtener Signature
         signature = fachoxml.builder.xpath(fachoxml.root, '//ds:Signature')
         assert signature is not None
 
+        # Se mueve Signature a elemento raiz para realizar verificaion
         signature.getparent().remove(signature)
         fachoxml.root.append(signature)
 
-        ctx = xades.XAdESContext()
-
+        # Verificar archivo usando Signature
         pkcs12_data = self._pkcs12_path_or_bytes
         if isinstance(self._pkcs12_path_or_bytes, str):
             pkcs12_data = open(self._pkcs12_path_or_bytes, 'rb').read()
-
+        ctx = xades.XAdESContext()
         ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(pkcs12_data,
                                                    self._passphrase))
-
         try:
             if self._mockpolicy:
                 with mock_xades_policy():
