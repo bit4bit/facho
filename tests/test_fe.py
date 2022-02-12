@@ -19,10 +19,7 @@ def test_xmlsigned_build(monkeypatch):
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
-
-    with monkeypatch.context() as m:
-        helpers.mock_urlopen(m)
-        signer.sign_xml_element(xml.root)
+    signer.sign_xml_element(xml.root)
 
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
 
@@ -38,9 +35,7 @@ def test_xmlsigned_with_passphrase_build(monkeypatch):
     xml = fe.FeXML('Invoice',
                    'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
-    with monkeypatch.context() as m:
-        helpers.mock_urlopen(m)
-        signer.sign_xml_element(xml.root)
+    signer.sign_xml_element(xml.root)
 
     elem = xml.find_or_create_element('/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
 
@@ -105,10 +100,7 @@ def test_xml_sign_dian(monkeypatch):
     xmlstring = xml.tostring()
     print(xmlstring)
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
-
-    with monkeypatch.context() as m:
-        helpers.mock_urlopen(m)
-        xmlsigned = signer.sign_xml_string(xmlstring)
+    xmlsigned = signer.sign_xml_string(xmlstring)
     assert "Signature" in xmlsigned
 
 def test_xml_sign_dian_using_bytes(monkeypatch):
@@ -122,7 +114,5 @@ def test_xml_sign_dian_using_bytes(monkeypatch):
     p12_data = open('./tests/example.p12', 'rb').read()
     signer = fe.DianXMLExtensionSigner.from_bytes(p12_data)
 
-    with monkeypatch.context() as m:
-        helpers.mock_urlopen(m)
-        xmlsigned = signer.sign_xml_string(xmlstring)
+    xmlsigned = signer.sign_xml_string(xmlstring)
     assert "Signature" in xmlsigned

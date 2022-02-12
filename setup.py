@@ -21,11 +21,14 @@ requirements = ['Click>=6.0',
                 'xmlsig==0.1.7',
                 'xades==0.2.2',
                 'xmlsec==1.3.12',
+                # usamos esta dependencia en runtime
+                # para forzar uso de policy_id de archivo local
+                'mock>=2.0.0',
                 'xmlschema>=1.8']
 
 setup_requirements = ['pytest-runner', ]
 
-test_requirements = ['pytest', 'mock>=2.0.0']
+test_requirements = ['pytest', ]
 
 setup(
     author="Jovany Leandro G.C",

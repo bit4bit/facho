@@ -13,7 +13,7 @@ def DIANWriteSigned(xml, filename, private_key, passphrase, use_cache_policy=Fal
     if dian_signer is None:
         dian_signer = fe.DianXMLExtensionSigner
 
-    signer = dian_signer(private_key, passphrase=passphrase, mockpolicy=use_cache_policy)
+    signer = dian_signer(private_key, passphrase=passphrase, localpolicy=use_cache_policy)
 
     with open(filename, 'w') as f:
         f.write(signer.sign_xml_string(document))

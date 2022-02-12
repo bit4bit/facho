@@ -26,9 +26,8 @@ SCHEME_AGENCY_ATTRS = {
 }
 
 
-pwd = Path(__file__).parent
 # RESOLUCION 0001: pagina 516
-POLICY_ID = 'file://'+str(pwd)+'/data/dian/politicadefirmav2.pdf'
+POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
 POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
 
 
@@ -62,6 +61,7 @@ def mock_xades_policy():
     with patch('xades.policy.urllib.urlopen') as mock:
         class UrllibPolicyMock:
             def read(self):
+                # Usamos contenido de archivo local
                 cur_dir = os.path.dirname(os.path.abspath(__file__))
                 data_dir = os.path.join(cur_dir, 'data', 'dian')
                 policy_file = os.path.join(data_dir, 'politicadefirmav2.pdf')
@@ -281,20 +281,20 @@ class DianXMLExtensionSoftwareSecurityCode(FachoXMLExtension):
 
 class DianXMLExtensionSigner:
 
-    def __init__(self, pkcs12_path, passphrase=None, mockpolicy=False):
+    def __init__(self, pkcs12_path, passphrase=None, localpolicy=True):
         self._pkcs12_data = open(pkcs12_path, 'rb').read()
         self._passphrase = None
-        self._mockpolicy = mockpolicy
+        self._localpolicy = localpolicy
         if passphrase:
             self._passphrase = passphrase.encode('utf-8')
 
     @classmethod
-    def from_bytes(cls, data, passphrase=None, mockpolicy=False):
+    def from_bytes(cls, data, passphrase=None, localpolicy=True):
         self = cls.__new__(cls)
         
         self._pkcs12_data = data
         self._passphrase = None
-        self._mockpolicy = mockpolicy
+        self._localpolicy = localpolicy
         if passphrase:
             self._passphrase = passphrase.encode('utf-8')
             
@@ -360,7 +360,7 @@ class DianXMLExtensionSigner:
         ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(self._pkcs12_data,
                                                    self._passphrase))
 
-        if self._mockpolicy:
+        if self._localpolicy:
             with mock_xades_policy():
                 ctx.sign(signature)
                 ctx.verify(signature)
@@ -480,10 +480,10 @@ class DianZIP:
 
 class DianXMLExtensionSignerVerifier:
 
-    def __init__(self, pkcs12_path_or_bytes, passphrase=None, mockpolicy=False):
+    def __init__(self, pkcs12_path_or_bytes, passphrase=None, localpolicy=True):
         self._pkcs12_path_or_bytes = pkcs12_path_or_bytes
         self._passphrase = None
-        self._mockpolicy = mockpolicy
+        self._localpolicy = localpolicy
         if passphrase:
             self._passphrase = passphrase.encode('utf-8')
 
@@ -508,7 +508,7 @@ class DianXMLExtensionSignerVerifier:
         ctx.load_pkcs12(OpenSSL.crypto.load_pkcs12(pkcs12_data,
                                                    self._passphrase))
         try:
-            if self._mockpolicy:
+            if self._localpolicy:
                 with mock_xades_policy():
                     ctx.verify(signature)
             else:

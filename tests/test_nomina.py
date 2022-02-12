@@ -239,9 +239,7 @@ def test_nomina_xmlsign(monkeypatch):
     xml = nomina.toFachoXML()
 
     signer = fe.nomina.DianXMLExtensionSigner('./tests/example.p12')
-    with monkeypatch.context() as m:
-        helpers.mock_urlopen(m)
-        xml.add_extension(signer)
+    xml.add_extension(signer)
 
     print(xml.tostring())
     elem = xml.get_element('/fe:NominaIndividual/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature')
