@@ -50,6 +50,19 @@ class FechaPago(Fecha):
     def apply(self, fragment):
         fragment.set_element('./FechaPago', self.value)
 
+
+@dataclass
+class Novedad:
+    value: False
+
+    def apply(self, fragment):
+        fragment.set_attributes('./Novedad',
+                                CUNENov=self.value,
+                                )
+    def post_apply(self, fexml, scopexml, fragment):
+        scopexml.set_element('./Novedad', "false")
+
+
 @dataclass
 class NumeroSecuencia:
     consecutivo: int
@@ -131,6 +144,7 @@ class Proveedor:
             raise RuntimeError('fail to get InformacionGeneral/@Ambiente')
         
         scopexml.set_element('./CodigoQR', codigo_qr)
+        scopexml.set_element('./Novedad', "false")        
 
         # NIE020
         software_code = self._software_security_code(fexml, scopexml)
@@ -149,25 +163,28 @@ class Proveedor:
 
         code = "".join([id_software, software_pin, numero])
 
-        fexml.set_attributes(scopexml.xpath_from_root('/ProveedorXML'), fachoSoftwareSC=code)
+        fexml.set_attributes(scopexml.xpath_from_root('/ProveedorXML'))
         h = hashlib.sha384()
         h.update(code.encode('utf-8'))
         return h.hexdigest()
     
 @dataclass
 class Metadata:
+    novedad: Novedad
     secuencia: NumeroSecuencia
     # NIE013, NIE014, NIE015, NIE016
     lugar_generacion: Lugar
     proveedor: Proveedor
 
-    def apply(self, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+    def apply(self, novedad, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+        self.novedad.apply(novedad)
         self.secuencia.apply(numero_secuencia_xml)
         self.lugar_generacion.apply(lugar_generacion_xml, './LugarGeneracionXML')
         self.proveedor.apply(proveedor_xml)
 
-    def post_apply(self, fexml, scopexml, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
+    def post_apply(self, fexml, scopexml, novedad, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
         self.proveedor.post_apply(fexml, scopexml, proveedor_xml)
+        self.novedad.post_apply(fexml, scopexml, proveedor_xml)        
         
 @dataclass
 class PeriodoNomina:
@@ -245,7 +262,8 @@ class InformacionGeneral:
                                 # NIE029
                                 PeriodoNomina = self.periodo_nomina.code,
                                 # NIE030
-                                TipoMoneda = self.tipo_moneda.code
+                                TipoMoneda = self.tipo_moneda.code,
+                                TRM = 0
                                 # TODO(bit4bit) resto...
                                 # .....
                                 )
@@ -278,8 +296,7 @@ class InformacionGeneral:
         fragment.set_attributes(
             './InformacionGeneral',
             # NIE024
-            CUNE = cune_hash,
-            fachoCUNE = cune
+            CUNE = cune_hash
         )
 
 class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
@@ -299,7 +316,8 @@ class DIANNominaXML:
         self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
 
         if schemaLocation is not None:
-            self.fexml.root.set("SchemaLocation", schemaLocation)
+            self.fexml.root.set("SchemaLocation", "")            
+            self.fexml.root.set("change", schemaLocation)
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
@@ -311,7 +329,7 @@ class DIANNominaXML:
             self.root_fragment = self.fexml.fragment(xpath_ajuste)
         self.root_fragment.placeholder_for('./ReemplazandoPredecesor', optional=True)
         self.root_fragment.placeholder_for('./EliminandoPredecesor', optional=True)
-        self.root_fragment.placeholder_for('./Novedad', optional=True)
+        self.root_fragment.placeholder_for('./Novedad', optional=False)
         self.root_fragment.placeholder_for('./Periodo')
         self.root_fragment.placeholder_for('./NumeroSecuenciaXML')
         self.root_fragment.placeholder_for('./LugarGeneracionXML')
@@ -325,7 +343,7 @@ class DIANNominaXML:
         self.root_fragment.placeholder_for('./Devengados/Basico')
         self.root_fragment.placeholder_for('./Devengados/Transporte', optional=True)
 
-
+        self.novedad = self.root_fragment.fragment('./Novedad')
         self.informacion_general_xml = self.root_fragment.fragment('./InformacionGeneral')
         self.periodo_xml = self.root_fragment.fragment('./Periodo')
         self.fecha_pagos_xml = self.root_fragment.fragment('./FechasPagos')
@@ -345,7 +363,7 @@ class DIANNominaXML:
         if not isinstance(metadata, Metadata):
             raise ValueError('se espera tipo Metadata')
         self.metadata = metadata
-        self.metadata.apply(self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
+        self.metadata.apply(self.novedad, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
         
     def asignar_informacion_general(self, general):
         if not isinstance(general, InformacionGeneral):
@@ -461,7 +479,7 @@ class DIANNominaXML:
             self.informacion_general.post_apply(self.fexml, self.root_fragment, self.informacion_general_xml)
 
         if self.metadata is not None:
-            self.metadata.post_apply(self.fexml, self.root_fragment, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
+            self.metadata.post_apply(self.fexml, self.root_fragment, self.novedad, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
 
         return self.fexml
 
@@ -501,7 +519,7 @@ class DIANNominaXML:
         devengados_total = Amount(0.0)
         for devengado in devengados:
             devengados_total += devengado
-            
+        self.root_fragment.set_element('./Redondeo', str(round(0,2)))          
         self.root_fragment.set_element('./DevengadosTotal', str(round(devengados_total,2)))
 
     def _values_of_xpaths(self, xpaths):
