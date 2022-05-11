@@ -32,9 +32,10 @@ POLICY_NAME = u'Política de firma para facturas electrónicas de la República 
 
 
 NAMESPACES = {
-    'facho': 'http://git.disroot.org/Etrivial/facho',
     'atd': 'urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2',
+    'nomina': 'dian:gov:co:facturaelectronica:NominaIndividual',
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
+    'xs': 'http://www.w3.org/2001/XMLSchema-instance',    
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
     'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
     'cdt': 'urn:DocumentInformation:names:specification:ubl:colombia:schema:xsd:DocumentInformationAggregateComponents-1',
@@ -46,6 +47,7 @@ NAMESPACES = {
     'udt': 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2',
     'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
     'xades': 'http://uri.etsi.org/01903/v1.3.2#',
+    'xades141': 'http://uri.etsi.org/01903/v1.4.1#',    
     'ds': 'http://www.w3.org/2000/09/xmldsig#',
     'sig': 'http://www.w3.org/2000/09/xmldsig#',
 }
@@ -85,10 +87,11 @@ class FeXML(FachoXML):
     
     def tostring(self, **kw):
         # MACHETE(bit4bit) la DIAN espera que la etiqueta raiz no este en un namespace
+        root_namespace = self.root_namespace()
+        xmlns_name = {v: k for k, v in NAMESPACES.items()}[root_namespace]
         return super().tostring(**kw)\
-            .replace("fe:", "")\
-            .replace("xmlns:fe", "xmlns")
-
+            .replace(xmlns_name + ':', '')\
+            .replace('xmlns:'+xmlns_name, 'xmlns')
 
 class DianXMLExtensionCUDFE(FachoXMLExtension):
 

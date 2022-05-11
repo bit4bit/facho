@@ -177,6 +177,9 @@ class FachoXML:
         xml = LXMLBuilder.from_string(document)
         return FachoXML(xml, nsmap=namespaces)
 
+    def root_namespace(self):
+        return etree.QName(self.root).namespace
+
     def append_element(self, elem, new_elem):
         #elem = self.find_or_create_element(xpath, append=append)
         #self.builder.append(elem, new_elem)
