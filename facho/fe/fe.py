@@ -33,7 +33,7 @@ POLICY_NAME = u'Política de firma para facturas electrónicas de la República 
 
 NAMESPACES = {
     'atd': 'urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2',
-    'no': 'dian:gov:co:facturaelectronica:NominaIndividual',
+    'nomina': 'dian:gov:co:facturaelectronica:NominaIndividual',
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
     'xs': 'http://www.w3.org/2001/XMLSchema-instance',    
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
@@ -87,11 +87,11 @@ class FeXML(FachoXML):
     
     def tostring(self, **kw):
         # MACHETE(bit4bit) la DIAN espera que la etiqueta raiz no este en un namespace
+        root_namespace = self.root_namespace()
+        xmlns_name = {v: k for k, v in NAMESPACES.items()}[root_namespace]
         return super().tostring(**kw)\
-            .replace("fe:", "")\
-            .replace("xmlns:no", "xmlns")\
-            .replace("change", "xsi:schemaLocation")
-
+            .replace(xmlns_name + ':', '')\
+            .replace('xmlns:'+xmlns_name, 'xmlns')
 
 class DianXMLExtensionCUDFE(FachoXMLExtension):
 

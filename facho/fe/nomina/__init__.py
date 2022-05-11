@@ -53,14 +53,20 @@ class FechaPago(Fecha):
 
 @dataclass
 class Novedad:
-    value: False
+    # cune de nomina a relacionar
+    # NIE204
+    cune: str
+    # NIE199
+    activa: bool = False
 
     def apply(self, fragment):
-        fragment.set_attributes('./Novedad',
-                                CUNENov=self.value,
-                                )
+        if self.cune != "":
+            fragment.set_attributes('./Novedad',
+                                    CUNENov=self.cune,
+                                    )
+
     def post_apply(self, fexml, scopexml, fragment):
-        scopexml.set_element('./Novedad', "false")
+        scopexml.set_element('./Novedad', self.activa)
 
 
 @dataclass
@@ -313,11 +319,10 @@ class DIANNominaXML:
         self.informacion_general_version = None
 
         self.tag_document = tag_document
-        self.fexml = fe.FeXML(tag_document, 'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+        self.fexml = fe.FeXML(tag_document, 'dian:gov:co:facturaelectronica:NominaIndividual')
 
         if schemaLocation is not None:
-            self.fexml.root.set("SchemaLocation", "")            
-            self.fexml.root.set("change", schemaLocation)
+            self.fexml.root.set("SchemaLocation", schemaLocation)            
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
@@ -519,6 +524,8 @@ class DIANNominaXML:
         devengados_total = Amount(0.0)
         for devengado in devengados:
             devengados_total += devengado
+        # TODO(bit4bit) nque valor va redondeado?
+        # NIE186
         self.root_fragment.set_element('./Redondeo', str(round(0,2)))          
         self.root_fragment.set_element('./DevengadosTotal', str(round(devengados_total,2)))
 
@@ -538,7 +545,7 @@ class DIANNominaXML:
 class DIANNominaIndividual(DIANNominaXML):
 
     def __init__(self):
-        schema = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
+        schema = "dian:gov:co:facturaelectronica:NominaIndividual"
 
         super().__init__('NominaIndividual', schemaLocation=schema)
         self.informacion_general_version = 'V1.0: Documento Soporte de Pago de Nómina Electrónica'
