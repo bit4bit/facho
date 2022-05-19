@@ -156,6 +156,7 @@ def test_nomina_xml():
         hora_generacion = '1053:10-05:00',
         tipo_ambiente = fe.nomina.InformacionGeneral.AMBIENTE_PRODUCCION,
         software_pin = '693',
+        tipo_xml = fe.nomina.InformacionGeneral.TIPO_XML_NORMAL,
         periodo_nomina = fe.nomina.PeriodoNomina(code='1'),
         tipo_moneda = fe.nomina.TipoMoneda(code='COP')
     ))
@@ -274,7 +275,7 @@ def test_adicionar_reemplazar_devengado_comprobante_total():
 
     xml = nomina.toFachoXML()
 
-    assert xml.get_element_text('/nomina:NominaIndividualDeAjuste/Reemplazar/ComprobanteTotal') == '1000000.00'
+    assert xml.get_element_text('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ComprobanteTotal') == '1000000.00'
 
 
 def test_adicionar_reemplazar_asignar_predecesor():
@@ -288,9 +289,9 @@ def test_adicionar_reemplazar_asignar_predecesor():
 
     xml = nomina.toFachoXML()
     print(xml.tostring())
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@NumeroPred') == '123456'
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@CUNEPred') == 'ABC123456'
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@FechaGenPred') == '2021-11-16'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@NumeroPred') == '123456'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@CUNEPred') == 'ABC123456'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor/@FechaGenPred') == '2021-11-16'
 
 
 def test_adicionar_reemplazar_eliminar_predecesor_opcional():
@@ -305,8 +306,8 @@ def test_adicionar_reemplazar_eliminar_predecesor_opcional():
     xml = nomina.toFachoXML()
     print(xml.tostring())
 
-    assert xml.get_element('/nomina:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor') is not None
-    assert xml.get_element('/nomina:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor') is None
+    assert xml.get_element('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor') is not None
+    assert xml.get_element('/nominaajuste:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor') is None
 
 def test_adicionar_eliminar_reemplazar_predecesor_opcional():
     nomina = fe.nomina.DIANNominaIndividualDeAjuste.Eliminar()
@@ -319,8 +320,8 @@ def test_adicionar_eliminar_reemplazar_predecesor_opcional():
 
     xml = nomina.toFachoXML()
     print(xml.tostring())
-    assert xml.get_element('/nomina:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor') is not None
-    assert xml.get_element('/nomina:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor') is None
+    assert xml.get_element('/nominaajuste:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor') is not None
+    assert xml.get_element('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/ReemplazandoPredecesor') is None
 
 def test_adicionar_eliminar_devengado_comprobante_total():
     nomina = fe.nomina.DIANNominaIndividualDeAjuste.Eliminar()
@@ -337,7 +338,7 @@ def test_adicionar_eliminar_devengado_comprobante_total():
 
     xml = nomina.toFachoXML()
 
-    assert xml.get_element_text('/nomina:NominaIndividualDeAjuste/Eliminar/ComprobanteTotal') == '1000000.00'
+    assert xml.get_element_text('/nominaajuste:NominaIndividualDeAjuste/Eliminar/ComprobanteTotal') == '1000000.00'
 
 def test_adicionar_eliminar_asignar_predecesor():
     nomina = fe.nomina.DIANNominaIndividualDeAjuste.Eliminar()
@@ -350,9 +351,9 @@ def test_adicionar_eliminar_asignar_predecesor():
 
     xml = nomina.toFachoXML()
     print(xml.tostring())
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@NumeroPred') == '123456'
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@CUNEPred') == 'ABC123456'
-    assert xml.get_element_text_or_attribute('/nomina:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@FechaGenPred') == '2021-11-16'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@NumeroPred') == '123456'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@CUNEPred') == 'ABC123456'
+    assert xml.get_element_text_or_attribute('/nominaajuste:NominaIndividualDeAjuste/Eliminar/EliminandoPredecesor/@FechaGenPred') == '2021-11-16'
 
 def test_nomina_devengado_horas_extras_diarias():
     nomina = fe.nomina.DIANNominaIndividual()
