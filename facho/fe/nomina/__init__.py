@@ -320,9 +320,12 @@ class DIANNominaXML:
 
         self.tag_document = tag_document
         self.fexml = fe.FeXML(tag_document, 'dian:gov:co:facturaelectronica:NominaIndividual')
+        
+        schemaLocation = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
 
         if schemaLocation is not None:
-            self.fexml.root.set("SchemaLocation", schemaLocation)            
+            self.fexml.root.set("SchemaLocation", "")
+            self.fexml.root.set("schemaLocation", schemaLocation)            
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico

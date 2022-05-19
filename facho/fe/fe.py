@@ -91,7 +91,8 @@ class FeXML(FachoXML):
         xmlns_name = {v: k for k, v in NAMESPACES.items()}[root_namespace]
         return super().tostring(**kw)\
             .replace(xmlns_name + ':', '')\
-            .replace('xmlns:'+xmlns_name, 'xmlns')
+            .replace('xmlns:'+xmlns_name, 'xmlns')\
+            .replace('schemaLocation', 'xsi:schemaLocation')
 
 class DianXMLExtensionCUDFE(FachoXMLExtension):
 
