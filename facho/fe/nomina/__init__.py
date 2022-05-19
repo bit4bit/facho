@@ -150,7 +150,6 @@ class Proveedor:
             raise RuntimeError('fail to get InformacionGeneral/@Ambiente')
         
         scopexml.set_element('./CodigoQR', codigo_qr)
-        scopexml.set_element('./Novedad', "false")        
 
         # NIE020
         software_code = self._software_security_code(fexml, scopexml)
@@ -183,14 +182,16 @@ class Metadata:
     proveedor: Proveedor
 
     def apply(self, novedad, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
-        self.novedad.apply(novedad)
+        if novedad:
+            self.novedad.apply(novedad)
         self.secuencia.apply(numero_secuencia_xml)
         self.lugar_generacion.apply(lugar_generacion_xml, './LugarGeneracionXML')
         self.proveedor.apply(proveedor_xml)
 
     def post_apply(self, fexml, scopexml, novedad, numero_secuencia_xml, lugar_generacion_xml, proveedor_xml):
         self.proveedor.post_apply(fexml, scopexml, proveedor_xml)
-        self.novedad.post_apply(fexml, scopexml, proveedor_xml)        
+        if novedad:
+            self.novedad.post_apply(fexml, scopexml, proveedor_xml)        
         
 @dataclass
 class PeriodoNomina:
@@ -235,6 +236,29 @@ class InformacionGeneral:
         valor: str = '2'
 
         def __str__(self):
+            self.valor            
+
+    # TABLA 5.5.7
+    @dataclass
+    class TIPO_XML:
+        valor: str
+
+        @classmethod
+        def same(cls, value):
+            return cls.valor == str(value)
+
+    @dataclass
+    class TIPO_XML_NORMAL(TIPO_XML):
+        valor: str = '102'
+
+        def __str__(self):
+            self.valor            
+
+    @dataclass
+    class TIPO_XML_AJUSTES(TIPO_XML):
+        valor: str = '103'
+
+        def __str__(self):
             self.valor
 
     fecha_generacion: typing.Union[str, Fecha]
@@ -242,6 +266,7 @@ class InformacionGeneral:
     periodo_nomina: PeriodoNomina
     tipo_moneda: TipoMoneda
     tipo_ambiente: TIPO_AMBIENTE
+    tipo_xml: TIPO_XML
     software_pin: str
 
     def __post_init__(self):
@@ -256,7 +281,7 @@ class InformacionGeneral:
                                 # NIE202
                                 # TABLA 5.5.2
                                 # TODO(bit4bit) solo NominaIndividual
-                                TipoXML = '102',
+                                TipoXML = self.tipo_xml.valor,
                                 # NIE024
                                 CUNE = None,
                                 # NIE025
@@ -315,17 +340,18 @@ class DianXMLExtensionSigner(fe.DianXMLExtensionSigner):
 
 
 class DIANNominaXML:
-    def __init__(self, tag_document, xpath_ajuste=None,schemaLocation=None):
+    def __init__(self, tag_document, xpath_ajuste=None, schemaLocation=None, namespace_ajuste=None):
         self.informacion_general_version = None
 
         self.tag_document = tag_document
-        self.fexml = fe.FeXML(tag_document, 'dian:gov:co:facturaelectronica:NominaIndividual')
-        
-        schemaLocation = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
 
-        if schemaLocation is not None:
-            self.fexml.root.set("SchemaLocation", "")
-            self.fexml.root.set("schemaLocation", schemaLocation)            
+        if namespace_ajuste:
+            self.fexml = fe.FeXML(tag_document, namespace_ajuste)
+        else:
+            self.fexml = fe.FeXML(tag_document, 'dian:gov:co:facturaelectronica:NominaIndividual')
+
+        self.fexml.root.set("SchemaLocation", "")
+        self.fexml.root.set("schemaLocation", schemaLocation)
 
         # layout, la dian requiere que los elementos
         # esten ordenados segun el anexo tecnico
@@ -337,7 +363,8 @@ class DIANNominaXML:
             self.root_fragment = self.fexml.fragment(xpath_ajuste)
         self.root_fragment.placeholder_for('./ReemplazandoPredecesor', optional=True)
         self.root_fragment.placeholder_for('./EliminandoPredecesor', optional=True)
-        self.root_fragment.placeholder_for('./Novedad', optional=False)
+        if not namespace_ajuste:
+            self.root_fragment.placeholder_for('./Novedad', optional=False)
         self.root_fragment.placeholder_for('./Periodo')
         self.root_fragment.placeholder_for('./NumeroSecuenciaXML')
         self.root_fragment.placeholder_for('./LugarGeneracionXML')
@@ -350,8 +377,10 @@ class DIANNominaXML:
         self.root_fragment.placeholder_for('./FechasPagos')
         self.root_fragment.placeholder_for('./Devengados/Basico')
         self.root_fragment.placeholder_for('./Devengados/Transporte', optional=True)
-
-        self.novedad = self.root_fragment.fragment('./Novedad')
+        if not namespace_ajuste:
+            self.novedad = self.root_fragment.fragment('./Novedad')
+        else:
+            self.novedad = None
         self.informacion_general_xml = self.root_fragment.fragment('./InformacionGeneral')
         self.periodo_xml = self.root_fragment.fragment('./Periodo')
         self.fecha_pagos_xml = self.root_fragment.fragment('./FechasPagos')
@@ -371,6 +400,7 @@ class DIANNominaXML:
         if not isinstance(metadata, Metadata):
             raise ValueError('se espera tipo Metadata')
         self.metadata = metadata
+                
         self.metadata.apply(self.novedad, self.numero_secuencia_xml, self.lugar_generacion_xml, self.proveedor_xml)
         
     def asignar_informacion_general(self, general):
@@ -548,7 +578,7 @@ class DIANNominaXML:
 class DIANNominaIndividual(DIANNominaXML):
 
     def __init__(self):
-        schema = "dian:gov:co:facturaelectronica:NominaIndividual"
+        schema = "dian:gov:co:facturaelectronica:NominaIndividual NominaIndividualElectronicaXSD.xsd"
 
         super().__init__('NominaIndividual', schemaLocation=schema)
         self.informacion_general_version = 'V1.0: Documento Soporte de Pago de Nómina Electrónica'
@@ -564,6 +594,8 @@ class DIANNominaIndividualDeAjuste(DIANNominaXML):
             fecha_generacion: str
 
             def apply(self, fragment):
+                # NIAE214
+                fragment.set_element('./TipoNota', '1')                
                 fragment.set_element('./Reemplazar/ReemplazandoPredecesor', None,
                                      # NIAE090
                                      NumeroPred = self.numero,
@@ -574,9 +606,11 @@ class DIANNominaIndividualDeAjuste(DIANNominaXML):
                                      )
 
         def __init__(self):
-            super().__init__('NominaIndividualDeAjuste', './Reemplazar')
-            # NIAE214
-            self.root_fragment.set_element('./TipoNota', '1')
+            schema = "dian:gov:co:facturaelectronica:NominaIndividualDeAjuste NominaIndividualDeAjusteElectronicaXSD.xsd"
+            
+            super().__init__('NominaIndividualDeAjuste', './Reemplazar', schemaLocation=schema, namespace_ajuste='dian:gov:co:facturaelectronica:NominaIndividualDeAjuste')
+            
+            self.informacion_general_version = 'V1.0: Nota de Ajuste de Documento Soporte de Pago de Nómina Electrónica'
 
         def asignar_predecesor(self, predecesor):
             if not isinstance(predecesor, self.Predecesor):
@@ -593,6 +627,7 @@ class DIANNominaIndividualDeAjuste(DIANNominaXML):
             fecha_generacion: str
 
             def apply(self, fragment):
+                fragment.set_element('./TipoNota', '2')
                 fragment.set_element('./Eliminar/EliminandoPredecesor', None,
                                      # NIAE090
                                      NumeroPred = self.numero,
@@ -603,9 +638,9 @@ class DIANNominaIndividualDeAjuste(DIANNominaXML):
                                      )
 
         def __init__(self):
-            super().__init__('NominaIndividualDeAjuste', './Eliminar')
+            schema = "dian:gov:co:facturaelectronica:NominaIndividualDeAjuste NominaIndividualDeAjusteElectronicaXSD.xsd"            
+            super().__init__('NominaIndividualDeAjuste', './Eliminar', schemaLocation=schema, namespace_ajuste='dian:gov:co:facturaelectronica:NominaIndividualDeAjuste')
 
-            self.root_fragment.set_element('./TipoNota', '2')
             self.informacion_general_version = "V1.0: Nota de Ajuste de Documento Soporte de Pago de Nómina Electrónica"
 
         def asignar_predecesor(self, predecesor):

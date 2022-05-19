@@ -34,6 +34,7 @@ POLICY_NAME = u'Política de firma para facturas electrónicas de la República 
 NAMESPACES = {
     'atd': 'urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2',
     'nomina': 'dian:gov:co:facturaelectronica:NominaIndividual',
+    'nominaajuste': 'dian:gov:co:facturaelectronica:NominaIndividualDeAjuste',    
     'fe': 'http://www.dian.gov.co/contratos/facturaelectronica/v1',
     'xs': 'http://www.w3.org/2001/XMLSchema-instance',    
     'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
@@ -93,7 +94,7 @@ class FeXML(FachoXML):
             .replace(xmlns_name + ':', '')\
             .replace('xmlns:'+xmlns_name, 'xmlns')\
             .replace('schemaLocation', 'xsi:schemaLocation')
-
+    
 class DianXMLExtensionCUDFE(FachoXMLExtension):
 
     def __init__(self, invoice, tipo_ambiente = AMBIENTE_PRUEBAS):
