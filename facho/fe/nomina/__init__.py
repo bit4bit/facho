@@ -144,7 +144,7 @@ class Proveedor:
         ambiente = fexml.get_element_attribute(scopexml.xpath_from_root('/InformacionGeneral'), 'Ambiente')
         codigo_qr = f"https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={cune}"
 
-        if InformacionGeneral.AMBIENTE_PRUEBAS.same(ambiente):
+        if InformacionGeneral.AMBIENTE_PRUEBAS == ambiente:
             codigo_qr = f"https://catalogo-vpfe-hab.dian.gov.co/document/searchqr?documentkey={cune}"
         elif ambiente is None:
             raise RuntimeError('fail to get InformacionGeneral/@Ambiente')
@@ -219,9 +219,8 @@ class InformacionGeneral:
     class TIPO_AMBIENTE:
         valor: str
 
-        @classmethod
-        def same(cls, value):
-            return cls.valor == str(value)
+        def __eq__(self, other):
+            return self.valor == str(other)
 
     # TABLA 5.1.1
     @dataclass
@@ -243,9 +242,8 @@ class InformacionGeneral:
     class TIPO_XML:
         valor: str
 
-        @classmethod
-        def same(cls, value):
-            return cls.valor == str(value)
+        def __eq__(self, other):
+            return self.valor == str(other)
 
     @dataclass
     class TIPO_XML_NORMAL(TIPO_XML):
