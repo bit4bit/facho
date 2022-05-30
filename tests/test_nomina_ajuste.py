@@ -12,12 +12,96 @@ from facho import fe
 
 import helpers
 
-def test_nomina_ajuste_reemplazar():
+def atest_nomina_ajuste_reemplazar():
     nomina = fe.nomina.DIANNominaIndividualDeAjuste.Reemplazar()
 
     xml = nomina.toFachoXML()
     print(xml)
     assert False
+
+def test_nomina_ajuste_reemplazar_asignacion_tipo_xml():
+    nomina = fe.nomina.DIANNominaIndividualDeAjuste.Reemplazar()
+    nomina.asignar_metadata(fe.nomina.Metadata(
+        novedad=fe.nomina.Novedad(
+            activa = True,
+            cune = "N0111"
+        ),
+        secuencia=fe.nomina.NumeroSecuencia(
+            prefijo = 'N',
+            consecutivo='00001'
+        ),
+        lugar_generacion=fe.nomina.Lugar(
+            pais = fe.nomina.Pais(
+                code = 'CO'
+            ),
+            departamento = fe.nomina.Departamento(
+                code = '05'
+            ),
+            municipio = fe.nomina.Municipio(
+                code = '05001'
+            ),
+        ),
+        proveedor=fe.nomina.Proveedor(
+            nit='999999',
+            dv=2,
+            software_id='xx',
+            software_pin='12',
+            razon_social='facho'
+        )
+    ))
+    nomina.asignar_empleador(fe.nomina.Empleador(
+        razon_social='facho',
+        nit = '700085371',
+        dv = '1',
+        pais = fe.nomina.Pais(
+            code = 'CO'
+        ),
+        departamento = fe.nomina.Departamento(
+            code = '05'
+        ),
+        municipio = fe.nomina.Municipio(
+            code = '05001'
+        ),
+        direccion = 'calle etrivial'
+    ))
+
+    nomina.asignar_trabajador(fe.nomina.Trabajador(
+        tipo_contrato = fe.nomina.TipoContrato(
+            code = '1'
+        ),
+        alto_riesgo = False,
+        tipo_documento = fe.nomina.TipoDocumento(
+            code = '11'
+        ),
+        primer_apellido = 'gnu',
+        segundo_apellido = 'emacs',
+        primer_nombre = 'facho',
+        lugar_trabajo = fe.nomina.LugarTrabajo(
+            pais = fe.nomina.Pais(code='CO'),
+            departamento = fe.nomina.Departamento(code='05'),
+            municipio = fe.nomina.Municipio(code='05001'),
+            direccion = 'calle facho'
+        ),
+        numero_documento = '800199436',
+        tipo = fe.nomina.TipoTrabajador(
+            code = '01'
+        ),
+        salario_integral = True,
+        sueldo = fe.nomina.Amount(1_500_000)
+    ))
+    nomina.asignar_informacion_general(fe.nomina.InformacionGeneral(
+        fecha_generacion = '2020-01-16',
+        hora_generacion = '1053:10-05:00',
+        tipo_ambiente = fe.nomina.InformacionGeneral.AMBIENTE_PRODUCCION,
+        software_pin = '693',
+        tipo_xml = fe.nomina.InformacionGeneral.TIPO_XML_AJUSTES,
+        periodo_nomina = fe.nomina.PeriodoNomina(code='1'),
+        tipo_moneda = fe.nomina.TipoMoneda(code='COP')
+    ))
+
+    xml = nomina.toFachoXML()
+
+    assert xml.get_element_attribute('/nominaajuste:NominaIndividualDeAjuste/Reemplazar/InformacionGeneral', 'TipoXML') == '103'
 
 
 def test_adicionar_reemplazar_devengado_comprobante_total():

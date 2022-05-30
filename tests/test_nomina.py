@@ -215,7 +215,7 @@ def test_nomina_xml():
     xml = nomina.toFachoXML()
     expected_cune = 'b8f9b6c24de07ffd92ea5467433a3b69357cfaffa7c19722db94b2e0eca41d057085a54f484b5da15ff585e773b0b0ab'
     assert xml.get_element_attribute('/nomina:NominaIndividual/InformacionGeneral', 'CUNE') == expected_cune
-    assert xml.get_element_attribute('/nomina:NominaIndividual/InformacionGeneral', 'TipoXML') == expected_cune
+    assert xml.get_element_attribute('/nomina:NominaIndividual/InformacionGeneral', 'TipoXML') == '102'
     assert xml.get_element_text_or_attribute('/nomina:NominaIndividual/NumeroSecuenciaXML/@Numero') == 'N00001'
     assert xml.get_element_text_or_attribute('/nomina:NominaIndividual/NumeroSecuenciaXML/@Consecutivo') == '00001'
     assert xml.get_element_text_or_attribute('/nomina:NominaIndividual/LugarGeneracionXML/@Pais') == 'CO'
