@@ -12,7 +12,7 @@ from facho import fe
 
 import helpers
 
-def atest_nomina_ajuste_reemplazar():
+def test_nomina_ajuste_reemplazar():
     nomina = fe.nomina.DIANNominaIndividualDeAjuste.Reemplazar()
 
     xml = nomina.toFachoXML()
