@@ -11,9 +11,6 @@
 dev-setup:
 	docker build -t facho .
 
-py-develop:
-	docker run -t -v $(PWD):/app -w /app facho sh -c 'python3.7 setup.py develop --user'
-
 dev-shell:
 	docker run --rm -ti -v "$(PWD):/app" -w /app --name facho-cli facho bash
 

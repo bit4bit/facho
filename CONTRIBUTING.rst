@@ -94,6 +94,14 @@ Ready to contribute? Here's how to set up `facho` for local development.
 
 7. Submit a pull request through the GitHub website.
 
+Using docker
+------------
+
+1. make -f Makefile.dev build
+2. make -f Makefile.dev dev-shell
+3. make -f Makefile.dev python3.8 setup.py develop
+4. make -f Makefile.dev python3.8 setup.py test
+
 Pull Request Guidelines
 -----------------------
 
