@@ -122,8 +122,14 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName=self.schemeName())
-        #DIAN 1.8.-2021: FAD03
-        fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
+
+        if self.schemeName() == "CUDS-SHA384":
+            fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: documento soporte en adquisiciones efectuadas a no obligados a facturar.')
+        else:
+            fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
+
+        # #DIAN 1.8.-2021: FAD03
+        # fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
         fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente_int())
         #DIAN 1.7.-2020: FAB36
         fachoxml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',
@@ -246,6 +252,39 @@ class DianXMLExtensionCUDE(DianXMLExtensionCUDFE):
             '%d' % build_vars['TipoAmb'],
         ]
 
+class DianXMLExtensionCUDS(DianXMLExtensionCUDFE):
+    def __init__(self, invoice, software_pin, tipo_ambiente = AMBIENTE_PRUEBAS):
+        self.tipo_ambiente = tipo_ambiente
+        self.software_pin = software_pin
+        self.invoice = invoice
+
+    def schemeName(self):
+        return 'CUDS-SHA384'
+
+    def buildVars(self):
+        build_vars = super().buildVars()
+        build_vars['Software-PIN'] = str(self.software_pin)
+        return build_vars
+
+    def formatVars(self):
+        build_vars = self.buildVars()
+        CodImpuesto1 = build_vars['CodImpuesto1']
+        CodImpuesto2 = build_vars['CodImpuesto2']
+        CodImpuesto3 = build_vars['CodImpuesto3']
+        return [
+            '%s' % build_vars['NumFac'],
+            '%s' % build_vars['FecFac'],
+            '%s' % build_vars['HoraFac'],
+            form.Amount(build_vars['ValorBruto']).truncate_as_string(2),
+            CodImpuesto1,
+            form.Amount(build_vars['ValorImpuestoPara'].get(CodImpuesto1, 0.0)).truncate_as_string(2),
+            form.Amount(build_vars['ValorTotalPagar']).truncate_as_string(2),
+            '%s' % build_vars['NitOFE'],
+            '%s' % build_vars['NumAdq'],            
+            '%s' % build_vars['Software-PIN'],
+            '%d' % build_vars['TipoAmb'],
+        ]
+    
 class DianXMLExtensionSoftwareProvider(FachoXMLExtension):
     # RESOLUCION 0004: pagina 108
 

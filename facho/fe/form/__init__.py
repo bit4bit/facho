@@ -211,12 +211,17 @@ class City:
         self.name = codelist.Municipio[self.code]['name']
 
 @dataclass
+class PostalZone:
+    code: str = ''
+        
+@dataclass
 class Address:
     name: str
     street: str = ''
     city: City = City('05001')
     country: Country = Country('CO')
     countrysubentity: CountrySubentity = CountrySubentity('05')
+    postalzone: PostalZone = PostalZone('')
 
 @dataclass
 class PartyIdentification:
@@ -735,3 +740,5 @@ class DebitNote(Invoice):
         if not self.invoice_ident_prefix:
             self.invoice_ident_prefix = self.invoice_ident[0:6]
 
+class SupportDocument(Invoice):
+    pass

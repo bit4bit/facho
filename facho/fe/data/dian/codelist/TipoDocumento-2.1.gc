@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- DIAN Genericode listas de valores:: Ultima modificación 18-02-2019 - evb-->
+<!-- DIAN Genericode listas de valores: Ultima modificación 03-04-2022 - wcbr-->
 <gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
 	<Identification>
 		<ShortName>TipoDocumento</ShortName>
@@ -35,7 +35,10 @@
 				<SimpleValue>01</SimpleValue>
 			</Value>
 			<Value ColumnRef="name">
-				<SimpleValue>Factura de Venta Nacional</SimpleValue>
+				<SimpleValue>Factura electrónica de Venta</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Tipos de factura</SimpleValue>
 			</Value>
 		</Row>
 		<Row>
@@ -43,7 +46,10 @@
 				<SimpleValue>02</SimpleValue>
 			</Value>
 			<Value ColumnRef="name">
-				<SimpleValue>Factura de Exportación </SimpleValue>
+				<SimpleValue>Factura electrónica de venta con propósito de exportación</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Tipos de factura</SimpleValue>
 			</Value>
 		</Row>
 		<Row>
@@ -51,7 +57,21 @@
 				<SimpleValue>03</SimpleValue>
 			</Value>
 			<Value ColumnRef="name">
-				<SimpleValue>Factura de Contingencia</SimpleValue>
+				<SimpleValue>Factura de talonario o papel con numeración de contingencia.</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Tipos de factura</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>04</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Factura electrónica de Venta  por Contingencia DIAN</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Tipos de factura</SimpleValue>
 			</Value>
 		</Row>
 		<Row>
@@ -61,6 +81,9 @@
 			<Value ColumnRef="name">
 				<SimpleValue>Nota Crédito</SimpleValue>
 			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Exclusivo en referencias a documentos (elementos DocumentReference)</SimpleValue>
+			</Value>
 		</Row>
 		<Row>
 			<Value ColumnRef="code">
@@ -69,6 +92,31 @@
 			<Value ColumnRef="name">
 				<SimpleValue>Nota Débito</SimpleValue>
 			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Exclusivo en referencias a documentos (elementos DocumentReference)</SimpleValue>
+			</Value>
 		</Row>
-	</SimpleCodeList>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>05</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Tipo de documento</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>95</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Nota de ajuste al documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente</SimpleValue>
+			</Value>
+			<Value ColumnRef="description">
+				<SimpleValue>Exclusivo en referencias a documentos (elementos DocumentReference)</SimpleValue>
+			</Value>
+		</Row>
+	</SimpleCodeList>	
 </gc:CodeList>
