@@ -3,9 +3,9 @@ from ..form import *
 from datetime import datetime, date
 from .attached_document import *
 
-__all__ = ['DIANInvoiceSupportDocumentXML']
+__all__ = ['DIANSupportDocumentXML']
 
-class DIANInvoiceSupportDocumentXML(fe.FeXML):
+class DIANSupportDocumentXML(fe.FeXML):
     """
     DianSupportDocumentXML mapea objeto form.Invoice a XML segun
     lo indicado para él Documento soporte en adquisiciones efectuadas con sujetos no obligados a expedir factura de venta o documento equivalente.
@@ -293,25 +293,25 @@ class DIANInvoiceSupportDocumentXML(fe.FeXML):
         if isinstance(reference, InvoiceDocumentReference):
             return fexml._set_invoice_document_reference(reference)
 
-    def set_discrepancy_response(fexml, invoice):
-        reference = invoice.invoice_discrepancy_response
-        if reference is None:
-            return
+   # def set_discrepancy_response(fexml, invoice):
+   #     reference = invoice.invoice_discrepancy_response
+   #     if reference is None:
+   #        return
 
-        if isinstance(reference, DebitNoteDocumentReference):
-            return fexml._set_debit_note_document_reference(reference)
-        if isinstance(reference, CreditNoteDocumentReference):
-            return fexml._set_credit_note_document_reference(reference)
+        # if isinstance(reference, DebitNoteDocumentReference):
+        #     return fexml._set_debit_note_document_reference(reference)
+        # if isinstance(reference, CreditNoteDocumentReference):
+        #     return fexml._set_credit_note_document_reference(reference)
 
-        if isinstance(reference, InvoiceDocumentReference):
-            return fexml._set_invoice_document_reference(reference)
+        # if isinstance(reference, InvoiceDocumentReference):
+        #     return fexml._set_invoice_document_reference(reference)
 
-        fexml.set_element('./cac:DiscrepancyResponse/cbc:ReferenceID',
-                          reference.ident)
-        fexml.set_element('./cac:DiscrepancyResponse/cbc:ResponseCode:UUID',
-                          '1')
-        fexml.set_element('./cac:DiscrepancyResponse/cbc:Description',
-                          'Test')        
+        # fexml.set_element('./cac:DiscrepancyResponse/cbc:ReferenceID',
+        #                   reference.ident)
+        # fexml.set_element('./cac:DiscrepancyResponse/cbc:ResponseCode:UUID',
+        #                   '1')
+        # fexml.set_element('./cac:DiscrepancyResponse/cbc:Description',
+        #                   'Test')        
 
     def set_invoice_totals(fexml, invoice):
         tax_amount_for = defaultdict(lambda: defaultdict(lambda: Amount(0.0)))
@@ -496,11 +496,9 @@ class DIANInvoiceSupportDocumentXML(fe.FeXML):
         fexml.set_invoice_lines(invoice)
         fexml.set_payment_mean(invoice)
         fexml.set_allowance_charge(invoice)
-        fexml.set_discrepancy_response(invoice)        
+        #fexml.set_discrepancy_response(invoice)        
         fexml.set_billing_reference(invoice)
-        cosa = AttachedDocument(id=1, xml=fexml)
-        print(cosa.toFachoXML())
-
+     
         return fexml
 
     def customize(fexml, invoice):

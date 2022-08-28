@@ -259,14 +259,14 @@ def generate_invoice(private_key, passphrase, scriptname, generate=False, ssl=Tr
     spec.loader.exec_module(module)
 
     import facho.fe.form as form
-    from facho.fe.form_xml import DIANInvoiceXML, DIANWriteSigned,DIANWrite
+    from facho.fe.form_xml import DIANInvoiceXML, DIANWriteSigned, DIANWrite, DIANSupportDocumentXML
     from facho import fe
 
     try:
         invoice_xml = module.document_xml()
     except AttributeError:
-        invoice_xml = DIANInvoiceXML
-
+        #invoice_xml = DIANInvoiceXML
+        invoice_xml = DIANSupportDocumentXML 
     print("Using document xml:", invoice_xml)
     invoice = module.invoice()
     invoice.calculate()

@@ -163,10 +163,10 @@ class Item:
 
 
 class StandardItem(Item):
-    def __init__(self, id_: str, description: str = ''):
+    def __init__(self, id_: str, description: str = '', name: str = ''):
         super().__init__(id=id_,
                          description=description,
-                         scheme_name='',
+                         scheme_name=name,
                          scheme_id='999',
                          scheme_agency_id='')
 
