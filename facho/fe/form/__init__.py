@@ -373,6 +373,21 @@ class PrePaidPayment:
     #DIAN 1.7.-2020: FBD03
     paid_amount: Amount = Amount(0.0)
 
+@dataclass
+class BillingResponse:
+    id: str
+    code: str
+    description: str
+
+class SupportDocumentCreditNoteResponse(BillingResponse):
+    """
+    ReferenceID: Identifica la sección del Documento
+    Soporte original a la cual se aplica la corrección.
+    ResponseCode: Código de descripción de la corrección.
+    Description: Descripción de la naturaleza de la corrección.
+    """
+
+
 
 @dataclass
 class BillingReference:
@@ -386,7 +401,6 @@ class CreditNoteDocumentReference(BillingReference):
     uuid: CUFE de la factura electronica
     date: fecha de emision de la factura relacionada
     """
-
 
 class DebitNoteDocumentReference(BillingReference):
     """
@@ -549,6 +563,10 @@ class DebitNoteDocumentType(str):
         # 6.1.3
         return '92'
 
+class CreditNoteSupportDocumentType(str):
+    def __str__(self):
+        return '95'
+
 class Invoice:
     def __init__(self, type_code: str):
         if str(type_code) not in codelist.TipoDocumento:
@@ -568,6 +586,7 @@ class Invoice:
         self.invoice_allowance_charge = []
         self.invoice_prepaid_payment = []
         self.invoice_billing_reference = None
+        self.invoice_discrepancy_response = None
         self.invoice_type_code = str(type_code)
         self.invoice_ident_prefix = None
 
@@ -642,6 +661,10 @@ class Invoice:
 
     def set_billing_reference(self, billing_reference: BillingReference):
         self.invoice_billing_reference = billing_reference
+
+    def set_discrepancy_response(self, billing_response: BillingResponse):
+        self.invoice_discrepancy_response = billing_response
+
 
     def accept(self, visitor):
         visitor.visit_payment_mean(self.invoice_payment_mean)
@@ -741,4 +764,26 @@ class DebitNote(Invoice):
             self.invoice_ident_prefix = self.invoice_ident[0:6]
 
 class SupportDocument(Invoice):
+    pass
+
+class SupportDocumentCreditNote(SupportDocument):
+    def __init__(self, invoice_document_reference: BillingReference,
+                invoice_discrepancy_response: BillingResponse):
+        super().__init__(CreditNoteSupportDocumentType())
+
+        if not isinstance(invoice_document_reference, BillingReference):
+            raise TypeError('invoice_document_reference invalid type')
+        self.invoice_billing_reference = invoice_document_reference
+        self.invoice_discrepancy_response = invoice_discrepancy_response
+
+    def _get_codelist_tipo_operacion(self):
+        return codelist.TipoOperacionNCDS
+
+    def _check_ident_prefix(self, prefix):
+        if len(prefix) != 6:
+            raise ValueError('prefix must be 6 length')
+
+    def _set_ident_prefix_automatic(self):
+        if not self.invoice_ident_prefix:
+            self.invoice_ident_prefix = self.invoice_ident[0:6]
     pass

@@ -30,7 +30,6 @@ SCHEME_AGENCY_ATTRS = {
 POLICY_ID = 'https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf'
 POLICY_NAME = u'Política de firma para facturas electrónicas de la República de Colombia.'
 
-
 NAMESPACES = {
     'atd': 'urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2',
     'nomina': 'dian:gov:co:facturaelectronica:NominaIndividual',
@@ -124,7 +123,12 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
                              schemeName=self.schemeName())
 
         if self.schemeName() == "CUDS-SHA384":
-            fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: documento soporte en adquisiciones efectuadas a no obligados a facturar.')
+            if fachoxml.tag_document() == 'Invoice':
+                fachoxml.set_element('./cbc:ProfileID',
+                        'DIAN 2.1: documento soporte en adquisiciones efectuadas a no obligados a facturar.')
+            else:
+                fachoxml.set_element('./cbc:ProfileID',
+                        'DIAN 2.1: Nota de ajuste al documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente')
         else:
             fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
 

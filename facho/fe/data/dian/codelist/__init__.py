@@ -87,6 +87,7 @@ MediosPago = CodeList(path_for_codelist('MediosPago-2.1.gc'), 'code', 'name')
 FormasPago = CodeList(path_for_codelist('FormasPago-2.1.gc'), 'code', 'name')
 RegimenFiscal = CodeList(path_for_codelist('RegimenFiscal-2.1.custom.gc'), 'code', 'name')
 TipoOperacionNC = CodeList(path_for_codelist('TipoOperacionNC-2.1.gc'), 'code', 'name')
+TipoOperacionNCDS = CodeList(path_for_codelist('TipoOperacionNCDS-2.1.gc'), 'code', 'name')
 TipoOperacionND = CodeList(path_for_codelist('TipoOperacionND-2.1 - copia.gc'), 'code', 'name')
 TipoOperacionF = CodeList(path_for_codelist('TipoOperacionF-2.1.gc'), 'code', 'name')\
     .update(CodeList(path_for_codelist('TipoOperacionF-2.1.custom.gc'), 'code', 'name'))
