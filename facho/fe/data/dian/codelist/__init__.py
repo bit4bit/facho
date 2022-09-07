@@ -82,6 +82,10 @@ TipoAmbiente = CodeList(path_for_codelist('TipoAmbiente-2.1.gc'), 'code', 'name'
 TipoDocumento = CodeList(path_for_codelist('TipoDocumento-2.1.gc'), 'code', 'name')
 TipoImpuesto = CodeList(path_for_codelist('TipoImpuesto-2.1.gc'), 'code', 'name')\
     .update(CodeList(path_for_codelist('TipoImpuesto-2.1.custom.gc'), 'code', 'name'))
+TarifaImpuesto = CodeList(path_for_codelist('TarifaImpuestoINC-2.1.gc'), 'code', 'name')\
+        .update(CodeList(path_for_codelist('TarifaImpuestoIVA-2.1.gc'), 'code', 'name'))\
+        .update(CodeList(path_for_codelist('TarifaImpuestoReteIVA-2.1.gc'), 'code', 'name'))\
+        .update(CodeList(path_for_codelist('TarifaImpuestoReteRenta-2.1.gc'), 'code', 'name'))
 CodigoPrecioReferencia = CodeList(path_for_codelist('CodigoPrecioReferencia-2.1.gc'), 'code', 'name')
 MediosPago = CodeList(path_for_codelist('MediosPago-2.1.gc'), 'code', 'name')
 FormasPago = CodeList(path_for_codelist('FormasPago-2.1.gc'), 'code', 'name')
