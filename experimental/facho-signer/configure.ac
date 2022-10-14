@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 AC_INIT([facho-signer], [0.0.1], [bit4bit@riseup.net])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/facho_signer.c])
