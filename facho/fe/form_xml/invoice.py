@@ -453,10 +453,9 @@ class DIANInvoiceXML(fe.FeXML):
         
         for index, item in enumerate(tax_amount_for.items()):
             cod_impuesto, amount_of = item
-            next_append = index > 0
 
             #DIAN 1.7.-2020: FAS01
-            line = fexml.fragment('./cac:TaxTotal', append=next_append)
+            line = fexml.fragment('./cac:TaxTotal', append=True)
             #DIAN 1.7.-2020: FAU06
             tax_amount = amount_of['tax_amount']
             fexml.set_element_amount_for(line,
