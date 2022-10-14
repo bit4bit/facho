@@ -21,10 +21,10 @@ __all__ = ['DianClient',
 
 class SOAPService:
 
-    def get_wsdl(self):
+    def wsdl(self):
         raise NotImplementedError()
 
-    def get_service(self):
+    def service(self):
         raise NotImplementedError()
 
     def build_response(self, as_dict):
@@ -63,10 +63,10 @@ class GetNumberingRange(SOAPService):
     accountCodeT: str
     softwareCode: str
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'GetNumberingRange'
 
     def build_response(self, as_dict):
@@ -78,10 +78,10 @@ class SendBillAsync(SOAPService):
     fileName: str
     contentFile: str
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'SendBillAsync'
 
     def build_response(self, as_dict):
@@ -106,10 +106,10 @@ class SendTestSetAsync(SOAPService):
     contentFile: str
     testSetId: str = ''
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'SendTestSetAsync'
 
     def build_response(self, as_dict):
@@ -120,10 +120,10 @@ class SendBillSync(SOAPService):
     fileName: str
     contentFile: bytes
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'SendBillSync'
 
     def build_response(self, as_dict):
@@ -153,10 +153,10 @@ class GetStatusResponse:
 class GetStatus(SOAPService):
     trackId: bytes
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'GetStatus'
 
     def build_response(self, as_dict):
@@ -166,10 +166,10 @@ class GetStatus(SOAPService):
 class GetStatusZip(SOAPService):
     trackId: bytes
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'GetStatusZip'
 
     def build_response(self, as_dict):
@@ -179,10 +179,10 @@ class GetStatusZip(SOAPService):
 class SendNominaSync(SOAPService):
     contentFile: bytes
 
-    def get_wsdl(self):
+    def wsdl(self):
         return 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
-    def get_service(self):
+    def service(self):
         return 'SendNominaSync'
 
     def build_response(self, as_dict):
@@ -193,31 +193,31 @@ class Habilitacion:
     WSDL = 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc?wsdl'
 
     class GetNumberingRange(GetNumberingRange):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class SendBillAsync(SendBillAsync):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class SendBillSync(SendBillSync):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class SendTestSetAsync(SendTestSetAsync):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class GetStatus(GetStatus):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class GetStatusZip(GetStatusZip):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
     class SendNominaSync(SendNominaSync):
-        def get_wsdl(self):
+        def wsdl(self):
             return Habilitacion.WSDL
 
 class DianGateway:
@@ -226,7 +226,7 @@ class DianGateway:
         raise NotImplementedError()
 
     def _remote_service(self, conn, service):
-        return conn.service[service.get_service()]
+        return conn.service[service.service()]
 
     def _close(self, conn):
         return
@@ -250,7 +250,7 @@ class DianClient(DianGateway):
         self._password = password
 
     def _open(self, service):
-        return zeep.Client(service.get_wsdl(), wsse=UsernameToken(self._username, self._password))
+        return zeep.Client(service.wsdl(), wsse=UsernameToken(self._username, self._password))
 
 
 class DianSignatureClient(DianGateway):
@@ -264,7 +264,7 @@ class DianSignatureClient(DianGateway):
         # RESOLUCCION 0004: pagina 756
         from zeep.wsse import utils
 
-        client = zeep.Client(service.get_wsdl(), wsse=
+        client = zeep.Client(service.wsdl(), wsse=
                              BinarySignature(
                                  self.private_key_path, self.public_key_path, self.password,
                                  signature_method=xmlsec.Transform.RSA_SHA256,
