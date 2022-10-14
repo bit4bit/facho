@@ -13,6 +13,9 @@ class DIANDebitNoteXML(DIANInvoiceXML):
     def __init__(self, invoice):
         super().__init__(invoice, 'DebitNote')
 
+    def post_attach_invoice(fexml, invoice):
+        fexml.set_element('./cbc:ProfileID', 'DIAN 2.1 Nota Débito de Factura Electrónica de Venta')
+
     def tag_document(fexml):
         return 'DebitNote'
 

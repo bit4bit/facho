@@ -21,6 +21,7 @@ class DIANInvoiceXML(fe.FeXML):
         ublextension = self.fragment('./ext:UBLExtensions/ext:UBLExtension', append=True)
         extcontent = ublextension.find_or_create_element('/ext:UBLExtension/ext:ExtensionContent')
         self.attach_invoice(invoice)
+        self.post_attach_invoice(invoice)
 
     def set_supplier(fexml, invoice):
         fexml.placeholder_for('./cac:AccountingSupplierParty')
@@ -415,7 +416,6 @@ class DIANInvoiceXML(fe.FeXML):
             return fexml._set_debit_note_document_reference(reference)
         if isinstance(reference, CreditNoteDocumentReference):
             return fexml._set_credit_note_document_reference(reference)
-
         if isinstance(reference, InvoiceDocumentReference):
             return fexml._set_invoice_document_reference(reference)
 
@@ -566,7 +566,11 @@ class DIANInvoiceXML(fe.FeXML):
             line.set_element('./cbc:MultiplierFactorNumeric', str(round(charge.multiplier_factor_numeric, 2)))
             fexml.set_element_amount_for(line, './cbc:Amount', charge.amount)
             fexml.set_element_amount_for(line, './cbc:BaseAmount', charge.base_amount)
-            
+
+    def post_attach_invoice(fexml, invoice):
+        #DIAN 1.8.-2021: FAD03
+        fexml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
+
     def attach_invoice(fexml, invoice):
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""

@@ -122,8 +122,7 @@ class DianXMLExtensionCUDFE(FachoXMLExtension):
         fachoxml.set_element('./cbc:UUID', cufe,
                              schemeID=self.tipo_ambiente,
                              schemeName=self.schemeName())
-        #DIAN 1.8.-2021: FAD03
-        fachoxml.set_element('./cbc:ProfileID', 'DIAN 2.1: Factura Electrónica de Venta')
+
         fachoxml.set_element('./cbc:ProfileExecutionID', self._tipo_ambiente_int())
         #DIAN 1.7.-2020: FAB36
         fachoxml.set_element('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode',

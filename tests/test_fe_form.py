@@ -33,7 +33,24 @@ def test_invoicesimple_build_with_cufe(simple_invoice):
     cufe = xml.get_element_text('/fe:Invoice/cbc:UUID')
     assert cufe != ''
 
+def test_invoice_profile_id(simple_invoice):
+    xml = DIANInvoiceXML(simple_invoice)
+    cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
+    xml.add_extension(cufe_extension)
+    assert xml.get_element_text('/fe:Invoice/cbc:ProfileID') == 'DIAN 2.1: Factura Electrónica de Venta'
 
+def test_debit_note_profile_id(simple_invoice):
+    xml = DIANDebitNoteXML(simple_invoice)
+    cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
+    xml.add_extension(cufe_extension)
+    assert xml.get_element_text('/fe:DebitNote/cbc:ProfileID') == 'DIAN 2.1 Nota Débito de Factura Electrónica de Venta'
+
+def test_credit_note_profile_id(simple_invoice):
+    xml = DIANCreditNoteXML(simple_invoice)
+    cufe_extension = fe.DianXMLExtensionCUFE(simple_invoice)
+    xml.add_extension(cufe_extension)
+    assert xml.get_element_text('/fe:CreditNote/cbc:ProfileID') == 'DIAN 2.1: Nota Crédito de Factura Electrónica de Venta'
+    
 def test_invoicesimple_xml_signed(monkeypatch, simple_invoice):
     xml = DIANInvoiceXML(simple_invoice)
 

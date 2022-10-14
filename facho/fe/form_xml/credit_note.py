@@ -18,3 +18,6 @@ class DIANCreditNoteXML(DIANInvoiceXML):
 
     def tag_document_concilied(fexml):
         return 'Credited'
+
+    def post_attach_invoice(fexml, invoice):
+        fexml.set_element('./cbc:ProfileID', 'DIAN 2.1: Nota Crédito de Factura Electrónica de Venta')
