@@ -9,7 +9,6 @@ RUN apt-get install -y --no-install-recommends \
   ca-certificates
 
 RUN wget https://bootstrap.pypa.io/get-pip.py \
-  && python3 get-pip.py pip==21.3 \
   && python3.7 get-pip.py pip==21.3 \
   && python3.8 get-pip.py pip==21.3 \
   && rm get-pip.py
@@ -20,11 +19,9 @@ RUN apt-get install -y --no-install-recommends \
         build-essential \
         zip
 
-RUN python3.6 --version
 RUN python3.7 --version
 RUN python3.8 --version
 
-RUN pip3.6 install setuptools setuptools-rust
 RUN pip3.7 install setuptools setuptools-rust
 RUN pip3.8 install setuptools setuptools-rust
 

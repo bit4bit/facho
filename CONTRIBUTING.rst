@@ -57,6 +57,17 @@ If you are proposing a feature:
 Get Started!
 ------------
 
+Using docker
+------------
+
+1. make -f Makefile.dev dev-setup
+   1. make -f Makefile.dev dev-shell
+2. make -f Makefile.dev test
+3. make -f Makefile.dev tox
+
+From Source Code
+-----------
+
 Ready to contribute? Here's how to set up `facho` for local development.
 
 1. Fork the `facho` repo .
@@ -94,13 +105,6 @@ Ready to contribute? Here's how to set up `facho` for local development.
 
 7. Submit a pull request through the GitHub website.
 
-Using docker
-------------
-
-1. make -f Makefile.dev build
-2. make -f Makefile.dev dev-shell
-3. make -f Makefile.dev python3.8 setup.py develop
-4. make -f Makefile.dev python3.8 setup.py test
 
 Pull Request Guidelines
 -----------------------
