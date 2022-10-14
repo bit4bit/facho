@@ -181,8 +181,6 @@ class FachoXML:
         return etree.QName(self.root).namespace
 
     def append_element(self, elem, new_elem):
-        #elem = self.find_or_create_element(xpath, append=append)
-        #self.builder.append(elem, new_elem)
         self.builder.append(elem, new_elem)
 
     def add_extension(self, extension):
