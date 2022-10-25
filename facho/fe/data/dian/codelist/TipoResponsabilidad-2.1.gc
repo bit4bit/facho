@@ -62,5 +62,29 @@
 				<SimpleValue>Régimen simple de tributación</SimpleValue>
 			</Value>
 		</Row>
+				<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-48</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>Impuesto sobre las ventas – IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>O-49</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No responsable de IVA</SimpleValue>
+			</Value>
+		</Row>
+		<Row>
+			<Value ColumnRef="code">
+				<SimpleValue>R-99-PN</SimpleValue>
+			</Value>
+			<Value ColumnRef="name">
+				<SimpleValue>No responsable</SimpleValue>
+			</Value>
+		</Row>
 	</SimpleCodeList>
 </gc:CodeList>
