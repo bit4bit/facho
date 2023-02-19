@@ -147,7 +147,6 @@ class DIANInvoiceXML(fe.FeXML):
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:ID',
                           invoice.invoice_customer.tax_scheme.code)
 
-
         #DIAN 1.7.-2020: CAJ41
         fexml.set_element('./cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cac:TaxScheme/cbc:Name',
                           invoice.invoice_customer.tax_scheme.name)
@@ -421,6 +420,7 @@ class DIANInvoiceXML(fe.FeXML):
 
     def set_invoice_totals(fexml, invoice):
         tax_amount_for = defaultdict(lambda: defaultdict(lambda: Amount(0.0)))
+        withholding_amount_for = defaultdict(lambda: defaultdict(lambda: Amount(0.0)))
         percent_for = defaultdict(lambda: None)
 
         #requeridos para CUFE
@@ -433,23 +433,34 @@ class DIANInvoiceXML(fe.FeXML):
         #tax_amount_for['03']['taxable_amount'] += 0.0
 
         total_tax_amount = Amount(0.0)
+        total_withholding_amount = Amount(0.0)
 
         for invoice_line in invoice.invoice_lines:
             for subtotal in invoice_line.tax.subtotals:
                 if subtotal.scheme is not None:
                     tax_amount_for[subtotal.scheme.code]['tax_amount'] += subtotal.tax_amount
                     tax_amount_for[subtotal.scheme.code]['taxable_amount'] += invoice_line.taxable_amount
-
+                    
                     # MACHETE ojo InvoiceLine.tax pasar a Invoice
                     percent_for[subtotal.scheme.code] = subtotal.percent
 
                 total_tax_amount += subtotal.tax_amount
 
+            for subtotal_withholding in invoice_line.withholding.subtotals:
+                if subtotal_withholding.scheme is not None:
+                    withholding_amount_for[subtotal_withholding.scheme.code]['tax_amount'] += subtotal_withholding.tax_amount
+                    withholding_amount_for[subtotal_withholding.scheme.code]['taxable_amount'] += invoice_line.withholding_taxable_amount
+
+                    # MACHETE ojo InvoiceLine.tax pasar a Invoice
+                    
+                    percent_for[subtotal_withholding.scheme.code] = subtotal_withholding.percent
+
+                total_withholding_amount += subtotal_withholding.tax_amount
+
         if total_tax_amount != Amount(0.0):
             fexml.placeholder_for('./cac:TaxTotal')
             fexml.set_element_amount('./cac:TaxTotal/cbc:TaxAmount',
                     total_tax_amount)
-
         
         for index, item in enumerate(tax_amount_for.items()):
             cod_impuesto, amount_of = item
@@ -487,7 +498,44 @@ class DIANInvoiceXML(fe.FeXML):
                     cod_impuesto)
             line.set_element('/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name',
                     'IVA')
-  
+            
+        for index, item in enumerate(withholding_amount_for.items()):
+            cod_impuesto, amount_of = item
+            next_append = index > 0
+
+            #DIAN 1.7.-2020: FAS01
+            line = fexml.fragment('./cac:WithholdingTaxTotal', append=next_append)
+            #DIAN 1.7.-2020: FAU06
+            tax_amount = amount_of['tax_amount']
+            fexml.set_element_amount_for(line,
+                                         '/cac:WithholdingTaxTotal/cbc:TaxAmount',
+                                         tax_amount)
+
+            #DIAN 1.7.-2020: FAS05
+            fexml.set_element_amount_for(line,
+                                         '/cac:WithholdingTaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
+                                         amount_of['taxable_amount'])
+
+            #DIAN 1.7.-2020: FAU06
+            fexml.set_element_amount_for(line,
+                                         '/cac:WithholdingTaxTotal/cac:TaxSubtotal/cbc:TaxAmount',
+                                         amount_of['tax_amount'])
+
+            #DIAN 1.7.-2020: FAS07
+            if percent_for[cod_impuesto]:
+                line.set_element('/cac:WithholdingTaxTotal/cac:TaxSubtotal/cbc:Percent',
+                                 percent_for[cod_impuesto])
+
+
+            if percent_for[cod_impuesto]:
+                line.set_element('/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent',
+                                 percent_for[cod_impuesto])
+                
+            line.set_element('/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID',
+                    cod_impuesto)
+            line.set_element('/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name',
+                    'ReteRenta')
+
     # abstract method
     def tag_document(fexml):
         return 'Invoice'
@@ -515,7 +563,29 @@ class DIANInvoiceXML(fe.FeXML):
                 #DIAN 1.7.-2020: FAX15
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.scheme.code)
                 line.set_element('./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.scheme.name)
-    
+
+
+    def set_invoice_line_withholding(fexml, line, invoice_line):
+        fexml.set_element_amount_for(line,
+                                     './cac:WithholdingTaxTotal/cbc:TaxAmount',
+                                     invoice_line.withholding_amount)
+        #DIAN 1.7.-2020: FAX05
+        fexml.set_element_amount_for(line,
+                                     './cac:WithholdingTaxTotal/cac:TaxSubtotal/cbc:TaxableAmount',
+                                     invoice_line.withholding_taxable_amount)
+
+        for subtotal in invoice_line.withholding.subtotals:
+            line.set_element('./cac:WithholdingTaxTotal/cac:TaxSubtotal/cbc:TaxAmount', subtotal.tax_amount, currencyID='COP')
+
+            if subtotal.percent is not None:
+                line.set_element('./cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent', '%0.2f' % round(subtotal.percent, 2))
+
+            if subtotal.scheme is not None:
+                #DIAN 1.7.-2020: FAX15
+                line.set_element('./cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID', subtotal.scheme.code)
+                line.set_element('./cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:Name', subtotal.scheme.name)
+
+                
     def set_invoice_lines(fexml, invoice):
         next_append = False
         for index, invoice_line in enumerate(invoice.invoice_lines):
@@ -530,6 +600,9 @@ class DIANInvoiceXML(fe.FeXML):
 
             if not isinstance(invoice_line.tax, TaxTotalOmit):
                 fexml.set_invoice_line_tax(line, invoice_line)
+
+            if not isinstance(invoice_line.withholding, WithholdingTaxTotalOmit):
+                fexml.set_invoice_line_withholding(line, invoice_line)
 
             line.set_element('./cac:Item/cbc:Description', invoice_line.item.description)
 

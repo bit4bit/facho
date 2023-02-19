@@ -1,6 +1,5 @@
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
-
 import hashlib
 from functools import reduce
 import copy
@@ -11,7 +10,6 @@ from collections import defaultdict
 import decimal
 from decimal import Decimal
 import typing
-
 from ..data.dian import codelist
 
 DECIMAL_PRECISION = 6
@@ -266,7 +264,6 @@ class TaxScheme:
     code: str
     name: str = ''
 
-
     def __post_init__(self):
         if self.code not in codelist.TipoImpuesto:
             raise ValueError("code not found")
@@ -325,13 +322,42 @@ class TaxTotal:
 
     def calculate(self, invline):
         self.taxable_amount = invline.total_amount
-
         for subtax in self.subtotals:
             subtax.calculate(invline)
             self.tax_amount += subtax.tax_amount
 
 
 class TaxTotalOmit(TaxTotal):
+    def __init__(self):
+        super().__init__([])
+
+    def calculate(self, invline):
+        pass
+
+@dataclass
+class WithholdingTaxSubTotal:
+    percent: float
+    scheme: typing.Optional[TaxScheme] = None
+    tax_amount: Amount = Amount(0.0)
+
+    def calculate(self, invline):
+        if self.percent is not None:
+            self.tax_amount = invline.total_amount * Amount(self.percent / 100)
+        
+@dataclass
+class WithholdingTaxTotal:
+    subtotals: list
+    tax_amount: Amount = Amount(0.0)
+    taxable_amount: Amount = Amount(0.0)
+
+    def calculate(self, invline):
+        self.taxable_amount = invline.total_amount
+
+        for subtax in self.subtotals:
+            subtax.calculate(invline)
+            self.tax_amount += subtax.tax_amount
+    
+class WithholdingTaxTotalOmit(WithholdingTaxTotal):
     def __init__(self):
         super().__init__([])
 
@@ -474,7 +500,7 @@ class InvoiceLine:
     # la factura y el percent es unico por type_code
     # de subtotal
     tax: typing.Optional[TaxTotal]
-
+    withholding: typing.Optional[WithholdingTaxTotal]
     allowance_charge: typing.List[AllowanceCharge] = dataclasses.field(default_factory=list)
 
     def add_allowance_charge(self, charge):
@@ -518,8 +544,17 @@ class InvoiceLine:
     def taxable_amount(self):
         return self.tax.taxable_amount
 
+    @property
+    def withholding_amount(self):
+        return self.withholding.tax_amount
+
+    @property
+    def withholding_taxable_amount(self):
+        return self.withholding.taxable_amount
+
     def calculate(self):
         self.tax.calculate(self)
+        self.withholding.calculate(self)
 
     def __post_init__(self):
         if not isinstance(self.quantity, Quantity):
@@ -527,6 +562,9 @@ class InvoiceLine:
 
         if self.tax is None:
             self.tax = TaxTotalOmit()
+            
+        if self.withholding is None:
+            self.withholding = WithholdingTaxTotalOmit()
 
 @dataclass
 class LegalMonetaryTotal:

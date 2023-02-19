@@ -75,7 +75,7 @@
 				<SimpleValue>06</SimpleValue>
 			</Value>
 			<Value ColumnRef="name">
-				<SimpleValue>ReteFuente</SimpleValue>
+				<SimpleValue>ReteRenta</SimpleValue>
 			</Value>
 		</Row>
 		<Row>
@@ -157,7 +157,8 @@
 			<Value ColumnRef="name">
 				<SimpleValue>Impuesto al Consumo de Datos</SimpleValue>
 			</Value>
-		</Row> 
+		</Row>
+ 
 		<Row>
 			<Value ColumnRef="code">
 				<SimpleValue>ZZ</SimpleValue>

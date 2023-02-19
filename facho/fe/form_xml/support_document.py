@@ -499,6 +499,5 @@ class DIANSupportDocumentXML(fe.FeXML):
         return fexml
 
     def customize(fexml, invoice):
-        
         """adiciona etiquetas a FEXML y retorna FEXML
         en caso de fallar validacion retorna None"""
