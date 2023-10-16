@@ -14,6 +14,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['Click>=6.0',
+                'chardet>=0.0',
                 'zeep==4.0.0',
                 'lxml==4.6.3',
                 'cryptography==3.3.2',

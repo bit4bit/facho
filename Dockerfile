@@ -1,5 +1,7 @@
 # DERIVADO DE https://alextereshenkov.github.io/run-python-tests-with-tox-in-docker.html
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+
+LABEL org.opencontainers.image.authors="bit4bit@riseup.net"
 
 RUN apt-get -qq update
 
@@ -22,10 +24,11 @@ RUN wget https://bootstrap.pypa.io/get-pip.py \
   && rm get-pip.py
 
 RUN apt-get install -y --no-install-recommends \
-        libxml2-dev \
-        libxmlsec1-dev \
-        build-essential \
-        zip
+    libxml2-dev \
+    libxmlsec1-dev \
+    build-essential \
+    zip \
+    pkg-config
 
 RUN python3.7 --version
 RUN python3.8 --version
