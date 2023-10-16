@@ -17,7 +17,7 @@ INSTALACION
 
 usando pip::
   
-   pip install git+https://git.disroot.org/Etrivial/facho
+   pip install git+https://github.com/bit4bit/facho
 
 CLI
 ===
