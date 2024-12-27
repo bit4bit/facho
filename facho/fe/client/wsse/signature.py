@@ -234,9 +234,10 @@ def _append_timestamp(security, expires_dt=None):
     if expires_dt is None:
         expires_dt = timedelta(seconds=6000)
 
+    timestamp = datetime.now()
     etimestamp = utils.WSU.Timestamp({'{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Id': utils.get_unique_id()})
-    etimestamp.append(utils.WSU.Created(get_timestamp()))
-    etimestamp.append(utils.WSU.Expires(get_timestamp(delta=expires_dt)))
+    etimestamp.append(utils.WSU.Created(get_timestamp(timestamp=timestamp)))
+    etimestamp.append(utils.WSU.Expires(get_timestamp(timestamp=timestamp, delta=expires_dt)))
     security.insert(0, etimestamp)
     if etree.LXML_VERSION[:2] >= (3, 5):
         etree.cleanup_namespaces(security,

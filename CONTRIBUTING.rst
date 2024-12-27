@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://lib.facho.cyou
+Report bugs at https://git.disroot.org/Etrivial/facho/issues.
 
 If you are reporting a bug, please include:
 
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://lib.facho.cyou/ticket.
+The best way to send feedback is to file an issue at https://git.disroot.org/Etrivial/facho/issues.
 
 If you are proposing a feature:
 
@@ -57,28 +57,18 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Using docker
-------------
-
-1. make -f Makefile.dev dev-setup
-   1. make -f Makefile.dev dev-shell
-2. make -f Makefile.dev test
-3. make -f Makefile.dev tox
-
-From Source Code
------------
-
 Ready to contribute? Here's how to set up `facho` for local development.
 
 1. Fork the `facho` repo .
 2. Clone your fork locally::
 
-    $ fossil clone https://lib.facho.cyou
+    $ git clone https://git.disroot.org/Etrivial/facho.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
     $ python3 -mvenv facho-venv && source facho-venv/bin/activate
     $ cd facho/
+    $ pre-commit install
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -104,6 +94,13 @@ Ready to contribute? Here's how to set up `facho` for local development.
 
 7. Submit a pull request through the GitHub website.
 
+Using docker
+------------
+
+1. make -f Makefile.dev build
+2. make -f Makefile.dev dev-shell
+3. make -f Makefile.dev python3.8 setup.py develop
+4. make -f Makefile.dev python3.8 setup.py test
 
 Pull Request Guidelines
 -----------------------

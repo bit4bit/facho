@@ -1,8 +1,9 @@
-from .. import fe
-from ..form import *
+# from .. import fe
+# from ..form import *
 from .invoice import DIANInvoiceXML
 
 __all__ = ['DIANCreditNoteXML']
+
 
 class DIANCreditNoteXML(DIANInvoiceXML):
     """
@@ -18,6 +19,3 @@ class DIANCreditNoteXML(DIANInvoiceXML):
 
     def tag_document_concilied(fexml):
         return 'Credited'
-
-    def post_attach_invoice(fexml, invoice):
-        fexml.set_element('./cbc:ProfileID', 'DIAN 2.1: Nota Crédito de Factura Electrónica de Venta')

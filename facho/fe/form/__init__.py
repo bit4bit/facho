@@ -1,23 +1,25 @@
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
 
-import hashlib
-from functools import reduce
-import copy
+# import hashlib
+# from functools import reduce
+# import copy
+
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, date
-from collections import defaultdict
+# from collections import defaultdict
 import decimal
 from decimal import Decimal
 import typing
-
 from ..data.dian import codelist
 
 DECIMAL_PRECISION = 6
 
+
 class AmountCurrencyError(TypeError):
     pass
+
 
 @dataclass
 class Currency:
@@ -28,6 +30,7 @@ class Currency:
 
     def __str__(self):
         return self.code
+
 
 class Collection:
 
@@ -45,6 +48,7 @@ class Collection:
     def sum(self):
         return sum(self.array)
 
+
 class AmountCollection(Collection):
 
     def sum(self):
@@ -53,10 +57,13 @@ class AmountCollection(Collection):
             total += v
         return total
 
-class Amount:
-    def __init__(self, amount: int or float or str or Amount, currency: Currency = Currency('COP')):
 
-        #DIAN 1.7.-2020: 1.2.3.1
+class Amount:
+    def __init__(
+            self, amount: typing.Union[int, float, str, "Amount"],
+            currency: Currency = Currency('COP')):
+
+        # DIAN 1.7.-2020: 1.2.3.1
         if isinstance(amount, Amount):
             if amount < Amount(0.0):
                 raise ValueError('amount must be positive >= 0')
@@ -67,14 +74,16 @@ class Amount:
             if float(amount) < 0:
                 raise ValueError('amount must be positive >= 0')
 
-            self.amount = Decimal(amount, decimal.Context(prec=DECIMAL_PRECISION,
-                                                          #DIAN 1.7.-2020: 1.2.1.1
-                                                          rounding=decimal.ROUND_HALF_EVEN ))
+            self.amount = Decimal(
+                amount, decimal.Context(
+                    prec=DECIMAL_PRECISION,
+                    # DIAN 1.7.-2020: 1.2.1.1
+                    rounding=decimal.ROUND_HALF_EVEN))
             self.currency = currency
 
     def fromNumber(self, val):
         return Amount(val, currency=self.currency)
-    
+
     def round(self, prec):
         return Amount(round(self.amount, prec), currency=self.currency)
 
@@ -92,7 +101,8 @@ class Amount:
     def __eq__(self, other):
         if not self.is_same_currency(other):
             raise AmountCurrencyError()
-        return round(self.amount, DECIMAL_PRECISION) == round(other.amount, DECIMAL_PRECISION)
+        return round(self.amount, DECIMAL_PRECISION) == round(
+            other.amount, DECIMAL_PRECISION)
 
     def _cast(self, val):
         if type(val) in [int, float]:
@@ -100,7 +110,7 @@ class Amount:
         if isinstance(val, Amount):
             return val
         raise TypeError("cant cast to amount")
-    
+
     def __add__(self, rother):
         other = self._cast(rother)
         if not self.is_same_currency(other):
@@ -124,14 +134,14 @@ class Amount:
 
     def truncate_as_string(self, prec):
         parts = str(self.float()).split('.', 1)
-        return '%s.%s' % (parts[0], parts[1][0:prec].ljust(prec,'0'))
+        return '%s.%s' % (parts[0], parts[1][0:prec].ljust(prec, '0'))
 
     def float(self):
         return float(round(self.amount, DECIMAL_PRECISION))
-    
+
 
 class Quantity:
-    
+
     def __init__(self, val, code):
         if type(val) not in [float, int]:
             raise ValueError('val expected int or float')
@@ -153,6 +163,7 @@ class Quantity:
     def __repr__(self):
         return str(self)
 
+
 @dataclass
 class Item:
     scheme_name: str
@@ -163,10 +174,10 @@ class Item:
 
 
 class StandardItem(Item):
-    def __init__(self, id_: str, description: str = ''):
+    def __init__(self, id_: str, description: str = '', name: str = ''):
         super().__init__(id=id_,
                          description=description,
-                         scheme_name='',
+                         scheme_name=name,
                          scheme_id='999',
                          scheme_agency_id='')
 
@@ -177,9 +188,9 @@ class UNSPSCItem(Item):
                          description=description,
                          scheme_name='UNSPSC',
                          scheme_id='001',
-                         scheme_agency_id='10')        
+                         scheme_agency_id='10')
 
-        
+
 @dataclass
 class Country:
     code: str
@@ -189,6 +200,7 @@ class Country:
         if self.code not in codelist.Paises:
             raise ValueError("code [%s] not found" % (self.code))
         self.name = codelist.Paises[self.code]['name']
+
 
 @dataclass
 class CountrySubentity:
@@ -200,6 +212,7 @@ class CountrySubentity:
             raise ValueError("code [%s] not found" % (self.code))
         self.name = codelist.Departamento[self.code]['name']
 
+
 @dataclass
 class City:
     code: str
@@ -210,13 +223,22 @@ class City:
             raise ValueError("code [%s] not found" % (self.code))
         self.name = codelist.Municipio[self.code]['name']
 
+
+@dataclass
+class PostalZone:
+    code: str = ''
+
+
 @dataclass
 class Address:
     name: str
     street: str = ''
-    city: City = City('05001')
-    country: Country = Country('CO')
-    countrysubentity: CountrySubentity = CountrySubentity('05')
+    city: City = field(default_factory=lambda: City('05001'))
+    country: Country = field(default_factory=lambda: Country('CO'))
+    countrysubentity: CountrySubentity = field(
+        default_factory=lambda: CountrySubentity('05'))
+    postalzone: PostalZone = field(default_factory=lambda: PostalZone(''))
+
 
 @dataclass
 class PartyIdentification:
@@ -236,6 +258,7 @@ class PartyIdentification:
     def __post_init__(self):
         if self.type_fiscal not in codelist.TipoIdFiscal:
             raise ValueError("type_fiscal [%s] not found" % (self.type_fiscal))
+
 
 @dataclass
 class Responsability:
@@ -261,11 +284,11 @@ class TaxScheme:
     code: str
     name: str = ''
 
-
     def __post_init__(self):
         if self.code not in codelist.TipoImpuesto:
             raise ValueError("code not found")
         self.name = codelist.TipoImpuesto[self.code]['name']
+
 
 @dataclass
 class Party:
@@ -274,10 +297,10 @@ class Party:
     responsability_code: typing.List[Responsability]
     responsability_regime_code: str
     organization_code: str
-    tax_scheme: TaxScheme = TaxScheme('01')
+    tax_scheme: TaxScheme = field(default_factory=lambda: TaxScheme('01'))
 
     phone: str = ''
-    address: Address = Address('')
+    address: Address = field(default_factory=lambda: Address(''))
     email: str = ''
     legal_name: str = ''
     legal_company_ident: str = ''
@@ -305,7 +328,7 @@ class TaxScheme:
 class TaxSubTotal:
     percent: float
     scheme: typing.Optional[TaxScheme] = None
-    tax_amount: Amount = Amount(0.0)
+    tax_amount: Amount = field(default_factory=lambda: Amount(0.0))
 
     def calculate(self, invline):
         if self.percent is not None:
@@ -315,12 +338,11 @@ class TaxSubTotal:
 @dataclass
 class TaxTotal:
     subtotals: list
-    tax_amount: Amount = Amount(0.0)
-    taxable_amount: Amount = Amount(0.0)
+    tax_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    taxable_amount: Amount = field(default_factory=lambda: Amount(0.0))
 
     def calculate(self, invline):
         self.taxable_amount = invline.total_amount
-
         for subtax in self.subtotals:
             subtax.calculate(invline)
             self.tax_amount += subtax.tax_amount
@@ -332,6 +354,40 @@ class TaxTotalOmit(TaxTotal):
 
     def calculate(self, invline):
         pass
+
+
+@dataclass
+class WithholdingTaxSubTotal:
+    percent: float
+    scheme: typing.Optional[TaxScheme] = None
+    tax_amount: Amount = field(default_factory=lambda: Amount(0.0))
+
+    def calculate(self, invline):
+        if self.percent is not None:
+            self.tax_amount = invline.total_amount * Amount(self.percent / 100)
+
+
+@dataclass
+class WithholdingTaxTotal:
+    subtotals: list
+    tax_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    taxable_amount: Amount = field(default_factory=lambda: Amount(0.0))
+
+    def calculate(self, invline):
+        self.taxable_amount = invline.total_amount
+
+        for subtax in self.subtotals:
+            subtax.calculate(invline)
+            self.tax_amount += subtax.tax_amount
+
+
+class WithholdingTaxTotalOmit(WithholdingTaxTotal):
+    def __init__(self):
+        super().__init__([])
+
+    def calculate(self, invline):
+        pass
+
 
 @dataclass
 class Price:
@@ -347,6 +403,7 @@ class Price:
             raise ValueError("quantity must be int")
 
         self.amount *= self.quantity
+
 
 @dataclass
 class PaymentMean:
@@ -365,8 +422,24 @@ class PaymentMean:
 
 @dataclass
 class PrePaidPayment:
-    #DIAN 1.7.-2020: FBD03
-    paid_amount: Amount = Amount(0.0)
+    # DIAN 1.7.-2020: FBD03
+    paid_amount: Amount = field(default_factory=lambda: Amount(0.0))
+
+
+@dataclass
+class BillingResponse:
+    id: str
+    code: str
+    description: str
+
+
+class SupportDocumentCreditNoteResponse(BillingResponse):
+    """
+    ReferenceID: Identifica la sección del Documento
+    Soporte original a la cual se aplica la corrección.
+    ResponseCode: Código de descripción de la corrección.
+    Description: Descripción de la naturaleza de la corrección.
+    """
 
 
 @dataclass
@@ -374,6 +447,7 @@ class BillingReference:
     ident: str
     uuid: str
     date: date
+
 
 class CreditNoteDocumentReference(BillingReference):
     """
@@ -390,12 +464,14 @@ class DebitNoteDocumentReference(BillingReference):
     date: fecha de emision de la factura relacionada
     """
 
+
 class InvoiceDocumentReference(BillingReference):
     """
     ident: Prefijo + Numero de la nota credito relacionada
     uuid: CUDE de la nota credito relacionada
     date: fecha de emision de la nota credito relacionada
     """
+
 
 @dataclass
 class AllowanceChargeReason:
@@ -409,22 +485,26 @@ class AllowanceChargeReason:
 
 @dataclass
 class AllowanceCharge:
-    #DIAN 1.7.-2020: FAQ03
+    # DIAN 1.7.-2020: FAQ03
     charge_indicator: bool = True
-    amount: Amount = Amount(0.0)
+    amount: Amount = field(default_factory=lambda: Amount(0.0))
     reason: AllowanceChargeReason = None
 
-    #Valor Base para calcular el descuento o el cargo
-    base_amount: typing.Optional[Amount] = Amount(0.0)
-    
+    # Valor Base para calcular el descuento o el cargo
+    base_amount: typing.Optional[Amount] = field(
+        default_factory=lambda: Amount(0.0))
+
     # Porcentaje: Porcentaje que aplicar.
-    multiplier_factor_numeric: Amount = Amount(1.0)
-    
+    multiplier_factor_numeric: Amount = field(
+        default_factory=lambda: Amount(1.0))
+
     def isCharge(self):
-        return self.charge_indicator == True
+        charge_indicator = self.charge_indicator is True
+        return charge_indicator
 
     def isDiscount(self):
-        return self.charge_indicator == False
+        charge_indicator = self.charge_indicator is False
+        return charge_indicator
 
     def asCharge(self):
         self.charge_indicator = True
@@ -438,10 +518,12 @@ class AllowanceCharge:
     def set_base_amount(self, amount):
         self.base_amount = amount
 
+
 class AllowanceChargeAsDiscount(AllowanceCharge):
     def __init__(self, amount: Amount = Amount(0.0)):
         self.charge_indicator = False
         self.amount = amount
+
 
 @dataclass
 class InvoiceLine:
@@ -455,8 +537,9 @@ class InvoiceLine:
     # la factura y el percent es unico por type_code
     # de subtotal
     tax: typing.Optional[TaxTotal]
-
-    allowance_charge: typing.List[AllowanceCharge] = dataclasses.field(default_factory=list)
+    withholding: typing.Optional[WithholdingTaxTotal]
+    allowance_charge: typing.List[AllowanceCharge] = dataclasses.field(
+        default_factory=list)
 
     def add_allowance_charge(self, charge):
         if not isinstance(charge, AllowanceCharge):
@@ -467,7 +550,7 @@ class InvoiceLine:
     @property
     def total_amount_without_charge(self):
         return (self.quantity * self.price.amount)
-    
+
     @property
     def total_amount(self):
         charge = AmountCollection(self.allowance_charge)\
@@ -499,8 +582,17 @@ class InvoiceLine:
     def taxable_amount(self):
         return self.tax.taxable_amount
 
+    @property
+    def withholding_amount(self):
+        return self.withholding.tax_amount
+
+    @property
+    def withholding_taxable_amount(self):
+        return self.withholding.taxable_amount
+
     def calculate(self):
         self.tax.calculate(self)
+        self.withholding.calculate(self)
 
     def __post_init__(self):
         if not isinstance(self.quantity, Quantity):
@@ -509,18 +601,22 @@ class InvoiceLine:
         if self.tax is None:
             self.tax = TaxTotalOmit()
 
+        if self.withholding is None:
+            self.withholding = WithholdingTaxTotalOmit()
+
+
 @dataclass
 class LegalMonetaryTotal:
-    line_extension_amount: Amount = Amount(0.0)
-    tax_exclusive_amount: Amount = Amount(0.0)
-    tax_inclusive_amount: Amount = Amount(0.0)
-    charge_total_amount: Amount = Amount(0.0)
-    allowance_total_amount: Amount = Amount(0.0)
-    payable_amount: Amount = Amount(0.0)
-    prepaid_amount: Amount = Amount(0.0)
+    line_extension_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    tax_exclusive_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    tax_inclusive_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    charge_total_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    allowance_total_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    payable_amount: Amount = field(default_factory=lambda: Amount(0.0))
+    prepaid_amount: Amount = field(default_factory=lambda: Amount(0.0))
 
     def calculate(self):
-        #DIAN 1.7.-2020: FAU14
+        # DIAN 1.7.-2020: FAU14
         self.payable_amount = \
             self.tax_inclusive_amount \
             + self.allowance_total_amount \
@@ -528,21 +624,28 @@ class LegalMonetaryTotal:
             - self.prepaid_amount
 
 
-
 class NationalSalesInvoiceDocumentType(str):
     def __str__(self):
         # 6.1.3
         return '01'
+
 
 class CreditNoteDocumentType(str):
     def __str__(self):
         # 6.1.3
         return '91'
 
+
 class DebitNoteDocumentType(str):
     def __str__(self):
         # 6.1.3
         return '92'
+
+
+class CreditNoteSupportDocumentType(str):
+    def __str__(self):
+        return '95'
+
 
 class Invoice:
     def __init__(self, type_code: str):
@@ -563,6 +666,7 @@ class Invoice:
         self.invoice_allowance_charge = []
         self.invoice_prepaid_payment = []
         self.invoice_billing_reference = None
+        self.invoice_discrepancy_response = None
         self.invoice_type_code = str(type_code)
         self.invoice_ident_prefix = None
 
@@ -588,7 +692,8 @@ class Invoice:
             if len(prefix) <= 4:
                 self.invoice_ident_prefix = prefix
             else:
-                raise ValueError('ident prefix failed to get, expected 0  to 4 chars')
+                raise ValueError(
+                    'ident prefix failed to get, expected 0  to 4 chars')
 
     def set_ident(self, ident: str):
         """
@@ -619,7 +724,7 @@ class Invoice:
 
     def _get_codelist_tipo_operacion(self):
         return codelist.TipoOperacionF
-    
+
     def set_operation_type(self, operation):
         if operation not in self._get_codelist_tipo_operacion():
             raise ValueError("operation not found")
@@ -638,6 +743,9 @@ class Invoice:
     def set_billing_reference(self, billing_reference: BillingReference):
         self.invoice_billing_reference = billing_reference
 
+    def set_discrepancy_response(self, billing_response: BillingResponse):
+        self.invoice_discrepancy_response = billing_response
+
     def accept(self, visitor):
         visitor.visit_payment_mean(self.invoice_payment_mean)
         visitor.visit_customer(self.invoice_customer)
@@ -649,29 +757,34 @@ class Invoice:
 
     def _calculate_legal_monetary_total(self):
         for invline in self.invoice_lines:
-            self.invoice_legal_monetary_total.line_extension_amount += invline.total_amount
-            self.invoice_legal_monetary_total.tax_exclusive_amount += invline.total_tax_exclusive_amount
-            #DIAN 1.7.-2020: FAU6
-            self.invoice_legal_monetary_total.tax_inclusive_amount += invline.total_tax_inclusive_amount
+            self.invoice_legal_monetary_total.line_extension_amount +=\
+                invline.total_amount
+            self.invoice_legal_monetary_total.tax_exclusive_amount +=\
+                invline.total_tax_exclusive_amount
+            # DIAN 1.7.-2020: FAU6
+            self.invoice_legal_monetary_total.tax_inclusive_amount +=\
+                invline.total_tax_inclusive_amount
 
-        #DIAN 1.7.-2020: FAU08
-        self.invoice_legal_monetary_total.allowance_total_amount = AmountCollection(self.invoice_allowance_charge)\
+        # DIAN 1.7.-2020: FAU08
+        self.invoice_legal_monetary_total.allowance_total_amount =\
+            AmountCollection(self.invoice_allowance_charge)\
             .filter(lambda charge: charge.isDiscount())\
             .map(lambda charge: charge.amount)\
             .sum()
 
-        #DIAN 1.7.-2020: FAU10
-        self.invoice_legal_monetary_total.charge_total_amount = AmountCollection(self.invoice_allowance_charge)\
+        # DIAN 1.7.-2020: FAU10
+        self.invoice_legal_monetary_total.charge_total_amount =\
+            AmountCollection(self.invoice_allowance_charge)\
             .filter(lambda charge: charge.isCharge())\
             .map(lambda charge: charge.amount)\
             .sum()
 
-        #DIAN 1.7.-2020: FAU12
-        self.invoice_legal_monetary_total.prepaid_amount = AmountCollection(self.invoice_prepaid_payment)\
-            .map(lambda paid: paid.paid_amount)\
-            .sum()
+        # DIAN 1.7.-2020: FAU12
+        self.invoice_legal_monetary_total.prepaid_amount = AmountCollection(
+            self.invoice_prepaid_payment).map(
+                lambda paid: paid.paid_amount).sum()
 
-        #DIAN 1.7.-2020: FAU14
+        # DIAN 1.7.-2020: FAU14
         self.invoice_legal_monetary_total.calculate()
 
     def _refresh_charges_base_amount(self):
@@ -679,17 +792,20 @@ class Invoice:
             for invline in self.invoice_lines:
                 if invline.allowance_charge:
                     # TODO actualmente solo uno de los cargos es permitido
-                    raise ValueError('allowance charge in invoice exclude invoice line')
-            
+                    raise ValueError(
+                        'allowance charge in invoice exclude invoice line')
+
         # cargos a nivel de factura
         for charge in self.invoice_allowance_charge:
-            charge.set_base_amount(self.invoice_legal_monetary_total.line_extension_amount)
-        
+            charge.set_base_amount(
+                self.invoice_legal_monetary_total.line_extension_amount)
+
     def calculate(self):
         for invline in self.invoice_lines:
             invline.calculate()
         self._calculate_legal_monetary_total()
         self._refresh_charges_base_amount()
+
 
 class NationalSalesInvoice(Invoice):
     def __init__(self):
@@ -706,7 +822,7 @@ class CreditNote(Invoice):
 
     def _get_codelist_tipo_operacion(self):
         return codelist.TipoOperacionNC
-    
+
     def _check_ident_prefix(self, prefix):
         if len(prefix) != 6:
             raise ValueError('prefix must be 6 length')
@@ -735,3 +851,30 @@ class DebitNote(Invoice):
         if not self.invoice_ident_prefix:
             self.invoice_ident_prefix = self.invoice_ident[0:6]
 
+
+class SupportDocument(Invoice):
+    pass
+
+
+class SupportDocumentCreditNote(SupportDocument):
+    def __init__(
+            self, invoice_document_reference: BillingReference,
+            invoice_discrepancy_response: BillingResponse):
+        super().__init__(CreditNoteSupportDocumentType())
+
+        if not isinstance(invoice_document_reference, BillingReference):
+            raise TypeError('invoice_document_reference invalid type')
+        self.invoice_billing_reference = invoice_document_reference
+        self.invoice_discrepancy_response = invoice_discrepancy_response
+
+    def _get_codelist_tipo_operacion(self):
+        return codelist.TipoOperacionNCDS
+
+    def _check_ident_prefix(self, prefix):
+        if len(prefix) != 6:
+            raise ValueError('prefix must be 6 length')
+
+    def _set_ident_prefix_automatic(self):
+        if not self.invoice_ident_prefix:
+            self.invoice_ident_prefix = self.invoice_ident[0:6]
+    pass

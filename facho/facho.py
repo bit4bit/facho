@@ -1,12 +1,11 @@
 # This file is part of facho.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
-
 from lxml import etree
-from lxml.etree import Element, SubElement, tostring
+from lxml.etree import Element, tostring
 import re
 from collections import defaultdict
 from copy import deepcopy
-from pprint import pprint
+
 
 class FachoValueInvalid(Exception):
     def __init__(self, xpath):
@@ -32,7 +31,10 @@ class LXMLBuilder:
 
     def __init__(self, nsmap):
         self.nsmap = nsmap
-        self._re_node_expr = re.compile(r'^(?P<path>((?P<ns>\w+):)?(?P<tag>[a-zA-Z0-9_-]+))(?P<attrs>\[.+\])?')
+        self._re_node_expr = \
+            re.compile(
+                r'^(?P<path>((?P<ns>\w+):)?(?P<tag>[a-zA-Z0-9_-]+))'
+                r'(?P<attrs>\[.+\])?')
         self._re_attrs = re.compile(r'(\w+)\s*=\s*\"?(\w+)\"?')
 
     def match_expression(self, node_expr):
@@ -121,7 +123,7 @@ class LXMLBuilder:
         elem.attrib[key] = value
 
     @classmethod
-    def remove_attributes(cls, elem, keys, exclude = []):
+    def remove_attributes(cls, elem, keys, exclude=[]):
         for key in keys:
             if key in exclude:
                 continue
@@ -143,7 +145,8 @@ class LXMLBuilder:
             self.remove_attributes(el, keys, exclude=['facho_optional'])
 
             is_optional = el.get('facho_optional', 'False') == 'True'
-            if is_optional and el.getchildren() == [] and el.keys() == ['facho_optional']:
+            if is_optional and el.getchildren() == [] and el.keys() == [
+                    'facho_optional']:
                 el.getparent().remove(el)
 
         return tostring(elem, **attrs).decode('utf-8')
@@ -153,14 +156,15 @@ class FachoXML:
     """
     Decora XML con funciones de consulta XPATH de un solo elemento
     """
-    def __init__(self, root, builder=None, nsmap=None, fragment_prefix='',fragment_root_element=None):
+    def __init__(self, root, builder=None, nsmap=None, fragment_prefix='',
+                 fragment_root_element=None):
         if builder is None:
             self.builder = LXMLBuilder(nsmap)
         else:
             self.builder = builder
 
         self.nsmap = nsmap
-        
+
         if isinstance(root, str):
             self.root = self.builder.build_element_from_string(root, nsmap)
         else:
@@ -180,14 +184,19 @@ class FachoXML:
     def root_namespace(self):
         return etree.QName(self.root).namespace
 
+    def root_localname(self):
+        return etree.QName(self.root).localname
+
     def append_element(self, elem, new_elem):
+        # elem = self.find_or_create_element(xpath, append=append)
+        # self.builder.append(elem, new_elem)
         self.builder.append(elem, new_elem)
 
     def add_extension(self, extension):
         extension.build(self)
 
-
-    def fragment(self, xpath, append=False, append_not_exists=False):
+    def fragment(
+            self, xpath, append=False, append_not_exists=False):
         nodes = xpath.split('/')
         nodes.pop()
         root_prefix = '/'.join(nodes)
@@ -197,7 +206,9 @@ class FachoXML:
 
         if parent is None:
             parent = self.find_or_create_element(xpath, append=append)
-        return FachoXML(parent, nsmap=self.nsmap, fragment_prefix=root_prefix, fragment_root_element=self.root)
+        return FachoXML(
+            parent, nsmap=self.nsmap, fragment_prefix=root_prefix,
+            fragment_root_element=self.root)
 
     def register_alias_xpath(self, alias, xpath):
         self.xpath_for[alias] = xpath
@@ -233,7 +244,8 @@ class FachoXML:
         """
         xpath = self._path_xpath_for(xpath)
         node_paths = xpath.split('/')
-        node_paths.pop(0) #remove empty /
+        # remove empty /
+        node_paths.pop(0)
         root_tag = node_paths.pop(0)
 
         root_node = self.builder.build_from_expression(root_tag)
@@ -241,10 +253,10 @@ class FachoXML:
             # restaurar ya que no es la raiz y asignar actual como raiz
             node_paths.insert(0, root_tag)
             root_node = self.root
-            
+
         if not self.builder.same_tag(root_node.tag, self.root.tag):
-            
-            raise ValueError('xpath %s must be absolute to /%s' % (xpath, self.root.tag))
+            raise ValueError('xpath %s must be absolute to /%s' % (
+                xpath, self.root.tag))
 
         # crea jerarquia segun xpath indicado
         parent = None
@@ -254,8 +266,8 @@ class FachoXML:
         for node_path in node_paths:
             node_expr = self.builder.match_expression(node_path)
             node = self.builder.build_from_expression(node_path)
-
-            child = self.builder.find_relative(current_elem, node_expr['path'], self.nsmap)
+            child = self.builder.find_relative(
+                current_elem, node_expr['path'], self.nsmap)
 
             parent = current_elem
             if child is not None:
@@ -266,11 +278,12 @@ class FachoXML:
 
         node_expr = self.builder.match_expression(node_tag)
         node = self.builder.build_from_expression(node_tag)
-        child = self.builder.find_relative(current_elem, node_expr['path'], self.nsmap)
+        child = self.builder.find_relative(
+            current_elem, node_expr['path'], self.nsmap)
         parent = current_elem
         if child is not None:
             current_elem = child
-           
+
         if parent == current_elem:
             self.builder.append(parent, node)
             return node
@@ -287,9 +300,10 @@ class FachoXML:
                 self.builder.append(parent, node)
                 return node
 
-            if self.builder.is_attribute(last_slibing, 'facho_placeholder', 'True'):
+            if self.builder.is_attribute(
+                    last_slibing, 'facho_placeholder', 'True'):
                 self._remove_facho_attributes(last_slibing)
-                return last_slibing 
+                return last_slibing
             self.builder.append_next(last_slibing, node)
             return node
 
@@ -300,7 +314,8 @@ class FachoXML:
         self._remove_facho_attributes(current_elem)
         return current_elem
 
-    def set_element_validator(self, xpath, validator = False):
+    def set_element_validator(
+            self, xpath, validator=False):
         """
         validador al asignar contenido a xpath indicado
 
@@ -313,8 +328,9 @@ class FachoXML:
             self._validators[key] = lambda v, attrs: True
         else:
             self._validators[key] = validator
-        
-    def set_element(self, xpath, content, **attrs):
+
+    def set_element(
+            self, xpath, content, **attrs):
         """
         asigna contenido ubicado por ruta tipo XPATH.
         @param xpath ruta tipo XPATH
@@ -356,7 +372,8 @@ class FachoXML:
                 self.builder.set_attribute(elem, k, str(v))
         return self
 
-    def get_element_attribute(self, xpath, attribute, multiple=False):
+    def get_element_attribute(
+            self, xpath, attribute, multiple=False):
         elem = self.get_element(xpath, multiple=multiple)
 
         if elem is None:
@@ -393,14 +410,16 @@ class FachoXML:
                 return None
             return format_(text)
 
-    def get_element_text_or_attribute(self, xpath, default=None, multiple=False, raise_on_fail=False):
+    def get_element_text_or_attribute(
+            self, xpath, default=None, multiple=False, raise_on_fail=False):
         parts = xpath.split('/')
-        is_attribute =  parts[-1].startswith('@')
+        is_attribute = parts[-1].startswith('@')
         if is_attribute:
             attribute_name = parts.pop(-1).lstrip('@')
             element_path = "/".join(parts)
             try:
-                val = self.get_element_attribute(element_path, attribute_name, multiple=multiple)
+                val = self.get_element_attribute(
+                    element_path, attribute_name, multiple=multiple)
                 if val is None:
                     return default
                 return val
@@ -433,7 +452,8 @@ class FachoXML:
             if isinstance(xpath, tuple):
                 val = xpath[0]
             else:
-                val = self.get_element_text_or_attribute(xpath, raise_on_fail=raise_on_fail)
+                val = self.get_element_text_or_attribute(
+                    xpath, raise_on_fail=raise_on_fail)
             vals.append(val)
         return vals
 
@@ -455,7 +475,8 @@ class FachoXML:
         return True
 
     def _remove_facho_attributes(self, elem):
-        self.builder.remove_attributes(elem, ['facho_optional', 'facho_placeholder'])
+        self.builder.remove_attributes(
+            elem, ['facho_optional', 'facho_placeholder'])
 
     def tostring(self, **kw):
         return self.builder.tostring(self.root, **kw)
@@ -467,15 +488,17 @@ class FachoXML:
         root = self.root
         if self.fragment_root_element is not None:
             root = self.fragment_root_element
-            
+
         if isinstance(self.nsmap, dict):
             nsmap = dict(map(reversed, self.nsmap.items()))
             ns = nsmap[etree.QName(root).namespace] + ':'
 
         if self.fragment_root_element is not None:
-            new_xpath = '/' + ns + etree.QName(root).localname + '/' + etree.QName(self.root).localname + '/' + xpath.lstrip('/')
+            new_xpath = '/' + ns + etree.QName(root).localname + '/' + \
+                etree.QName(self.root).localname + '/' + xpath.lstrip('/')
         else:
-            new_xpath = '/' + ns + etree.QName(root).localname + '/' + xpath.lstrip('/')
+            new_xpath = '/' + ns + etree.QName(root).localname + '/' + \
+                xpath.lstrip('/')
         return new_xpath
 
     def __str__(self):

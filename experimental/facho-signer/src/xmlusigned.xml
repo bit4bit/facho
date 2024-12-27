@@ -76,7 +76,7 @@
       <cac:PartyTaxScheme>
         <cbc:RegistrationName>NEUROTEC TECNOLOGIA S.A.S</cbc:RegistrationName>
         <cbc:CompanyID schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeAgencyID="195" schemeID="5" schemeName="31">900579212</cbc:CompanyID>
-        <cbc:TaxLevelCode listName="48">O-07;O-09;O-14;O-48</cbc:TaxLevelCode>
+        <cbc:TaxLevelCode listName="48">ZZ;O-09;O-14;O-48</cbc:TaxLevelCode>
         <cac:TaxScheme/>
       </cac:PartyTaxScheme>
       <cac:Contact>

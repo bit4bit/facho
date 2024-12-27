@@ -5,6 +5,7 @@ from .fe import DianXMLExtensionSigner
 from .fe import DianXMLExtensionSoftwareSecurityCode
 from .fe import DianXMLExtensionCUFE
 from .fe import DianXMLExtensionCUDE
+from .fe import DianXMLExtensionCUDS
 from .fe import DianXMLExtensionInvoiceAuthorization
 from .fe import DianXMLExtensionSoftwareProvider
 from .fe import DianXMLExtensionAuthorizationProvider

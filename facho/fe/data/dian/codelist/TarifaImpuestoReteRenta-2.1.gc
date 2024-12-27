@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIAN Genericode listas de validacion :: Ultima modificación 18-02-2019 - evb-->
+<gc:CodeList xmlns:gc="http://docs.oasis-open.org/codelist/ns/genericode/1.0/">
+   <Identification>
+      <ShortName>TarifaImpuestoReteFuente</ShortName>
+      <LongName xml:lang="es">Tarifas por Impuesto</LongName>
+      <Version>1</Version>
+      <CanonicalUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TarifaImpuestos</CanonicalUri>
+      <CanonicalVersionUri>urn:dian:names:especificacion:ubl:listacodigos:gc:TarifaImpuestos-2.1</CanonicalVersionUri>
+      <LocationUri>http://dian.gov.co/ubl/os-ubl-2.0/cl/gc/default/TarifaImpuestos-2.1.gc</LocationUri>
+      <Agency>
+         <LongName xml:lang="es">DIAN (Dirección de Impuestos y Aduanas Nacionales)</LongName>
+         <Identifier>195</Identifier>
+      </Agency>
+   </Identification>
+   <ColumnSet>
+      <Column Id="code" Use="required">
+         <ShortName>Code</ShortName>
+         <LongName xml:lang="es">Codigo Comun</LongName>
+         <Data Type="normalizedString"/>
+      </Column>
+      <Column Id="name" Use="required">
+         <ShortName>Name</ShortName>
+         <LongName xml:lang="es">Nombre</LongName>
+         <Data Type="string"/>
+      </Column>
+      <Column Id="description" Use="required">
+         <ShortName>Description</ShortName>
+         <LongName xml:lang="es">Descripcion</LongName>
+         <Data Type="string"/>
+      </Column>
+      <Key Id="codeKey">
+         <ShortName>CodeKey</ShortName>
+         <ColumnRef Ref="code"/>
+      </Key>
+   </ColumnSet>
+   <SimpleCodeList>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras generales (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras generales (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras con tarjeta débito o crédito</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de bienes o productos agrícolas o pecuarios sin procesamiento industrial</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial declarantes (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>0.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de café pergamino o cereza</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>0.10</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de combustibles derivados del petróleo</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Enajenación de activos fijos de personas naturales (notarías y tránsito son agentes retenedores)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de vehículos</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras de bienes raíces cuya destinación y uso sea vivienda de habitación (por las primeras 20.000 UVT, es decir hasta $637.780.000)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras  de bienes raíces cuya destinación y uso sea vivienda de habitación (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Compras  de bienes raíces cuya destinación y uso sea distinto a vivienda de habitación</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>4.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios generales (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>6.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios generales (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>4.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Por emolumentos eclesiásticos (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Por emolumentos eclesiásticos (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de transporte de carga</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de  transporte nacional de pasajeros por vía terrestre (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de  transporte nacional de pasajeros por vía terrestre (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de  transporte nacional de pasajeros por vía aérea o marítima</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>1.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios prestados por empresas de servicios temporales (sobre AIU)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios integrales de salud prestados por IPS</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de hoteles y restaurantes (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de hoteles y restaurantes (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>4.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Arrendamiento de bienes muebles</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Arrendamiento de bienes inmuebles (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Arrendamiento de bienes inmuebles (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Otros ingresos tributarios (declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Otros ingresos tributarios (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>11.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Honorarios y comisiones (personas jurídicas)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>11.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos o abonos en cuenta superen las 3.300 UVT ($105.135.000)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>10.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Honorarios y comisiones (no declarantes)</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.50</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Servicios de licenciamiento o derecho de uso de software</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>7.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Intereses o rendimientos financieros</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>4.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Rendimientos financieros provenientes de títulos de renta fija</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>20.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Loterías, rifas, apuestas y similares</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>3.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Retención en colocación independiente de juegos de suerte y azar</SimpleValue>
+         </Value>
+      </Row>
+      <Row>
+         <Value ColumnRef="code">
+            <SimpleValue>2.00</SimpleValue>
+         </Value>
+         <Value ColumnRef="name">
+            <SimpleValue>ReteFuente</SimpleValue>
+         </Value>
+         <Value ColumnRef="description">
+            <SimpleValue>Contratos de construcción  y urbanización</SimpleValue>
+         </Value>
+      </Row>
+   </SimpleCodeList>
+</gc:CodeList>
