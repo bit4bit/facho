@@ -2,6 +2,8 @@
 facho
 =====
 
+Moved to https://codeberg.org/bit4bit/facho
+
 Libreria para facturacion electronica colombia.
 
 - facho/facho.py: abstracion para manipulacion del XML
