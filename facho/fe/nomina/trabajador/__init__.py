@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..amount import Amount
 
@@ -29,7 +29,7 @@ class Trabajador:
 
     codigo_trabajador: str = None
     otros_nombres: str = None
-    sub_tipo: SubTipoTrabajador = SubTipoTrabajador(code='00')
+    sub_tipo: SubTipoTrabajador = field(default_factory=lambda: SubTipoTrabajador(code='00'))
 
     def apply(self, fragment):
         fragment.set_attributes('./Trabajador',

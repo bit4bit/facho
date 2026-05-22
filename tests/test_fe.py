@@ -5,15 +5,15 @@
 from datetime import datetime
 
 import pytest
-from facho import fe
 
+from facho import fe
 
 import helpers
 
 
 def test_xmlsigned_build(monkeypatch):
-    #openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem
-    #openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
+    # openssl req -x509 -sha256 -nodes -subj "/CN=test" -days 1 -newkey rsa:2048 -keyout example.key -out example.pem
+    # openssl pkcs12 -export -out example.p12 -inkey example.key -in example.pem
     signer = fe.DianXMLExtensionSigner('./tests/example.p12')
 
     xml = fe.FeXML('Invoice',
@@ -116,3 +116,20 @@ def test_xml_sign_dian_using_bytes(monkeypatch):
 
     xmlsigned = signer.sign_xml_string(xmlstring)
     assert "Signature" in xmlsigned
+
+def test_xml_signature_timestamp(monkeypatch):
+    xml = fe.FeXML(
+        'Invoice',
+        'http://www.dian.gov.co/contratos/facturaelectronica/v1')
+    xml.find_or_create_element(
+        '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent')
+    ublextension = xml.fragment(
+        '/fe:Invoice/ext:UBLExtensions/ext:UBLExtension', append=True)
+    ublextension.find_or_create_element(
+        '/ext:UBLExtension/ext:ExtensionContent')
+    xmlstring = xml.tostring()
+    signer = fe.DianXMLExtensionSigner('./tests/example.p12')
+    xmlsigned = signer.sign_xml_string(xmlstring)
+
+    with open('invoice.xml', 'w') as file_:
+        file_.write(xmlsigned)
